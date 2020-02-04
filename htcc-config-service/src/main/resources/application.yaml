@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active: ${env:local}
+
+security:
+  basic:
+    enabled: true
+
+eureka:
+  instance:
+    appname: ${spring.application.name}
