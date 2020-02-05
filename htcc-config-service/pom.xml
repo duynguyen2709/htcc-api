@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>vn.edu.hcmus</groupId>
-    <artifactId>htcc-config-service</artifactId>
+    <artifactId>htcc-gateway-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>htcc-config-service</name>
-    <description>Eureka Service Discovery and Central Configuration</description>
+    <name>htcc-gateway-service</name>
+    <description>Eureka Service Discovery and Gateway</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -32,17 +32,19 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-                        <exclusions>
-                            <exclusion>
-                                <groupId>org.springframework.boot</groupId>
-                                <artifactId>spring-boot-starter-logging</artifactId>
-                            </exclusion>
-                        </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
         </dependency>
     </dependencies>
 

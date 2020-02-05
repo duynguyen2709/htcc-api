@@ -1,18 +1,15 @@
+server:
+  port: 8200
+
 security:
   user:
     name: admin
     password: admin
 
-server:
-  port: 8761
-
-# edit defaultZone to eureka2:8762
-# to run 2 instances on local
 eureka:
   client:
     serviceUrl:
       defaultZone: http://${security.user.name}:${security.user.password}@eureka1:8761/eureka
   instance:
     hostname: eureka1
-  numberRegistrySyncRetries: 0
 

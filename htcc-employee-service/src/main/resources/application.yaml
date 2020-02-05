@@ -1,12 +1,8 @@
 spring:
   application:
-    name: htcc-gateway-service
+    name: htcc-employee-service
   profiles:
     active: ${env:local}
-
-security:
-  basic:
-    enabled: true
 
 eureka:
   client:
