@@ -3,6 +3,8 @@ spring:
     name: htcc-employee-service
   profiles:
     active: ${env:local}
+  zipkin:
+    enabled: false
 
 eureka:
   client:

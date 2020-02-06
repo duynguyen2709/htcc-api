@@ -3,6 +3,8 @@ spring:
     name: htcc-gateway-service
   profiles:
     active: ${env:local}
+  zipkin:
+    enabled: false
 
 security:
   basic:
@@ -17,3 +19,10 @@ eureka:
 
 logging:
   config: classpath:log4j2.properties
+
+zuul:
+  ignored-services: '*'
+  routes:
+    htcc-employee-service:
+      path: /employee/**
+      service-id: htcc-employee-service
