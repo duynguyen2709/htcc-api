@@ -15,7 +15,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${security.user.name}")
     private String username;
 
-    @Value("${security.user.name}")
+    @Value("${security.user.password}")
     private String password;
 
     @Override
