@@ -17,7 +17,7 @@ pipelines:
            - mvn -B package
     - step:
         script:
-           - mkd~/.ssh/my_other_ssh_key ir -p ~/.ssh
+           - mkdir -p ~/.ssh
            - cd ssh/
            - cat my_known_hosts >> ~/.ssh/known_hosts
            - (umask  077 ; echo $KEY_DEV_1 | base64 --decode > ~/.ssh/id_rsa)
