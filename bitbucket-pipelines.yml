@@ -1,0 +1,25 @@
+image: maven:3-jdk-8
+
+pipelines:
+  default:
+    - parallel:
+      - step:
+         caches:
+           - maven
+         script: 
+           - cd htcc-gateway-service/
+           - mvn -B package
+      - step:
+         caches:
+           - maven
+         script: 
+           - cd htcc-employee-service/
+           - mvn -B package
+    - step:
+        script:
+           - pwd 
+           - mkdir -p ~/.ssh
+           - cd ssh/
+           - cat my_known_hosts >> ~/.ssh/known_hosts
+           - (umask  077 ; echo $KEY_DEV_1 | base64 --decode > ~/.ssh/id_rsa)
+           - ssh -i ~/.ssh/key_dev_1 root@167.179.80.90 'echo "connected to `host` as $USER"'
