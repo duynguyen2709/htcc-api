@@ -17,6 +17,7 @@ pipelines:
            - mvn -B package
     - step:
         script:
+           - pwd 
            - mkdir -p ~/.ssh
            - cd ssh/
            - cat my_known_hosts >> ~/.ssh/known_hosts
