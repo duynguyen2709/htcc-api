@@ -2,8 +2,10 @@ spring:
   application:
     name: htcc-gateway-service
   profiles:
-    active: ${env:production}
+    active: ${env:local}
   zipkin:
+    enabled: false
+  jmx:
     enabled: false
 
 security:
@@ -26,3 +28,7 @@ zuul:
     htcc-employee-service:
       path: /employee/**
       service-id: htcc-employee-service
+
+management:
+  endpoints:
+    enabled-by-default: false

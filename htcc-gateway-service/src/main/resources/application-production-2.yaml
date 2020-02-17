@@ -6,10 +6,8 @@ security:
 server:
   port: 8761
 
-# edit defaultZone to eureka2:8762
-# to run 2 instances on local
 eureka:
-  replica: 127.0.0.1
+  replica: 10.25.96.3
   client:
     serviceUrl:
       defaultZone: http://${security.user.name}:${security.user.password}@${eureka.replica}:8761/eureka

@@ -1,0 +1,13 @@
+security:
+  user:
+    name: htcc
+    password: 6h5K8dapxfFdVKAS
+
+server:
+  port: 8761
+
+eureka:
+  replica: 10.25.96.4
+  client:
+    serviceUrl:
+      defaultZone: http://${security.user.name}:${security.user.password}@${eureka.replica}:8761/eureka
