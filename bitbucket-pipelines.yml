@@ -39,7 +39,7 @@ pipelines:
       - step:
          script:
           - cd htcc-gateway-service/
-          - mvn -B packgage
+          - mvn -B package
           - docker build -t duyna5/htcc-gateway-service .
           - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
           - docker push duyna5/htcc-gateway-service:latest
