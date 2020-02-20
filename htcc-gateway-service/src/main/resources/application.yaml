@@ -24,6 +24,7 @@ logging:
 
 zuul:
   ignored-services: '*'
+  prefix: /api
   routes:
     htcc-employee-service:
       path: /employee/**

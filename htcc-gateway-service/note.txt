@@ -1,2 +1,8 @@
 # docker run command:
 docker run -p 8761:8761 -d --name htcc-gateway-service -e "TZ=Asia/Ho_Chi_Minh" -e "JAVA_OPTS=-Xmx128m -Dspring.profiles.active=production-1" duyna5/htcc-gateway-service
+
+#Changelog
+20-02-2020 :
+ + Ver 1.0.0:
+    - Employee: enable hazelcast with config
+    - Add Swagger for Gateway & Employee
