@@ -10,6 +10,7 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.UiConfiguration;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,8 +28,8 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage("htcc.employee.service.controller"))
                 .paths(PathSelectors.any())
                 .build()
-                .apiInfo(new ApiInfo("HTCC Api Documentation",
-                        "Documentation automatically generated from Swagger",
+                .apiInfo(new ApiInfo("Employee Api Documentation",
+                        "",
                         model.getParent().getVersion(),
                         null,
                         "1612145",
@@ -36,4 +37,8 @@ public class SwaggerConfig {
                         null));
     }
 
+    @Bean UiConfiguration uiConfig() {
+        return new UiConfiguration("validatorUrl", "list", "alpha", "schema",
+                UiConfiguration.Constants.DEFAULT_SUBMIT_METHODS, false, true, 60000L);
+    }
 }
