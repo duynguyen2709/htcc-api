@@ -4,5 +4,5 @@ docker run -p 8761:8761 -d --name htcc-gateway-service -e "TZ=Asia/Ho_Chi_Minh" 
 #Changelog
 20-02-2020 :
  + Ver 1.0.0:
-    - Employee: enable hazelcast with config
+    - Employee : enable hazelcast with config
     - Add Swagger for Gateway & Employee
