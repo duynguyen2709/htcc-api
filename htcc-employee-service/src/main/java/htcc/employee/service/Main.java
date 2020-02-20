@@ -1,4 +1,4 @@
-package vn.edu.hcmus.htccemployeeservice;
+package htcc.employee.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package vn.edu.hcmus.htccemployeeservice.config;
+package htcc.employee.service.config;
 
 import brave.sampler.Sampler;
 import org.springframework.context.annotation.Bean;

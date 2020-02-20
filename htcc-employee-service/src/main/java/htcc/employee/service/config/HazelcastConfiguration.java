@@ -1,12 +1,17 @@
-package vn.edu.hcmus.htccemployeeservice.config;
+package htcc.employee.service.config;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.eureka.one.EurekaOneDiscoveryStrategyFactory;
 import com.netflix.discovery.EurekaClient;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(
+        value="service.hazelcast.useHazelcast",
+        havingValue = "true",
+        matchIfMissing = false)
 public class HazelcastConfiguration {
 
     @Bean

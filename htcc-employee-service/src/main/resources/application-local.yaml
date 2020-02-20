@@ -12,3 +12,7 @@ eureka:
       defaultZone: http://${security.user.name}:${security.user.password}@eureka1:8761/eureka
   instance:
     hostname: eureka1
+
+service:
+  hazelcast:
+    useHazelcast: false
