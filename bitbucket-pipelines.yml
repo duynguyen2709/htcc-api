@@ -19,21 +19,6 @@ pipelines:
            - mvn -B package
          artifacts: 
            - target/*
-    - parallel:
-      - step:
-         script: 
-           - mkdir -p ~/.ssh
-           - cd ssh/
-           - cat my_known_hosts >> ~/.ssh/known_hosts
-           - (umask  077 ; echo $KEY_DEV_1 | base64 --decode > ~/.ssh/id_rsa)
-           - ssh root@167.179.80.90 'echo "connected to 167.179.80.90 as $USER"'
-      - step:
-         script: 
-           - mkdir -p ~/.ssh
-           - cd ssh/
-           - cat my_known_hosts >> ~/.ssh/known_hosts
-           - (umask  077 ; echo $KEY_DEV_1 | base64 --decode > ~/.ssh/id_rsa)
-           - ssh root@108.61.162.225 'echo "connected to 108.61.162.225 as $USER"'
   custom:
     deploy-gateway-to-dev-1:
       - step:
@@ -50,7 +35,7 @@ pipelines:
           - cat my_known_hosts >> ~/.ssh/known_hosts
           - (umask  077 ; echo $KEY_DEV_1 | base64 --decode > ~/.ssh/id_rsa)
           - scp -P 22 -r ../htcc-gateway-service/src/main/resources/ root@167.179.80.90:/home/htcc-api/htcc-gateway-service 
-          - ssh root@167.179.80.90 'echo "connected to 167.179.80.90 as $USER"'
+          - ssh root@167.179.80.90 './home/htcc-api/htcc-gateway-service/gateway.sh'
             
 options:
   docker: true
