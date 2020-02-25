@@ -8,10 +8,6 @@ spring:
   jmx:
     enabled: false
 
-security:
-  basic:
-    enabled: true
-
 eureka:
   client:
     register-with-eureka: true
