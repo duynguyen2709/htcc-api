@@ -7,9 +7,8 @@ server:
   port: 8761
 
 eureka:
-  replica: 10.25.96.4
   client:
     serviceUrl:
-      defaultZone: http://${security.user.name}:${security.user.password}@${eureka.replica}:8761/eureka
+      defaultZone: http://${security.user.name}:${security.user.password}@eureka2:8761/eureka
   instance:
-    preferIpAddress: true
+    hostname: eureka1

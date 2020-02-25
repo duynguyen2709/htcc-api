@@ -6,8 +6,6 @@ security:
 server:
   port: 8761
 
-# edit defaultZone to eureka2:8762
-# to run 2 instances on local
 eureka:
   client:
     serviceUrl:
