@@ -12,18 +12,20 @@ import java.io.Serializable;
 @Log4j2
 @NoArgsConstructor
 public class RequestLogEntity implements Serializable {
-    public String       method  = "";
-    public String       path    = "";
-    public String       request = "";
-    public String       body    = "";
-    public BaseResponse response;
-    public long         requestTime = 0L;
-    public long         responseTime = 0L;
+    public String method       = "";
+    public String path         = "";
+    public String request      = "";
+    public String body         = "";
+    public long   requestTime  = 0L;
+    public long   responseTime = 0L;
+
+    public BaseResponse<Object> response;
 
     public void setResponse(String res) {
         try {
             response = StringUtil.fromJsonString(res, BaseResponse.class);
-        } catch (Exception e){
+        }
+        catch (Exception e) {
             response = new BaseResponse(ReturnCodeEnum.SUCCESS);
             response.data = res;
         }

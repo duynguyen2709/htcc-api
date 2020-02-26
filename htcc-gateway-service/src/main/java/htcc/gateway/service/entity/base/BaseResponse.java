@@ -2,19 +2,32 @@ package htcc.gateway.service.entity.base;
 
 import htcc.gateway.service.constant.ReturnCodeEnum;
 import htcc.gateway.service.util.StringUtil;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class BaseResponse {
+@ApiModel(description = "Response cho tất cả API")
+public class BaseResponse<T> implements Serializable {
 
-    public int    returnCode;
+    @ApiModelProperty(notes = "Kết quả gọi api (1 = thành công)",
+                      example = "1")
+    public int returnCode;
+
+    @ApiModelProperty(notes = "Câu mô tả lỗi xảy ra",
+                      example = "SUCCESS")
     public String returnMessage;
-    public Object data;
+
+    @ApiModelProperty(notes = "Dữ liệu trả về",
+                      example = "{\"token\":\"adasdasd\"}")
+    public T data;
 
     public static final BaseResponse SUCCESS   = new BaseResponse(ReturnCodeEnum.SUCCESS);
     public static final BaseResponse EXCEPTION = new BaseResponse(ReturnCodeEnum.EXCEPTION);
@@ -22,13 +35,11 @@ public class BaseResponse {
     public BaseResponse(ReturnCodeEnum e) {
         this.returnCode = e.getValue();
         this.returnMessage = e.toString();
-        this.data = "";
     }
 
     public BaseResponse(Exception e){
         this.returnCode = 0;
         this.returnMessage = "EXCEPTION";
-        this.data = e.getMessage();
     }
 
 }
