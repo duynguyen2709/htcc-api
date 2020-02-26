@@ -9,7 +9,10 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://${security.user.name}:${security.user.password}@eureka2:8762/eureka
+      defaultZone: http://${security.user.name}:${security.user.password}@eureka1:8761/eureka
   instance:
     hostname: eureka1
   numberRegistrySyncRetries: 0
+
+service:
+  debugMode: true

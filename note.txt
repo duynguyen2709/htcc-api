@@ -11,3 +11,7 @@
 25-02-2020 :
  + Ver 1.0.2:
     - Gateway : add BaseResponse, edit config file for replica on production
+
+26-02-2020 :
+ + Ver 1.0.3:
+    - Gateway : add logging request/response

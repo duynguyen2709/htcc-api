@@ -9,6 +9,8 @@ spring:
     enabled: false
 
 eureka:
+  dashboard:
+    path: /dashboard
   client:
     register-with-eureka: true
     fetch-registry: true
@@ -22,6 +24,9 @@ zuul:
   ignored-services: '*'
   prefix: /api
   routes:
+    htcc-gateway-service:
+      path: /gateway/**
+      service-id: htcc-gateway-service
     htcc-employee-service:
       path: /employee/**
       service-id: htcc-employee-service
@@ -29,3 +34,6 @@ zuul:
 management:
   endpoints:
     enabled-by-default: false
+
+service:
+  debugMode: false
