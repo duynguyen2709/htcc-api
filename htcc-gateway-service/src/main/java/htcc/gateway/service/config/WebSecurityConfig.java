@@ -66,6 +66,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private List<String> allowPaths(){
         List<String> antPatterns = new ArrayList<>();
+        antPatterns.add("/");
         antPatterns.add("/login");
         antPatterns.add("/api/**");
         antPatterns.add("/public/**");
