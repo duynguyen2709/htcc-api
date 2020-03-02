@@ -26,3 +26,6 @@ zuul:
     htcc-employee-service:
       path: /employee/**
       service-id: htcc-employee-service
+
+jwt:
+  secret: "gmDJYOtCOvOgzuC5u3XViSq8pxf7BerA"
