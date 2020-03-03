@@ -30,7 +30,7 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage("htcc.gateway.service.controller"))
                 .paths(PathSelectors.any())
                 .build()
-                .apiInfo(new ApiInfo("HTCC Api Documentation",
+                .apiInfo(new ApiInfo("HTCC Api Documentation\nBaseURL : https://1612145.online/",
                         "Tất cả API chỉ thành công khi returnCode = 1",
                         "1.0",
                         null,

@@ -26,7 +26,7 @@ public class RequestLogEntity implements Serializable {
             response = StringUtil.fromJsonString(res, BaseResponse.class);
         }
         catch (Exception e) {
-            response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+            response = new BaseResponse<Object>(ReturnCodeEnum.SUCCESS);
             response.data = res;
         }
     }

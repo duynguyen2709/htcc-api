@@ -3,14 +3,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.4.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>vn.edu.hcmus</groupId>
+        <artifactId>htcc-api-parent</artifactId>
+        <!--suppress MavenPropertyInParent -->
+        <version>${global.version}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
-    <groupId>vn.edu.hcmus</groupId>
+
     <artifactId>htcc-gateway-service</artifactId>
-    <version>1.0.3</version>
+    <version>${global.version}</version>
     <name>htcc-gateway-service</name>
     <description>Eureka Service Discovery and Gateway</description>
 

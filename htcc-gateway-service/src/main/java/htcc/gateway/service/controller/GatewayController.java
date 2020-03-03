@@ -10,19 +10,13 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+@Api(tags = "Gateway APIs",
+     value = "GatewayController",
+     description = "API public để đăng nhập, đăng xuất.")
 @RestController
 @Log4j2
 @RequestMapping("/public")
-@Api(tags = "Gateway APIs",
-     value = "GatewayController",
-     description = "API public để đăng nhập, đăng xuất. \n Authen bằng clientid + sig")
 public class GatewayController {
-
-    @GetMapping("/hello/{var}")
-    public String hello(@PathVariable String var) {
-        log.info("test");
-        return var;
-    }
 
     @ApiOperation(value = "Đăng nhập")
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,7 +28,15 @@ public class GatewayController {
         }
         catch (Exception e) {
             log.error("[login] ex", e);
-            return new BaseResponse(e);
+            return new BaseResponse<LoginResponse>(e);
         }
     }
+
+
+    @GetMapping("/hello/{var}")
+    public String hello(@PathVariable String var) {
+        log.info("test");
+        return var;
+    }
+
 }

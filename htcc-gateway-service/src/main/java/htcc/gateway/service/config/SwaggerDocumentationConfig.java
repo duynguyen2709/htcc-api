@@ -24,18 +24,18 @@ public class SwaggerDocumentationConfig implements SwaggerResourcesProvider {
     private String gatewayService;
 
     @Override
-    public List get() {
-        List resources = new ArrayList<>();
-        resources.add(swaggerResource(employeeService, "/api/employee/v2/api-docs", VERSION));
-        resources.add(swaggerResource(gatewayService, "/v2/api-docs", VERSION));
+    public List<SwaggerResource> get() {
+        List<SwaggerResource> resources = new ArrayList<>();
+        resources.add(swaggerResource(gatewayService, "/v2/api-docs"));
+        resources.add(swaggerResource(employeeService, "/api/employee/v2/api-docs"));
         return resources;
     }
 
-    private SwaggerResource swaggerResource(String name, String location, String version) {
+    private SwaggerResource swaggerResource(String name, String location) {
         SwaggerResource swaggerResource = new SwaggerResource();
         swaggerResource.setName(name);
         swaggerResource.setLocation(location);
-        swaggerResource.setSwaggerVersion(version);
+        swaggerResource.setSwaggerVersion(VERSION);
         return swaggerResource;
     }
 

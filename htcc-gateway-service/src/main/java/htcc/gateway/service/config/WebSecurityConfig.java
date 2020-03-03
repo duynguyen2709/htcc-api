@@ -28,9 +28,6 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${security.user.password}")
     private String password;
 
-    @Value("${eureka.dashboard.path}")
-    private String eurekaDashboard;
-
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
