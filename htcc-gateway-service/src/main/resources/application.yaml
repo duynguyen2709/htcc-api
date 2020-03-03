@@ -37,3 +37,6 @@ management:
 
 service:
   debugMode: false
+
+jwt:
+  secret: "gmDJYOtCOvOgzuC5u3XViSq8pxf7BerA"
