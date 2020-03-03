@@ -1,4 +1,4 @@
-package htcc.gateway.service.component;
+package htcc.gateway.service.component.filter;
 
 import com.google.common.io.CharStreams;
 import com.netflix.zuul.ZuulFilter;
@@ -32,7 +32,7 @@ public class LoggingFilter extends ZuulFilter {
 
     @Override
     public int filterOrder() {
-        return 10;
+        return 0;
     }
 
     @Override
@@ -48,32 +48,34 @@ public class LoggingFilter extends ZuulFilter {
         try (final InputStream responseDataStream = ctx.getResponseDataStream()) {
             String responseData = CharStreams.toString(new InputStreamReader(responseDataStream, StandardCharsets.UTF_8));
             logEnt.setResponse(responseData);
-
-            setLogData(ctx, logEnt);
-
             ctx.setResponseBody(responseData);
         } catch (Exception e) {
-            log.error("Error reading request/response", e);
+            log.error("Error reading request/response: " + e.getMessage());
         } finally {
+            setLogData(ctx, logEnt);
             processLog(logEnt);
         }
         return null;
     }
 
-    private void setLogData(RequestContext ctx, RequestLogEntity logEnt) throws IOException {
-        RequestWrapper request = new RequestWrapper(ctx.getRequest());
-        logEnt.method = request.getMethod();
-        logEnt.path = request.getRequestURI();
-        logEnt.request = UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString();
-        if (logEnt.method.equalsIgnoreCase("POST") ||
-                logEnt.method.equalsIgnoreCase("PUT")) {
-            if (request.getBody() != null && !request.getBody().isEmpty())
-                logEnt.body = StringUtil.toJsonString(StringUtil.fromJsonString(request.getBody(), Object.class));
-        } else {
-            logEnt.body = null;
+    private void setLogData(RequestContext ctx, RequestLogEntity logEnt) {
+        try {
+            RequestWrapper request = new RequestWrapper(ctx.getRequest());
+            logEnt.method = request.getMethod();
+            logEnt.path = request.getRequestURI();
+            logEnt.request = UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString();
+            if (logEnt.method.equalsIgnoreCase("POST") || logEnt.method.equalsIgnoreCase("PUT")) {
+                if (request.getBody() != null && !request.getBody().isEmpty())
+                    logEnt.body = StringUtil.toJsonString(StringUtil.fromJsonString(request.getBody(), Object.class));
+            }
+            else {
+                logEnt.body = null;
+            }
+            logEnt.requestTime = NumberUtil.getLongValue(request.getAttribute("requestTime"));
+            logEnt.responseTime = System.currentTimeMillis();
+        } catch (Exception e) {
+            log.error("setLogData ex", e);
         }
-        logEnt.requestTime = NumberUtil.getLongValue(request.getAttribute("requestTime"));
-        logEnt.responseTime = System.currentTimeMillis();
     }
 
     private void processLog(RequestLogEntity logEntity){

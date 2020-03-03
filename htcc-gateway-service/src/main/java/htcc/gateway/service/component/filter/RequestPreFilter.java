@@ -1,4 +1,4 @@
-package htcc.gateway.service.component;
+package htcc.gateway.service.component.filter;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;

@@ -37,6 +37,6 @@ management:
 
 service:
   debugMode: false
-
-jwt:
-  secret: "gmDJYOtCOvOgzuC5u3XViSq8pxf7BerA"
+  jwt:
+    key: "gmDJYOtCOvOgzuC5u3XViSq8pxf7BerA"
+    expireSecond: 86400

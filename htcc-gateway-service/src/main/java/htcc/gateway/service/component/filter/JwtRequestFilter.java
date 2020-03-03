@@ -1,4 +1,4 @@
-package htcc.gateway.service.component.authentication;
+package htcc.gateway.service.component.filter;
 
 import java.io.IOException;
 
@@ -7,6 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import htcc.gateway.service.component.authentication.JwtTokenUtil;
+import htcc.gateway.service.config.file.ServiceConfig;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,13 +42,25 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 		String uri = request.getRequestURI();
-		return (!uri.startsWith(apiPath));
+		boolean shouldNotFilter = false;
+
+		if (!uri.startsWith(apiPath)) {
+			shouldNotFilter = true;
+		}
+
+		if (uri.startsWith(ServiceConfig.BASE_API_PATH + ServiceConfig.PUBLIC_API_PATH)) {
+			shouldNotFilter = true;
+		}
+
+		logger.info(String.format("{%s} - {%s}", uri, shouldNotFilter));
+		return shouldNotFilter;
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
 
+		logger.info("Filter");
 		String requestTokenHeader = request.getHeader(AUTHORIZATION);
 
 		String username = null;
@@ -56,10 +70,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 			try {
 				username = jwtTokenUtil.getUsernameFromToken(jwtToken);
 			} catch (Exception e) {
-				log.error("JWT Token Invalid", e);
+				log.error("JWT Token [{}] Invalid", requestTokenHeader, e);
 			}
 		} else {
-			log.error("JWT Token [{}] does not begin with Bearer String", requestTokenHeader);
+			log.error("JWT Token [{}] Invalid", requestTokenHeader);
 		}
 
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
