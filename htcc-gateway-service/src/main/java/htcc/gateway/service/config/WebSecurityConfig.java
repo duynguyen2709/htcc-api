@@ -1,8 +1,8 @@
 package htcc.gateway.service.config;
 
-import htcc.gateway.service.component.authentication.JwtAuthenticationEntryPoint;
 import htcc.gateway.service.component.filter.JwtRequestFilter;
-import htcc.gateway.service.config.file.ServiceConfig;
+import htcc.gateway.service.config.file.SecurityConfig;
+import htcc.gateway.service.constant.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,26 +33,41 @@ import static java.util.Collections.singletonList;
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
-    @Autowired
     private UserDetailsService jwtUserDetailsService;
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
-    @Value("${security.user.name}")
-    private String username;
+    @Autowired
+    private SecurityConfig securityConfig;
 
-    @Value("${security.user.password}")
-    private String password;
+    @Value("${eureka.dashboard.path}")
+    private String eurekaDashboard;
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(jwtUserDetailsService)
+                .passwordEncoder(passwordEncoder());
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
                 .passwordEncoder(NoOpPasswordEncoder.getInstance())
-                .withUser(username)
-                .password(password)
+                .withUser(securityConfig.user.name)
+                .password(securityConfig.user.password)
                 .authorities("ADMIN");
     }
 
@@ -64,7 +79,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // allow public path
         http.authorizeRequests().antMatchers(allowPaths()).permitAll();
 
-        http.authorizeRequests().antMatchers(new String[]{"/dashboard"}).authenticated().and().formLogin();
+        http.authorizeRequests().antMatchers(new String[]{eurekaDashboard})
+                .authenticated().and().formLogin();
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -87,8 +103,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         List<String> antPatterns = new ArrayList<>();
         antPatterns.add("/");
         antPatterns.add("/login");
-        antPatterns.add(ServiceConfig.BASE_API_PATH + ServiceConfig.PUBLIC_API_PATH + "**");
-        antPatterns.add(ServiceConfig.PUBLIC_API_PATH + "**");
+        antPatterns.add(Constant.BASE_API_GATEWAY_PATH + Constant.PUBLIC_API_PATH + "**");
+        antPatterns.add(Constant.PUBLIC_API_PATH + "**");
 
         //swagger
         antPatterns.add("/swagger-ui.html");
@@ -101,23 +117,6 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         antPatterns.add("/configuration/security");
 
         return antPatterns.toArray(new String[0]);
-    }
-
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(jwtUserDetailsService)
-                .passwordEncoder(passwordEncoder());
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
     }
 
 }

@@ -1,14 +1,8 @@
 package htcc.gateway.service.component.filter;
 
-import java.io.IOException;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import htcc.gateway.service.component.authentication.JwtTokenUtil;
+import htcc.gateway.service.component.service.JwtTokenService;
 import htcc.gateway.service.config.file.ServiceConfig;
+import htcc.gateway.service.constant.Constant;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,76 +13,68 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
-import io.jsonwebtoken.ExpiredJwtException;
-import htcc.gateway.service.component.service.JwtUserDetailsService;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Component
 @Log4j2
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-	@Autowired
-	private JwtUserDetailsService jwtUserDetailsService;
+    @Autowired
+    private JwtTokenService jwtTokenService;
 
-	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String BEARER        = "Bearer ";
 
-	@Value("${zuul.prefix}")
-	private String apiPath;
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String  uri             = request.getRequestURI();
+        boolean shouldNotFilter = false;
 
-	private static final String AUTHORIZATION = "Authorization";
-	private static final String BEARER = "Bearer ";
+        if (!uri.startsWith(Constant.API_PATH)) {
+            shouldNotFilter = true;
+        }
 
-	@Override
-	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-		String uri = request.getRequestURI();
-		boolean shouldNotFilter = false;
+        if (uri.startsWith(Constant.BASE_API_GATEWAY_PATH + Constant.PUBLIC_API_PATH)) {
+            shouldNotFilter = true;
+        }
 
-		if (!uri.startsWith(apiPath)) {
-			shouldNotFilter = true;
-		}
+        return shouldNotFilter;
+    }
 
-		if (uri.startsWith(ServiceConfig.BASE_API_PATH + ServiceConfig.PUBLIC_API_PATH)) {
-			shouldNotFilter = true;
-		}
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 
-		logger.info(String.format("{%s} - {%s}", uri, shouldNotFilter));
-		return shouldNotFilter;
-	}
+        String requestTokenHeader = request.getHeader(AUTHORIZATION);
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws ServletException, IOException {
+        String username = null;
+        String jwtToken = null;
+        if (requestTokenHeader != null && requestTokenHeader.startsWith(BEARER)) {
+            jwtToken = requestTokenHeader.substring(7);
+            try {
+                username = jwtTokenService.getUsernameFromToken(jwtToken);
+            } catch (Exception e) {
+                log.error("JWT Token [{}] Invalid", requestTokenHeader, e);
+            }
+        } else {
+            log.error("JWT Token [{}] Invalid", requestTokenHeader);
+        }
 
-		logger.info("Filter");
-		String requestTokenHeader = request.getHeader(AUTHORIZATION);
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = jwtTokenService.loadUserByUsername(username);
 
-		String username = null;
-		String jwtToken = null;
-		if (requestTokenHeader != null && requestTokenHeader.startsWith(BEARER)) {
-			jwtToken = requestTokenHeader.substring(7);
-			try {
-				username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-			} catch (Exception e) {
-				log.error("JWT Token [{}] Invalid", requestTokenHeader, e);
-			}
-		} else {
-			log.error("JWT Token [{}] Invalid", requestTokenHeader);
-		}
+            if (jwtTokenService.validateToken(jwtToken, userDetails)) {
+                UsernamePasswordAuthenticationToken detail =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                detail.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(detail);
+            }
+        }
 
-		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-			UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(username);
-
-			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-
-				UsernamePasswordAuthenticationToken detail = new UsernamePasswordAuthenticationToken(
-						userDetails, null, userDetails.getAuthorities());
-				detail.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(detail);
-			}
-		}
-		chain.doFilter(request, response);
-	}
+        chain.doFilter(request, response);
+    }
 
 }

@@ -1,6 +1,6 @@
 package htcc.gateway.service.controller;
 
-import htcc.gateway.service.component.authentication.JwtTokenUtil;
+import htcc.gateway.service.component.service.JwtTokenService;
 import htcc.gateway.service.constant.ReturnCodeEnum;
 import htcc.gateway.service.entity.base.BaseResponse;
 import htcc.gateway.service.entity.request.LoginRequest;
@@ -11,8 +11,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,7 +28,7 @@ public class AuthenticationController {
     private AuthenticationManager authenManager;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtTokenService jwtTokenService;
 
     @Autowired
     private UserDetailsService jwtInMemoryUserDetailsService;
@@ -45,7 +43,7 @@ public class AuthenticationController {
             UserDetails userDetails = jwtInMemoryUserDetailsService
                     .loadUserByUsername(request.getUsername());
 
-            String token = jwtTokenUtil.generateToken(userDetails);
+            String token = jwtTokenService.generateToken(userDetails);
 
             response.data = new LoginResponse(token);
             return response;
