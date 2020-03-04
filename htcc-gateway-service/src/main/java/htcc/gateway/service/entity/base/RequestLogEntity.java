@@ -24,8 +24,7 @@ public class RequestLogEntity implements Serializable {
     public void setResponse(String res) {
         try {
             response = StringUtil.fromJsonString(res, BaseResponse.class);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             response = new BaseResponse<Object>(ReturnCodeEnum.SUCCESS);
             response.data = res;
         }

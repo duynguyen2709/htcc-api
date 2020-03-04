@@ -37,3 +37,8 @@ management:
 
 service:
   debugMode: false
+
+security:
+  jwt:
+    key: "gmDJYOtCOvOgzuC5u3XViSq8pxf7BerA"
+    expireSecond: 86400

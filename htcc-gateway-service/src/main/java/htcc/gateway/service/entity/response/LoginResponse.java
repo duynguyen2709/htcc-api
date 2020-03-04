@@ -10,5 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class LoginResponse implements Serializable {
+    private static final long serialVersionUID = -8091879091924046844L;
+
     public String token;
 }
