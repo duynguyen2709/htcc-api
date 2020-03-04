@@ -19,3 +19,7 @@
 03-03-2020 :
  + Ver 1.0.4:
     - Edit Swagger config, edit pom.xml parent
+
+04-03-2020 :
+ + Ver 1.0.5:
+    - Gateway: finish write log api
