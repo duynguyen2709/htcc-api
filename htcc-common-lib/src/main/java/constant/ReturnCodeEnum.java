@@ -8,6 +8,7 @@ public enum ReturnCodeEnum {
     SUCCESS(1),
     EXCEPTION(0),
     UNAUTHORIZE(401),
+    PERMISSION_DENIED(403),
     WRONG_USERNAME_OR_PASSWORD(-1),
     ACCOUNT_LOCKED(-2),
 

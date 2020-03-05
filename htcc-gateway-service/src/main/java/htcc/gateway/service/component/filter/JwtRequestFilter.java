@@ -1,6 +1,8 @@
 package htcc.gateway.service.component.filter;
 
 import constant.Constant;
+import constant.ReturnCodeEnum;
+import entity.base.BaseResponse;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.service.JwtTokenService;
 import lombok.extern.log4j.Log4j2;
@@ -34,7 +36,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String  uri             = request.getRequestURI();
         boolean shouldNotFilter = false;
 
-        if (!uri.startsWith(Constant.API_PATH)) {
+        if (!uri.startsWith(Constant.API_PATH) && !uri.startsWith(Constant.PRIVATE_API_PATH)) {
             shouldNotFilter = true;
         }
 
@@ -46,37 +48,42 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException {
 
-        String requestTokenHeader = request.getHeader(AUTHORIZATION);
+        try {
+            String requestTokenHeader = request.getHeader(AUTHORIZATION);
 
-        LoginRequest loginRequest = null;
-        String       jwtToken = null;
-        if (requestTokenHeader != null && requestTokenHeader.startsWith(BEARER)) {
-            jwtToken = requestTokenHeader.substring(7);
-            try {
-                loginRequest = jwtTokenService.getLoginInfoFromToken(jwtToken);
-            } catch (Exception e) {
-                log.error("JWT Token [{}] Invalid", requestTokenHeader, e);
+            LoginRequest loginRequest = null;
+            String       jwtToken     = null;
+            if (requestTokenHeader != null && requestTokenHeader.startsWith(BEARER)) {
+                jwtToken = requestTokenHeader.substring(7);
+                try {
+                    loginRequest = jwtTokenService.getLoginInfoFromToken(jwtToken);
+                } catch (Exception e) {
+                    throw new Exception(String.format("JWT Token [%s] Invalid", requestTokenHeader));
+                }
+            } else {
+                throw new Exception(String.format("JWT Token [%s] Invalid", requestTokenHeader));
             }
-        } else {
-            log.error("JWT Token [{}] Invalid", requestTokenHeader);
-        }
 
-        log.info(StringUtil.toJsonString(loginRequest));
+            if (loginRequest != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = jwtTokenService.loadUserByUsername(StringUtil.toJsonString(loginRequest));
 
-        if (loginRequest != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = jwtTokenService.loadUserByUsername(StringUtil.toJsonString(loginRequest));
-
-            if (jwtTokenService.validateToken(jwtToken, loginRequest.username)) {
-                UsernamePasswordAuthenticationToken detail =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                detail.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(detail);
+                if (jwtTokenService.validateToken(jwtToken, loginRequest.username)) {
+                    UsernamePasswordAuthenticationToken detail =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    detail.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(detail);
+                }
             }
-        }
 
-        chain.doFilter(request, response);
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            log.error("doFilterInternal ex: " + e.getMessage());
+
+            response.setContentType(Constant.APPLICATION_JSON);
+            response.getWriter().write(StringUtil.toJsonString(new BaseResponse<>(ReturnCodeEnum.UNAUTHORIZE)));
+        }
     }
 
 }

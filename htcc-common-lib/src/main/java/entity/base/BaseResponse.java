@@ -23,8 +23,7 @@ public class BaseResponse<T> implements Serializable {
                       example = "SUCCESS")
     public String returnMessage;
 
-    @ApiModelProperty(notes = "Dữ liệu trả về",
-                      example = "{\"token\":\"adasdasd\"}")
+    @ApiModelProperty(notes = "Dữ liệu trả về")
     public T data;
 
     public static final BaseResponse SUCCESS   = new BaseResponse(ReturnCodeEnum.SUCCESS);

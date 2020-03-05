@@ -8,6 +8,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.stereotype.Component;
+import util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;

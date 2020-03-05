@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import service.BaseJPAService;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Log4j2
@@ -24,7 +24,8 @@ public class AdminUserService extends BaseJPAService<AdminUser, String> {
 
     @Override
     public AdminUser findById(String key) {
-        return repo.findById(key).get();
+        Optional<AdminUser> user = repo.findById(key);
+        return user.orElse(null);
     }
 
     @Override

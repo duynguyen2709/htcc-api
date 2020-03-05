@@ -40,6 +40,8 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
 
         try {
             super.doDispatch(wrapper, response);
+        } catch (Exception e){
+            logger.warn(e);
         } finally {
             setLogData(wrapper, response);
             updateResponse(response);

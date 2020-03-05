@@ -13,14 +13,16 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import util.StringUtil;
 
 @Api(tags = "Gateway APIs",
      value = "AuthenticationController",
-     description = "API public để đăng nhập, đăng xuất.")
+     description = "API public để đăng nhập.")
 @RestController
 @Log4j2
 @RequestMapping("/public")
@@ -40,10 +42,11 @@ public class AuthenticationController {
     public BaseResponse<LoginResponse> login(@RequestBody LoginRequest request) {
         BaseResponse<LoginResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
-            authenManager.authenticate(new UsernamePasswordAuthenticationToken(request.username, request.password));
+            authenManager.authenticate(new UsernamePasswordAuthenticationToken(StringUtil.toJsonString(request), request.password));
             String token = jwtTokenService.generateToken(request);
             response.data = new LoginResponse(token);
         } catch (BadCredentialsException e){
+            log.warn("[login] ex: " + e.getMessage());
             response = new BaseResponse<>(ReturnCodeEnum.WRONG_USERNAME_OR_PASSWORD);
         } catch (Exception e) {
             log.error("[login] ex", e);
@@ -52,4 +55,5 @@ public class AuthenticationController {
 
         return response;
     }
+
 }
