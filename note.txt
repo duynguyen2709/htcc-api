@@ -28,5 +28,5 @@
     - Edit pom.xml to ref to common lib
 
 05-03-2020 :
- + Ver 1.0.6:
-    - Gateway: done login api (still have bug - eurekaDashboard)
+ + Ver 1.1.0:
+    - Gateway: done login & logout api

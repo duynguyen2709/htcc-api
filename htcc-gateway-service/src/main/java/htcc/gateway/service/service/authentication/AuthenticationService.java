@@ -10,6 +10,7 @@ import htcc.gateway.service.service.jpa.AdminUserService;
 import htcc.gateway.service.service.jpa.CompanyUserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,7 +34,9 @@ public class AuthenticationService {
 
             switch (system) {
                 case EUREKA_DASHBOARD:
-                    user = new BaseUser(securityConfig.user.name, securityConfig.user.password);
+                    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                    String password = passwordEncoder.encode(securityConfig.user.password);
+                    user = new BaseUser(securityConfig.user.name, password);
                     break;
 
                 case ADMIN_WEB:

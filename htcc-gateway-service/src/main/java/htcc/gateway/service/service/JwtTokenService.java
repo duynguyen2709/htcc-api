@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import util.NumberUtil;
 import util.StringUtil;
@@ -43,13 +44,18 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 
 	@Override
 	public UserDetails loadUserByUsername(String object) throws UsernameNotFoundException {
-		log.info("raw login object {}", object);
+		boolean isLoginDashboard = StringUtil.isJsonString(object);
 		LoginRequest req = null;
+
 		try {
-			req = StringUtil.fromJsonString(object, LoginRequest.class);
+			if (isLoginDashboard) {
+				req = StringUtil.fromJsonString(object, LoginRequest.class);
+			} else {
+				req = new LoginRequest(0, "", object, "");
+			}
 		} catch (Exception e){
-			log.error(e);
-			String err = String.format("loadUserByUsername ex, raw Request %s", object);
+			String err = String.format("loadUserByUsername ex, raw Request [%s]", object);
+			log.error(err, e.getMessage());
 			throw new UsernameNotFoundException(err);
 		}
 
@@ -60,9 +66,8 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 			throw new UsernameNotFoundException(err);
 		}
 
-		log.info(StringUtil.toJsonString(user));
 		return User.withUsername(user.username)
-				.password(user.getPassword())
+				.password(user.password)
 				.authorities(Collections.emptyList())
 				.accountExpired(false)
 				.accountLocked(false)
@@ -71,7 +76,7 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 				.build();
 	}
 
-	public String getUsernameFromToken(String token) {
+	private String getUsernameFromToken(String token) {
 		return getClaimFromToken(token, Claims::getSubject);
 	}
 

@@ -66,8 +66,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 throw new Exception(String.format("JWT Token [%s] Invalid", requestTokenHeader));
             }
 
-            log.info(StringUtil.toJsonString(loginRequest));
-
             if (loginRequest != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = jwtTokenService.loadUserByUsername(StringUtil.toJsonString(loginRequest));
 
