@@ -14,12 +14,20 @@ pipelines:
   custom:
     deploy-gateway-to-dev:
       - step:
+          name: Build Common Lib
           caches:
             - maven
           script:
             - cd htcc-common-lib/
             - mvn -B clean install
-            - cd ../htcc-gateway-service/
+          artifacts:
+            - target/**
+      - step:
+          name: Build Docker Image
+          caches:
+            - maven
+          script:
+            - cd htcc-gateway-service/
             - mvn -B package
             - docker build -t duyna5/htcc-gateway-service .
             - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
