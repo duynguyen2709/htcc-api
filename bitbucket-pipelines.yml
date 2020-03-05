@@ -7,26 +7,15 @@ pipelines:
           caches:
             - maven
           script:
-            - cd htcc-common-lib/
-            - mvn -B clean install
-            - cd ../
             - mvn -B clean install
   custom:
     deploy-gateway-to-dev:
-      - step:
-          name: Build Common Lib
-          caches:
-            - maven
-          script:
-            - cd htcc-common-lib/
-            - mvn -B clean install
-          artifacts:
-            - target/**
       - step:
           name: Build Docker Image
           caches:
             - maven
           script:
+            - mvn -B clean install
             - cd htcc-gateway-service/
             - mvn -B package
             - docker build -t duyna5/htcc-gateway-service .

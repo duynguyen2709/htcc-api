@@ -26,9 +26,9 @@
     </properties>
 
     <modules>
+        <module>htcc-common-lib</module>
         <module>htcc-gateway-service</module>
         <module>htcc-employee-service</module>
-        <module>htcc-common-lib</module>
     </modules>
 
     <dependencyManagement>
