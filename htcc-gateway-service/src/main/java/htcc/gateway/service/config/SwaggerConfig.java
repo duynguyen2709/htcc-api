@@ -42,7 +42,6 @@ public class SwaggerConfig {
                 .globalResponseMessage(RequestMethod.POST, responseMessages)
                 .globalResponseMessage(RequestMethod.PUT, responseMessages)
                 .globalResponseMessage(RequestMethod.DELETE, responseMessages);
-
     }
 
     @Bean

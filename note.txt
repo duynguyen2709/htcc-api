@@ -26,3 +26,7 @@
     - Edit Pipeline run only on branch Master
     - Add module HTCC-COMMON-LIB to share common code between projects
     - Edit pom.xml to ref to common lib
+
+05-03-2020 :
+ + Ver 1.0.6:
+    - Gateway: doing login (still have bug - inmemoryuser)

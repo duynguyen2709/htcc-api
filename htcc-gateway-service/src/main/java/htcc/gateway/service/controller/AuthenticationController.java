@@ -2,19 +2,21 @@ package htcc.gateway.service.controller;
 
 import constant.ReturnCodeEnum;
 import entity.base.BaseResponse;
-import htcc.gateway.service.component.service.JwtTokenService;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.entity.response.LoginResponse;
+import htcc.gateway.service.service.JwtTokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import util.StringUtil;
 
 @Api(tags = "Gateway APIs",
      value = "AuthenticationController",
@@ -31,7 +33,7 @@ public class AuthenticationController {
     private JwtTokenService jwtTokenService;
 
     @Autowired
-    private UserDetailsService jwtInMemoryUserDetailsService;
+    private UserDetailsService jwtUserDetailService;
 
     @ApiOperation(value = "Đăng nhập")
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,24 +41,15 @@ public class AuthenticationController {
         BaseResponse<LoginResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             authenManager.authenticate(new UsernamePasswordAuthenticationToken(request.username, request.password));
-
-            UserDetails userDetails = jwtInMemoryUserDetailsService
-                    .loadUserByUsername(request.getUsername());
-
-            String token = jwtTokenService.generateToken(userDetails);
-
+            String token = jwtTokenService.generateToken(request);
             response.data = new LoginResponse(token);
-            return response;
+        } catch (BadCredentialsException e){
+            response = new BaseResponse<>(ReturnCodeEnum.WRONG_USERNAME_OR_PASSWORD);
         } catch (Exception e) {
             log.error("[login] ex", e);
-            return new BaseResponse<LoginResponse>(e);
+            response = new BaseResponse<>(e);
         }
-    }
 
-    @GetMapping("/hello/{var}")
-    public String hello(@PathVariable String var) {
-        log.info("test");
-        return var;
+        return response;
     }
-
 }

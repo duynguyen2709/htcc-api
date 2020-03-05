@@ -3,6 +3,7 @@ package htcc.gateway.service.config;
 import constant.Constant;
 import htcc.gateway.service.component.filter.JwtRequestFilter;
 import htcc.gateway.service.config.file.SecurityConfig;
+import htcc.gateway.service.config.file.ServiceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -41,8 +42,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private SecurityConfig securityConfig;
 
-    @Value("${eureka.dashboard.path}")
-    private String eurekaDashboard;
+    @Autowired
+    private ServiceConfig serviceConfig;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -61,7 +62,6 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
@@ -73,15 +73,14 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        //disable cors and csrf
         http.cors().configurationSource(corsConfigurationSource()).and()
                 .csrf().disable().exceptionHandling();
 
         // allow public path
         http.authorizeRequests().antMatchers(allowPaths()).permitAll();
 
-        http.authorizeRequests().antMatchers(new String[]{eurekaDashboard})
-                .authenticated().and().formLogin();
-
+        // jwt request for api paths
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         super.configure(http);
@@ -103,6 +102,7 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         List<String> antPatterns = new ArrayList<>();
         antPatterns.add("/");
         antPatterns.add("/login");
+
         antPatterns.add(Constant.BASE_API_GATEWAY_PATH + Constant.PUBLIC_API_PATH + "**");
         antPatterns.add(Constant.PUBLIC_API_PATH + "**");
 

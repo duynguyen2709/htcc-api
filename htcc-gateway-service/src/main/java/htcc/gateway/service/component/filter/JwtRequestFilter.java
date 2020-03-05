@@ -1,7 +1,8 @@
 package htcc.gateway.service.component.filter;
 
 import constant.Constant;
-import htcc.gateway.service.component.service.JwtTokenService;
+import htcc.gateway.service.entity.request.LoginRequest;
+import htcc.gateway.service.service.JwtTokenService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import util.StringUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -48,12 +50,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         String requestTokenHeader = request.getHeader(AUTHORIZATION);
 
-        String username = null;
-        String jwtToken = null;
+        LoginRequest loginRequest = null;
+        String       jwtToken = null;
         if (requestTokenHeader != null && requestTokenHeader.startsWith(BEARER)) {
             jwtToken = requestTokenHeader.substring(7);
             try {
-                username = jwtTokenService.getUsernameFromToken(jwtToken);
+                loginRequest = jwtTokenService.getLoginInfoFromToken(jwtToken);
             } catch (Exception e) {
                 log.error("JWT Token [{}] Invalid", requestTokenHeader, e);
             }
@@ -61,10 +63,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             log.error("JWT Token [{}] Invalid", requestTokenHeader);
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = jwtTokenService.loadUserByUsername(username);
+        log.info(StringUtil.toJsonString(loginRequest));
 
-            if (jwtTokenService.validateToken(jwtToken, userDetails)) {
+        if (loginRequest != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = jwtTokenService.loadUserByUsername(StringUtil.toJsonString(loginRequest));
+
+            if (jwtTokenService.validateToken(jwtToken, loginRequest.username)) {
                 UsernamePasswordAuthenticationToken detail =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 detail.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

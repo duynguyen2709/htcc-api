@@ -2,6 +2,7 @@ package htcc.gateway.service.entity.request;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
+@AllArgsConstructor
 @ApiModel(description = "Request để đăng nhập")
 public class LoginRequest {
 
@@ -22,6 +24,10 @@ public class LoginRequest {
     @Min(1)
     public int clientId;
 
+    @ApiModelProperty(notes = "Mã công ty (null đối với web admin)",
+                      example = "VNG")
+    public String companyId;
+
     @ApiModelProperty(notes = "Tên đăng nhập",
                       example = "duyna5")
     @NotEmpty
@@ -32,7 +38,4 @@ public class LoginRequest {
     @NotEmpty
     public String password;
 
-    @ApiModelProperty(notes = "Mã công ty (null đối với web admin)",
-                      example = "VNG")
-    public String companyId;
 }

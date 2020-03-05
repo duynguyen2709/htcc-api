@@ -10,4 +10,8 @@ public class NumberUtil {
             return 0L;
         }
     }
+
+    public static int getIntValue(Object obj){
+        return (int)getLongValue(obj);
+    }
 }
