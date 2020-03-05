@@ -1,7 +1,6 @@
 package htcc.gateway.service.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import entity.base.BaseResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,9 +14,9 @@ import springfox.documentation.annotations.ApiIgnore;
 public class TestController {
 
     @GetMapping("/test")
-    public String hello() {
+    public BaseResponse test() {
         log.info("OK");
-        return "OK";
+        return BaseResponse.SUCCESS;
     }
 
 }

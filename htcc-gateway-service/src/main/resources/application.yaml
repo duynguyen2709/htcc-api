@@ -29,6 +29,9 @@ logging:
   config: classpath:log4j2.properties
 
 zuul:
+  ribbon:
+    eager-load:
+      enabled: true
   ignored-services: '*'
   prefix: /api
   routes:
@@ -38,6 +41,12 @@ zuul:
     htcc-employee-service:
       path: /employee/**
       service-id: htcc-employee-service
+
+ribbon:
+  eureka:
+    enabled: true
+  ReadTimeout: 30000
+  ConnectTimeout: 30000
 
 management:
   endpoints:

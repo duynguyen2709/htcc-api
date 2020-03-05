@@ -2,13 +2,13 @@ package htcc.gateway.service.service;
 
 import constant.Constant;
 import htcc.gateway.service.config.file.SecurityConfig;
-import htcc.gateway.service.entity.jpa.AdminUser;
 import htcc.gateway.service.entity.jpa.BaseUser;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.service.authentication.AuthenticationService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,13 +21,14 @@ import util.NumberUtil;
 import util.StringUtil;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@Log4j2
 public class JwtTokenService implements UserDetailsService, Serializable {
 
 	//<editor-fold defaultstate="collapsed" desc="Autowired">
@@ -42,10 +43,12 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 
 	@Override
 	public UserDetails loadUserByUsername(String object) throws UsernameNotFoundException {
+		log.info("raw login object {}", object);
 		LoginRequest req = null;
 		try {
 			req = StringUtil.fromJsonString(object, LoginRequest.class);
 		} catch (Exception e){
+			log.error(e);
 			String err = String.format("loadUserByUsername ex, raw Request %s", object);
 			throw new UsernameNotFoundException(err);
 		}
@@ -57,7 +60,15 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 			throw new UsernameNotFoundException(err);
 		}
 
-		return new User(user.username, user.password, new ArrayList<>());
+		log.info(StringUtil.toJsonString(user));
+		return User.withUsername(user.username)
+				.password(user.getPassword())
+				.authorities(Collections.emptyList())
+				.accountExpired(false)
+				.accountLocked(false)
+				.credentialsExpired(false)
+				.disabled(false)
+				.build();
 	}
 
 	public String getUsernameFromToken(String token) {
