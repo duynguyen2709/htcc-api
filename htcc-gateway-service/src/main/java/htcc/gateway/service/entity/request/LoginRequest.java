@@ -29,12 +29,12 @@ public class LoginRequest {
     public String companyId;
 
     @ApiModelProperty(notes = "Tên đăng nhập",
-                      example = "duyna5")
+                      example = "admin")
     @NotEmpty
     public String username;
 
     @ApiModelProperty(notes = "Mật khẩu",
-                      example = "123456")
+                      example = "123")
     @NotEmpty
     public String password;
 
