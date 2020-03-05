@@ -1,11 +1,9 @@
 package htcc.gateway.service.component.filter;
 
+import constant.Constant;
 import htcc.gateway.service.component.service.JwtTokenService;
-import htcc.gateway.service.config.file.ServiceConfig;
-import htcc.gateway.service.constant.Constant;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;

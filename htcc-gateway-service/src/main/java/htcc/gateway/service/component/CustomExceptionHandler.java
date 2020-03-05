@@ -1,11 +1,11 @@
 package htcc.gateway.service.component;
 
-import htcc.gateway.service.constant.ReturnCodeEnum;
-import htcc.gateway.service.util.StringUtil;
+import constant.ReturnCodeEnum;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
+import util.StringUtil;
 
 import java.util.Map;
 

@@ -1,8 +1,8 @@
 package htcc.gateway.service.controller;
 
+import constant.ReturnCodeEnum;
+import entity.base.BaseResponse;
 import htcc.gateway.service.component.service.JwtTokenService;
-import htcc.gateway.service.constant.ReturnCodeEnum;
-import htcc.gateway.service.entity.base.BaseResponse;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.entity.response.LoginResponse;
 import io.swagger.annotations.Api;

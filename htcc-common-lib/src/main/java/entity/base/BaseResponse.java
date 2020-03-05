@@ -1,13 +1,11 @@
-package htcc.gateway.service.entity.base;
+package entity.base;
 
-import htcc.gateway.service.constant.ReturnCodeEnum;
-import htcc.gateway.service.util.StringUtil;
+import constant.ReturnCodeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
 

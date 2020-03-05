@@ -28,9 +28,17 @@
     <modules>
         <module>htcc-gateway-service</module>
         <module>htcc-employee-service</module>
+        <module>htcc-common-lib</module>
     </modules>
 
     <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>vn.edu.hcmus</groupId>
+                <artifactId>htcc-common-lib</artifactId>
+                <version>${global.version}</version>
+            </dependency>
+        </dependencies>
     </dependencyManagement>
 
 </project>

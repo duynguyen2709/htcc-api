@@ -1,8 +1,8 @@
 package htcc.gateway.service.config;
 
+import constant.Constant;
 import htcc.gateway.service.component.filter.JwtRequestFilter;
 import htcc.gateway.service.config.file.SecurityConfig;
-import htcc.gateway.service.constant.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

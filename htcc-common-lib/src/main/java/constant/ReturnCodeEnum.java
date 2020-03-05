@@ -1,4 +1,4 @@
-package htcc.gateway.service.constant;
+package constant;
 
 import java.util.HashMap;
 
@@ -24,7 +24,7 @@ public enum ReturnCodeEnum {
 
     private final int value;
 
-    private static final HashMap<Integer, ReturnCodeEnum> returnMap = new HashMap<>();
+    private static final HashMap<Integer, ReturnCodeEnum> map = new HashMap<>();
 
     ReturnCodeEnum(int value) {
         this.value = value;
@@ -35,7 +35,7 @@ public enum ReturnCodeEnum {
     }
 
     public static ReturnCodeEnum fromInt(int iValue) {
-        return returnMap.get(iValue);
+        return map.get(iValue);
     }
 
     public String toString() {
@@ -46,7 +46,7 @@ public enum ReturnCodeEnum {
         ReturnCodeEnum[] var0 = values();
 
         for (ReturnCodeEnum errorCodeEnum : var0) {
-            returnMap.put(errorCodeEnum.value, errorCodeEnum);
+            map.put(errorCodeEnum.value, errorCodeEnum);
         }
 
     }

@@ -24,3 +24,5 @@
  + Ver 1.0.5:
     - Gateway: finish write log api
     - Edit Pipeline run only on branch Master
+    - Add module HTCC-COMMON-LIB to share common code between projects
+    - Edit pom.xml to ref to common lib

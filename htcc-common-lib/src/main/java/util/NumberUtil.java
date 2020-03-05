@@ -1,4 +1,4 @@
-package htcc.gateway.service.util;
+package util;
 
 public class NumberUtil {
 

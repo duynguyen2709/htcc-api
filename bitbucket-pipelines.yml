@@ -3,19 +3,14 @@ image: maven:3-jdk-8
 pipelines:
   branches:
     master:
-      - parallel:
-          - step:
-              caches:
-                - maven
-              script:
-                - cd htcc-gateway-service/
-                - mvn -B package
-          - step:
-              caches:
-                - maven
-              script:
-                - cd htcc-employee-service/
-                - mvn -B package
+      - step:
+          caches:
+            - maven
+          script:
+            - cd htcc-common-lib/
+            - mvn -B clean install
+            - cd ../
+            - mvn -B clean install
   custom:
     deploy-gateway-to-dev:
       - step:

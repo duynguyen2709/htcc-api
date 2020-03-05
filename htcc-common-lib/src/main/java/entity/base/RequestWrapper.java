@@ -1,4 +1,4 @@
-package htcc.gateway.service.entity.base;
+package entity.base;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
