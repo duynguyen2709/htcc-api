@@ -74,13 +74,13 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
     private void setLogData(RequestWrapper request, HttpServletResponse responseToCache) {
         RequestLogEntity logEnt = new RequestLogEntity();
         try {
-            logEnt.method = request.getMethod();
-            logEnt.path = request.getRequestURI();
-            logEnt.request = UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString();
-            logEnt.requestTime = NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME));
-            logEnt.responseTime = System.currentTimeMillis();
-            logEnt.serviceId = ServiceSystemEnum.getServiceFromUri(logEnt.path);
-            logEnt.body = hasBody(logEnt.method) ? StringUtil.valueOf(request.getBody()) : "";
+            logEnt.setMethod(request.getMethod());
+            logEnt.setPath(request.getRequestURI());
+            logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
+            logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
+            logEnt.setResponseTime(System.currentTimeMillis());
+            logEnt.setServiceId(ServiceSystemEnum.getServiceFromUri(logEnt.path));
+            logEnt.setBody((hasBody(logEnt.method)) ? StringUtil.valueOf(request.getBody()) : "");
             logEnt.setResponse(getResponsePayload(responseToCache));
         } catch (Exception e) {
             log.error("setLogData ex {}", e.getMessage());
