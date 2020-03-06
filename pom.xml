@@ -29,7 +29,7 @@
         <module>htcc-common-lib</module>
         <module>htcc-gateway-service</module>
         <module>htcc-employee-service</module>
-<!--        <module>htcc-log-service</module>-->
+        <module>htcc-log-service</module>
     </modules>
 
     <dependencyManagement>

@@ -80,14 +80,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
             logEnt.requestTime = NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME));
             logEnt.responseTime = System.currentTimeMillis();
             logEnt.serviceId = ServiceSystemEnum.getServiceFromUri(logEnt.path);
-
-            if (hasBody(logEnt.method)) {
-                if (request.getBody() != null && !request.getBody().isEmpty()) {
-                    logEnt.body = StringUtil.fromJsonString(request.getBody(), Object.class).toString();
-                }
-            } else {
-                logEnt.body = StringUtil.EMPTY;
-            }
+            logEnt.body = hasBody(logEnt.method) ? StringUtil.valueOf(request.getBody()) : "";
             logEnt.setResponse(getResponsePayload(responseToCache));
         } catch (Exception e) {
             log.error("setLogData ex {}", e.getMessage());

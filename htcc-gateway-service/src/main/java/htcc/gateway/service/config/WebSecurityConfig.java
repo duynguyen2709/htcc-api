@@ -65,9 +65,6 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().configurationSource(corsConfigurationSource()).and()
                 .csrf().disable().exceptionHandling();
 
-        // allow public path
-        http.authorizeRequests().antMatchers(allowPaths()).permitAll();
-
         http.authorizeRequests()
                 .antMatchers(new String[]{eurekaDashboard})
                 .authenticated()
@@ -87,25 +84,6 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    private String[] allowPaths(){
-        List<String> antPatterns = new ArrayList<>();
-        antPatterns.add("/");
-        antPatterns.add("/login");
-        antPatterns.add("/eureka/**");
-
-        //swagger
-        antPatterns.add("/swagger-ui.html");
-        antPatterns.add("/v2/api-docs");
-        antPatterns.add("/configuration/ui");
-        antPatterns.add("/swagger-resources/**");
-        antPatterns.add("/configuration/security");
-        antPatterns.add("/csrf");
-        antPatterns.add("/webjars/**");
-        antPatterns.add("/configuration/security");
-
-        return antPatterns.toArray(new String[0]);
     }
 
 }
