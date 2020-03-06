@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: htcc-log-service
+  profiles:
+    active: ${env:local}
+  zipkin:
+    enabled: false
+  jmx:
+    enabled: false
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  instance:
+    appname: ${spring.application.name}
+
+logging:
+  config: classpath:log4j2.properties
+
+service:
+  debugMode: false

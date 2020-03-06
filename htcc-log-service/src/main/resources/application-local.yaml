@@ -1,21 +1,25 @@
+server:
+  port: 8202
+
 security:
   user:
-    name: htcc
-    password: 6h5K8dapxfFdVKAS
-
-server:
-  port: 8761
+    name: admin
+    password: admin
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka2:8761/eureka
+      defaultZone: http://eureka1:8761/eureka
   instance:
     hostname: eureka1
 
+service:
+  hazelcast:
+    useHazelcast: false
+
 spring:
   datasource:
-    schemaName: HTCC_Authentication
+    schemaName: HTCC_Log
     options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
     server: 167.179.80.90:3306
     url: jdbc:mysql://${spring.datasource.server}/${spring.datasource.schemaName}?${spring.datasource.options}

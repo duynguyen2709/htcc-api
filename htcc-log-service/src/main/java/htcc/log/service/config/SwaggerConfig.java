@@ -1,4 +1,4 @@
-package htcc.employee.service.config;
+package htcc.log.service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +14,7 @@ import springfox.documentation.swagger.web.UiConfiguration;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -21,14 +22,14 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api() throws IOException {
-        List<ResponseMessage> responseMessages = Arrays.asList(new ResponseMessageBuilder()
-                .code(200).message("SUCCESS").build());
+        List<ResponseMessage> responseMessages =
+                Collections.singletonList(new ResponseMessageBuilder().code(200).message("SUCCESS").build());
 
         return new Docket(DocumentationType.SWAGGER_2).select()
-                .apis(RequestHandlerSelectors.basePackage("htcc.employee.service.controller"))
+                .apis(RequestHandlerSelectors.basePackage("htcc.log.service.controller"))
                 .paths(PathSelectors.any())
                 .build()
-                .apiInfo(new ApiInfo("BaseURL : https://1612145.online/api/employee/<apiname>",
+                .apiInfo(new ApiInfo("BaseURL : https://1612145.online/api/log/<apiname>",
                         "Tất cả API chỉ thành công khi returnCode = 1",
                         "1.0",
                         null,

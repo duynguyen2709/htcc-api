@@ -1,6 +1,7 @@
 package component;
 
 import constant.Constant;
+import constant.ServiceSystemEnum;
 import entity.base.RequestLogEntity;
 import entity.base.RequestWrapper;
 import lombok.extern.log4j.Log4j2;
@@ -20,8 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 public abstract class BaseRequestServlet extends DispatcherServlet {
 
     @Override
-    protected void doDispatch(HttpServletRequest request, HttpServletResponse response)
-            throws Exception {
+    protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String uri = request.getRequestURI();
         if (!uri.startsWith(Constant.API_PATH)) {
@@ -40,7 +40,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
 
         try {
             super.doDispatch(wrapper, response);
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.warn(e);
         } finally {
             setLogData(wrapper, response);
@@ -79,13 +79,8 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
             logEnt.request = UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString();
             logEnt.requestTime = NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME));
             logEnt.responseTime = System.currentTimeMillis();
-
-            if (hasBody(logEnt.method)) {
-                if (request.getBody() != null && !request.getBody().isEmpty())
-                    logEnt.body = StringUtil.fromJsonString(request.getBody(), Object.class).toString();
-            } else {
-                logEnt.body = StringUtil.EMPTY;
-            }
+            logEnt.serviceId = ServiceSystemEnum.getServiceFromUri(logEnt.path);
+            logEnt.body = hasBody(logEnt.method) ? StringUtil.valueOf(request.getBody()) : "";
             logEnt.setResponse(getResponsePayload(responseToCache));
         } catch (Exception e) {
             log.error("setLogData ex {}", e.getMessage());
@@ -102,7 +97,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
                 responseWrapper.copyBodyToResponse();
             }
         } catch (Exception e) {
-            log.error("updateResponse ex",e);
+            log.error("updateResponse ex", e);
         }
     }
 

@@ -19,8 +19,7 @@ public class LoginRequest {
     @ApiModelProperty(notes = "Mã định danh cho mỗi hệ thống khác nhau (mobile, web...) |" +
                                 "1 - Mobile | 2 - Web quản lý" +
                                 " công ty | 3 - Web quản trị hệ thống",
-                      example = "1 - Mobile | 2 - Web quản lý công ty | " +
-                              "3 - Web quản trị hệ thống")
+                      example = "1")
     @Min(1)
     public int clientId;
 
@@ -29,12 +28,12 @@ public class LoginRequest {
     public String companyId;
 
     @ApiModelProperty(notes = "Tên đăng nhập",
-                      example = "duyna5")
+                      example = "admin")
     @NotEmpty
     public String username;
 
     @ApiModelProperty(notes = "Mật khẩu",
-                      example = "123456")
+                      example = "123")
     @NotEmpty
     public String password;
 
