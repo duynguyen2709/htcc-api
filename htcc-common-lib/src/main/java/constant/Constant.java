@@ -10,6 +10,9 @@ public class Constant {
     public static final String PUBLIC_API_PATH       = "/public/";
     public static final String PRIVATE_API_PATH      = "/private/";
     public static final String BASE_API_GATEWAY_PATH = "/api/gateway";
+    public static final String BASE_API_EMPLOYEE_PATH = "/api/employee";
+    public static final String SWAGGER_DOCS_PATH     = "/v2/api-docs";
+
 
     public static final String CLIENT_ID = "clientId";
     public static final String COMPANY_ID = "companyId";

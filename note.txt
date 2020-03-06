@@ -30,3 +30,8 @@
 05-03-2020 :
  + Ver 1.1.0:
     - Gateway: done login & logout api
+
+06-03-2020 :
+ + Version 1.1.1:
+    - Fix Swagger
+    - Init Log Service
