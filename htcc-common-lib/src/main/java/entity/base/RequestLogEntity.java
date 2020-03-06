@@ -32,4 +32,13 @@ public class RequestLogEntity implements Serializable {
             response.data = res;
         }
     }
+
+    public void setBody(String str) {
+        try {
+            Object jsonString = StringUtil.fromJsonString(str, Object.class);
+            this.body = StringUtil.toJsonString(jsonString);
+        } catch (Exception e){
+            this.body = str;
+        }
+    }
 }
