@@ -19,8 +19,7 @@ public class LoginRequest {
     @ApiModelProperty(notes = "Mã định danh cho mỗi hệ thống khác nhau (mobile, web...) |" +
                                 "1 - Mobile | 2 - Web quản lý" +
                                 " công ty | 3 - Web quản trị hệ thống",
-                      example = "1 - Mobile | 2 - Web quản lý công ty | " +
-                              "3 - Web quản trị hệ thống")
+                      example = "1")
     @Min(1)
     public int clientId;
 
