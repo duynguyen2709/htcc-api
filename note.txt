@@ -39,4 +39,4 @@
 07-03-2020 :
  + Version 1.1.2:
     - Fix Logout API
-    - [Gateway] Add Redis
+    - [Gateway] Add Redis, change MySQL username & password
