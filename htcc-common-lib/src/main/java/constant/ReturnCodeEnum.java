@@ -4,35 +4,35 @@ import java.util.HashMap;
 
 public enum ReturnCodeEnum {
 
-    INIT(2),
-    SUCCESS(1),
-    EXCEPTION(0),
-    UNAUTHORIZE(401),
-    PERMISSION_DENIED(403),
-    WRONG_USERNAME_OR_PASSWORD(-1),
-    ACCOUNT_LOCKED(-2),
+    INIT(2, "Đang xử lý"),
+    SUCCESS(1, "Thành công"),
+    EXCEPTION(0, "Hệ thống đang có lỗi. Vui lòng thử lại sau"),
+    UNAUTHORIZE(401, "Không có quyền truy cập"),
+    PERMISSION_DENIED(403, ""),
+    WRONG_USERNAME_OR_PASSWORD(-1, "Sai tên đăng nhập hoặc mật khẩu"),
+    ACCOUNT_LOCKED(-2, "Tài khoản đã bị khóa"),
 
-    PARAM_CLIENTID_INVALID(-3),
-    PARAM_REQDATE_INVALID(-4),
-    PARAM_SIG_INVALID(-5),
-    PARAM_DATA_INVALID(-6),
-
-    CHECK_SIG_NOT_MATCH(-7),
-    TIME_LIMIT_EXCEED(-8),
-    REPLAY_ATTACK_BLOCKED(-9),
+    PARAM_CLIENTID_INVALID(-3, "Thiếu ClientID"),
+    PARAM_DATA_INVALID(-4, "Dữ liệu không hợp lệ"),
 
     ;
 
     private final int value;
+    private final String message;
 
     private static final HashMap<Integer, ReturnCodeEnum> map = new HashMap<>();
 
-    ReturnCodeEnum(int value) {
+    ReturnCodeEnum(int value, String message) {
         this.value = value;
+        this.message = message;
     }
 
     public int getValue() {
         return this.value;
+    }
+
+    public String getMessage() {
+        return this.message;
     }
 
     public static ReturnCodeEnum fromInt(int iValue) {

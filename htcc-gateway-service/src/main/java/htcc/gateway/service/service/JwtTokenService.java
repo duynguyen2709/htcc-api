@@ -1,6 +1,8 @@
 package htcc.gateway.service.service;
 
+import constant.ClientSystemEnum;
 import constant.Constant;
+import htcc.gateway.service.config.file.RedisBuzConfig;
 import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.BaseUser;
 import htcc.gateway.service.entity.request.LoginRequest;
@@ -16,7 +18,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import util.NumberUtil;
 import util.StringUtil;
@@ -40,6 +41,12 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 
 	@Autowired
 	private AuthenticationService authenService;
+
+	@Autowired
+	private RedisService redis;
+
+	@Autowired
+	private RedisBuzConfig redisConfig;
 	//</editor-fold>
 
 	@Override
@@ -76,46 +83,46 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 				.build();
 	}
 
-	private String getUsernameFromToken(String token) {
-		return getClaimFromToken(token, Claims::getSubject);
+	private String getUsername(String token) {
+		return getClaim(token, Claims::getSubject);
 	}
 
-	public LoginRequest getLoginInfoFromToken(String token) {
-		int clientId = NumberUtil.getIntValue(getClaimFromToken(token, c -> c.get(Constant.CLIENT_ID)));
-		String companyId = StringUtil.valueOf(getClaimFromToken(token, c -> c.get(Constant.COMPANY_ID)));
-		String username = getUsernameFromToken(token);
+	public LoginRequest getLoginInfo(String token) {
+		int clientId = NumberUtil.getIntValue(getClaim(token, c -> c.get(Constant.CLIENT_ID)));
+		String companyId = StringUtil.valueOf(getClaim(token, c -> c.get(Constant.COMPANY_ID)));
+		String username = getUsername(token);
 
 		return new LoginRequest(clientId, companyId, username, "");
 	}
 
-	private Date getExpirationDateFromToken(String token) {
-		return getClaimFromToken(token, Claims::getExpiration);
+	private Date getExpireDate(String token) {
+		return getClaim(token, Claims::getExpiration);
 	}
 
-	private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-		final Claims claims = getAllClaimsFromToken(token);
+	private <T> T getClaim(String token, Function<Claims, T> claimsResolver) {
+		final Claims claims = getAllClaims(token);
 		return claimsResolver.apply(claims);
 	}
 
-	private Claims getAllClaimsFromToken(String token) {
+	private Claims getAllClaims(String token) {
 		return Jwts.parser().setSigningKey(config.jwt.key).parseClaimsJws(token).getBody();
 	}
 
 	private boolean isTokenExpired(String token) {
-		boolean ignore = ignoreTokenExpiration(token);
+		boolean ignore = ignoreTokenExpire(token);
 		if (ignore){
 			return true;
 		}
 
-		Date expiration = getExpirationDateFromToken(token);
+		Date expiration = getExpireDate(token);
 		return expiration.before(new Date());
 	}
 
-	private boolean ignoreTokenExpiration(String token) {
+	private boolean ignoreTokenExpire(String token) {
 		return false;
 	}
 
-	public String generateToken(LoginRequest request) {
+	private String generateToken(LoginRequest request) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(Constant.CLIENT_ID, request.clientId);
 		claims.put(Constant.COMPANY_ID, StringUtil.valueOf(request.companyId));
@@ -129,12 +136,14 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 				.signWith(SignatureAlgorithm.HS512, config.jwt.key).compact();
 	}
 
+	public String getToken(LoginRequest request) {
+		return StringUtil.valueOf(redis.getOrSet(generateToken(request), redisConfig.tokenFormat,
+				request.clientId, request.companyId, request.username));
+	}
+
 	public boolean validateToken(String token, String reqUsername) {
-		String username = getUsernameFromToken(token);
+		String username = getUsername(token);
 		return (username.equals(reqUsername) && !isTokenExpired(token));
 	}
 
-	public Authentication getAuthentication() {
-		return SecurityContextHolder.getContext().getAuthentication();
-	}
 }

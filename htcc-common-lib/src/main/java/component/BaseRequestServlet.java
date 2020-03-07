@@ -76,6 +76,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
         try {
             logEnt.setMethod(request.getMethod());
             logEnt.setPath(request.getRequestURI());
+            logEnt.setParams(request.getParameterMap());
             logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
             logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
             logEnt.setResponseTime(System.currentTimeMillis());
