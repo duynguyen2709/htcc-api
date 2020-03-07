@@ -29,5 +29,5 @@ redis:
   useRedis: true
   password: abc@123
   useMaster: true
-  masterAddress: 172.17.0.1:6379
+  masterAddress: 10.25.96.3:6379
   nodeAddresses: 10.25.96.4:6379
