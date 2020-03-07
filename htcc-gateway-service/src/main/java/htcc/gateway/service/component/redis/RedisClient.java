@@ -50,6 +50,7 @@ public abstract class RedisClient {
                 ReadMode readMode = ReadMode.valueOf(config.getReadMode());
                 redisConfig.useClusterServers()
                         .addNodeAddress(nodeAddress)
+                        .setPassword(config.getPassword())
                         .setScanInterval(config.getScanInterval())
                         .setSlaveConnectionMinimumIdleSize(config.getSlaveConnectionMinimumIdleSize())
                         .setSlaveConnectionPoolSize(config.getSlaveConnectionPoolSize())

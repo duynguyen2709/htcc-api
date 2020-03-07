@@ -9,7 +9,7 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka1:8761/eureka
+      defaultZone: http://eureka1:8761/eureka, http://eureka2:8761/eureka
   instance:
     hostname: eureka2
 
@@ -26,5 +26,7 @@ spring:
     validationQuery: SELECT 1
 
 redis:
+  useRedis: true
+  password: abc@123
   cluster: true
   nodeAddresses: 127.0.0.1:6379;10.25.96.3:6379

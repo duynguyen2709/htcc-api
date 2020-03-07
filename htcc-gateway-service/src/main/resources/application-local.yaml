@@ -31,5 +31,6 @@ service:
 
 redis:
   useRedis: true
+  password:
   cluster: false
   nodeAddresses: 127.0.0.1:6379

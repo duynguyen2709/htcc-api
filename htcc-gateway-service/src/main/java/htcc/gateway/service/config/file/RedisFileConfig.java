@@ -12,6 +12,7 @@ import org.springframework.core.annotation.Order;
 @ConfigurationProperties(prefix="redis")
 public class RedisFileConfig {
     private boolean useRedis;
+    private String password;
     private boolean cluster;
     private String nodeAddresses;
     private String delimiterAddress;
