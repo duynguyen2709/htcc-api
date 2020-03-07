@@ -36,7 +36,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String  uri             = request.getRequestURI();
         boolean shouldNotFilter = false;
 
-        if (!uri.startsWith(Constant.API_PATH) && !uri.startsWith(Constant.PRIVATE_API_PATH)) {
+        if (!uri.startsWith(Constant.API_PATH)) {
             shouldNotFilter = true;
         }
 
@@ -63,8 +63,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (requestTokenHeader != null && requestTokenHeader.startsWith(BEARER)) {
                 jwtToken = requestTokenHeader.substring(7);
                 try {
-                    loginRequest = jwtTokenService.getLoginInfoFromToken(jwtToken);
+                    loginRequest = jwtTokenService.getLoginInfo(jwtToken);
                 } catch (Exception e) {
+                    log.error(e.getMessage());
                     throw new Exception(String.format("JWT Token [%s] Invalid", requestTokenHeader));
                 }
             } else {
@@ -73,7 +74,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
             if (loginRequest != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = jwtTokenService.loadUserByUsername(StringUtil.toJsonString(loginRequest));
-
                 if (jwtTokenService.validateToken(jwtToken, loginRequest.username)) {
                     UsernamePasswordAuthenticationToken detail =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -85,9 +85,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
         } catch (Exception e) {
             log.error("doFilterInternal ex: " + e.getMessage());
-
-            response.setContentType(Constant.APPLICATION_JSON);
-            response.getWriter().write(StringUtil.toJsonString(new BaseResponse<>(ReturnCodeEnum.UNAUTHORIZE)));
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
     }
 

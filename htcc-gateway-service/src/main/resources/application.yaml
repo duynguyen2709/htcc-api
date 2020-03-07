@@ -1,3 +1,4 @@
+################## Spring Config ##################
 spring:
   application:
     name: htcc-gateway-service
@@ -16,6 +17,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
 
+################## Eureka Config ##################
 eureka:
   dashboard:
     path: /dashboard
@@ -25,10 +27,17 @@ eureka:
   instance:
     appname: ${spring.application.name}
 
+management:
+  endpoints:
+    enabled-by-default: false
+
+################## Logging Config ##################
 logging:
   config: classpath:log4j2.properties
 
+################## Zuul Config ##################
 zuul:
+  sensitiveHeaders:
   ribbon:
     eager-load:
       enabled: true
@@ -48,10 +57,7 @@ ribbon:
   ReadTimeout: 30000
   ConnectTimeout: 30000
 
-management:
-  endpoints:
-    enabled-by-default: false
-
+################## Service Config ##################
 service:
   debugMode: false
 
@@ -59,3 +65,24 @@ security:
   jwt:
     key: "gmDJYOtCOvOgzuC5u3XViSq8pxf7BerA"
     expireSecond: 86400
+
+
+################## Redis Config ##################
+redis:
+  delimiterAddress: ;
+  scanInterval: 5000
+  slaveConnectionMinimumIdleSize: 10
+  slaveConnectionPoolSize: 100
+  masterConnectionMinimumIdleSize: 10
+  masterConnectionPoolSize: 100
+  idleConnectionTimeout: 10000
+  connectTimeout: 10000
+  responseTimeout: 10000
+  retryAttempts: 3
+  retryInterval: 1000
+  readMode: SLAVE
+  kryoCodec: true
+  masterAddress:
+
+redis-buz:
+  tokenFormat: TOKEN-%s-%s-%s # clientId-companyId-username

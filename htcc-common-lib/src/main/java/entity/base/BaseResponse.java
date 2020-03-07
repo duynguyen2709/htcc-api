@@ -31,12 +31,12 @@ public class BaseResponse<T> implements Serializable {
 
     public BaseResponse(ReturnCodeEnum e) {
         this.returnCode = e.getValue();
-        this.returnMessage = e.toString();
+        this.returnMessage = e.getMessage();
     }
 
     public BaseResponse(Exception e){
-        this.returnCode = 0;
-        this.returnMessage = "EXCEPTION";
+        this(ReturnCodeEnum.EXCEPTION);
+        this.data = (T) e.getMessage();
     }
 
 }

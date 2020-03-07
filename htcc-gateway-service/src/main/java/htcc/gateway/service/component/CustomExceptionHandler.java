@@ -18,7 +18,6 @@ public class CustomExceptionHandler extends DefaultErrorAttributes {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
 
         int returnCode = 0;
-        Object playerId;
         int status = Integer.parseInt(StringUtil.valueOf(errorAttributes.getOrDefault("status", 0)));
         if (status == ReturnCodeEnum.UNAUTHORIZE.getValue()) {
             returnCode = ReturnCodeEnum.UNAUTHORIZE.getValue();
@@ -27,7 +26,7 @@ public class CustomExceptionHandler extends DefaultErrorAttributes {
         String error = StringUtil.valueOf(errorAttributes.get("error"));
         errorAttributes.clear();
         errorAttributes.put("returnCode", returnCode);
-        errorAttributes.put("returnMessage", ReturnCodeEnum.fromInt(returnCode).toString());
+        errorAttributes.put("returnMessage", ReturnCodeEnum.fromInt(returnCode).getMessage());
         errorAttributes.put("data", error);
         return errorAttributes;
     }
