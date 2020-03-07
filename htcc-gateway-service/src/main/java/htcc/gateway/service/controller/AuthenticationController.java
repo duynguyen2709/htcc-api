@@ -43,7 +43,7 @@ public class AuthenticationController {
         BaseResponse<LoginResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             authenManager.authenticate(new UsernamePasswordAuthenticationToken(StringUtil.toJsonString(request), request.password));
-            String token = jwtTokenService.generateToken(request);
+            String token = jwtTokenService.getToken(request);
             response.data = new LoginResponse(token);
         } catch (BadCredentialsException e){
             log.warn("[login] ex: " + e.getMessage());

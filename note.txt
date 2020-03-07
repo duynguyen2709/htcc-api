@@ -35,3 +35,8 @@
  + Version 1.1.1:
     - Fix Swagger
     - Init Log Service
+
+07-03-2020 :
+ + Version 1.1.2:
+    - Fix Logout API
+    - [Gateway] Add Redis

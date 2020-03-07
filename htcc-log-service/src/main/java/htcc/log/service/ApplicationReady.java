@@ -7,6 +7,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.stereotype.Component;
+import util.LoggingUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,24 +22,6 @@ public class ApplicationReady {
 
     @EventListener({ApplicationReadyEvent.class})
     public void readyProcess() throws Exception {
-        log.info("************************* APP PROPERTIES ******************************");
-
-        List<MapPropertySource> propertySources = new ArrayList<>();
-
-        configurableEnvironment.getPropertySources().forEach(it -> {
-            if (it instanceof MapPropertySource && it.getName().contains("applicationConfig")) {
-                propertySources.add((MapPropertySource) it);
-            }
-        });
-
-        propertySources.stream()
-                .map(propertySource -> propertySource.getSource().keySet()).flatMap(Collection::stream).distinct().sorted().forEach(key -> {
-            try {
-                log.info(key + "=" + configurableEnvironment.getProperty(key));
-            } catch (Exception e) {
-                log.warn("{} -> {}", key, e.getMessage());
-            }
-        });
-        log.info("************************************************************************************");
+        LoggingUtil.printConfig(configurableEnvironment);
     }
 }

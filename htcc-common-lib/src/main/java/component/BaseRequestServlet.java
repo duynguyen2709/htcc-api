@@ -24,6 +24,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
     protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         String uri = request.getRequestURI();
+
         if (!uri.startsWith(Constant.API_PATH)) {
             super.doDispatch(request, response);
             return;
@@ -41,7 +42,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
         try {
             super.doDispatch(wrapper, response);
         } catch (Exception e) {
-            logger.warn(e);
+            log.warn(e);
         } finally {
             setLogData(wrapper, response);
             updateResponse(response);
@@ -76,6 +77,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
         try {
             logEnt.setMethod(request.getMethod());
             logEnt.setPath(request.getRequestURI());
+            logEnt.setParams(request.getParameterMap());
             logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
             logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
             logEnt.setResponseTime(System.currentTimeMillis());

@@ -22,9 +22,15 @@ spring:
     url: jdbc:mysql://${spring.datasource.server}/${spring.datasource.schemaName}?${spring.datasource.options}
     username: admin
     password: admin
-    testWhileIdle:
+    testWhileIdle: true
     timeBetweenEvictionRunsMillis: 60000
     validationQuery: SELECT 1
 
 service:
-  debugMode: true
+  debugMode: false
+
+redis:
+  useRedis: true
+  password:
+  useMaster: false
+  nodeAddresses: 127.0.0.1:6379
