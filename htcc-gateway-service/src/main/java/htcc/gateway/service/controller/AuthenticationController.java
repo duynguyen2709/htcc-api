@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,9 +46,16 @@ public class AuthenticationController {
             authenManager.authenticate(new UsernamePasswordAuthenticationToken(StringUtil.toJsonString(request), request.password));
             String token = jwtTokenService.getToken(request);
             response.data = new LoginResponse(token);
-        } catch (BadCredentialsException e){
-            log.warn("[login] ex: " + e.getMessage());
+
+        } catch (BadCredentialsException e) {
+            // wrong password
             response = new BaseResponse<>(ReturnCodeEnum.WRONG_USERNAME_OR_PASSWORD);
+
+        } catch (LockedException e) {
+            // account is locked
+            log.warn(String.format("[login] Account Locked [%s-%s-%s]", request.clientId, request.companyId, request.username));
+            response = new BaseResponse<>(ReturnCodeEnum.ACCOUNT_LOCKED);
+
         } catch (Exception e) {
             log.error("[login] ex", e);
             response = new BaseResponse<>(e);

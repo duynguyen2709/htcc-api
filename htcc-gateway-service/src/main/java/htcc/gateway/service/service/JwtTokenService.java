@@ -1,5 +1,6 @@
 package htcc.gateway.service.service;
 
+import constant.AccountStatusEnum;
 import constant.ClientSystemEnum;
 import constant.Constant;
 import htcc.gateway.service.config.file.RedisBuzConfig;
@@ -77,7 +78,7 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 				.password(user.password)
 				.authorities(Collections.emptyList())
 				.accountExpired(false)
-				.accountLocked(false)
+				.accountLocked(user.status == AccountStatusEnum.BLOCK.getValue())
 				.credentialsExpired(false)
 				.disabled(false)
 				.build();
