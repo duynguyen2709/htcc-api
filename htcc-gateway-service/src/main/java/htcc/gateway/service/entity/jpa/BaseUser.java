@@ -10,4 +10,5 @@ import lombok.RequiredArgsConstructor;
 public class BaseUser {
     public String username;
     public String password;
+    public int status;
 }
