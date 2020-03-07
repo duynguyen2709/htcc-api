@@ -18,7 +18,7 @@ public class RequestLogEntity implements Serializable {
     public String method       = "";
     public String path         = "";
     public String request      = "";
-    public Map<String, String[]> params = new HashMap<>();
+    public Object params;
     public String body         = "";
     public long   requestTime  = 0L;
     public long   responseTime = 0L;

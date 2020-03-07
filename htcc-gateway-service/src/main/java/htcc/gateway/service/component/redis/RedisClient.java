@@ -49,7 +49,7 @@ public abstract class RedisClient {
 
                 ReadMode readMode = ReadMode.valueOf(config.getReadMode());
                 redisConfig.useMasterSlaveServers()
-                        .setMasterAddress(config.getMasterAddress())
+                        .setMasterAddress("redis://" + config.getMasterAddress())
                         .addSlaveAddress(nodeAddress)
                         .setPassword(config.getPassword())
                         .setDnsMonitoringInterval(config.getScanInterval())

@@ -137,8 +137,9 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 	}
 
 	public String getToken(LoginRequest request) {
-		return StringUtil.valueOf(redis.getOrSet(generateToken(request), redisConfig.tokenFormat,
-				request.clientId, request.companyId, request.username));
+		return StringUtil.valueOf(redis.getOrSet(generateToken(request),
+				redisConfig.tokenFormat, request.clientId,
+				StringUtil.valueOf(request.companyId), request.username));
 	}
 
 	public boolean validateToken(String token, String reqUsername) {
