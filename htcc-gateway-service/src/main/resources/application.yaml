@@ -70,7 +70,7 @@ security:
 ################## Redis Config ##################
 redis:
   delimiterAddress: ;
-  scanInterval: 2000
+  scanInterval: 5000
   slaveConnectionMinimumIdleSize: 10
   slaveConnectionPoolSize: 100
   masterConnectionMinimumIdleSize: 10
@@ -80,8 +80,9 @@ redis:
   responseTimeout: 3000
   retryAttempts: 3
   retryInterval: 1000
-  readMode: MASTER
+  readMode: SLAVE
   kryoCodec: true
+  masterAddress:
 
 redis-buz:
   tokenFormat: TOKEN-%s-%s-%s # clientId-companyId-username

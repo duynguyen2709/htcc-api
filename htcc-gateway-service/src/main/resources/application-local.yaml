@@ -27,10 +27,10 @@ spring:
     validationQuery: SELECT 1
 
 service:
-  debugMode: true
+  debugMode: false
 
 redis:
   useRedis: true
   password:
-  cluster: false
+  useMaster: false
   nodeAddresses: 127.0.0.1:6379

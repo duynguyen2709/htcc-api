@@ -85,10 +85,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
         } catch (Exception e) {
             log.error("doFilterInternal ex: " + e.getMessage());
-
-            response.setContentType(Constant.APPLICATION_JSON);
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(StringUtil.toJsonString(new BaseResponse<>(ReturnCodeEnum.UNAUTHORIZE)));
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
     }
 

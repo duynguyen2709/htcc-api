@@ -28,5 +28,6 @@ spring:
 redis:
   useRedis: true
   password: abc@123
-  cluster: true
-  nodeAddresses: 127.0.0.1:6379;10.25.96.3:6379
+  useMaster: true
+  masterAddress: 10.25.96.3:6379
+  nodeAddresses: 172.17.0.1:6379

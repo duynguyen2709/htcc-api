@@ -40,7 +40,7 @@ public abstract class RedisClient {
                 redisConfig.setCodec(new KryoCodec());
             }
 
-            if (config.isCluster()) {
+            if (config.isUseMaster()) {
                 String[] nodeAddress = config.getNodeAddresses().split(config.getDelimiterAddress());
 
                 nodeAddress = Arrays.stream(nodeAddress)
@@ -48,10 +48,11 @@ public abstract class RedisClient {
                         .toArray(String[]::new);
 
                 ReadMode readMode = ReadMode.valueOf(config.getReadMode());
-                redisConfig.useClusterServers()
-                        .addNodeAddress(nodeAddress)
+                redisConfig.useMasterSlaveServers()
+                        .setMasterAddress(config.getMasterAddress())
+                        .addSlaveAddress(nodeAddress)
                         .setPassword(config.getPassword())
-                        .setScanInterval(config.getScanInterval())
+                        .setDnsMonitoringInterval(config.getScanInterval())
                         .setSlaveConnectionMinimumIdleSize(config.getSlaveConnectionMinimumIdleSize())
                         .setSlaveConnectionPoolSize(config.getSlaveConnectionPoolSize())
                         .setMasterConnectionMinimumIdleSize(config.getMasterConnectionMinimumIdleSize())

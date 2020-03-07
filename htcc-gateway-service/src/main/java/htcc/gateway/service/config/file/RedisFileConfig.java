@@ -13,7 +13,8 @@ import org.springframework.core.annotation.Order;
 public class RedisFileConfig {
     private boolean useRedis;
     private String password;
-    private boolean cluster;
+    private boolean useMaster;
+    private String masterAddress;
     private String nodeAddresses;
     private String delimiterAddress;
     private int scanInterval;

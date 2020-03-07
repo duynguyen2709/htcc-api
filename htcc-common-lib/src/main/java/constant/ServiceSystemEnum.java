@@ -3,6 +3,7 @@ package constant;
 import java.util.HashMap;
 
 public enum ServiceSystemEnum {
+    ERROR(0),
     GATEWAY(1),
     EMPLOYEE(2),
     MANAGER (3),
@@ -39,12 +40,14 @@ public enum ServiceSystemEnum {
     }
 
     public static int getServiceFromUri(String path){
-        final String subpath = path.split("/")[2].toUpperCase();
-        for (ServiceSystemEnum e : map.values()){
-            if (subpath.equals(e.toString())) {
-                return e.value;
+        try {
+            final String subpath = path.split("/")[2].toUpperCase();
+            for (ServiceSystemEnum e : map.values()) {
+                if (subpath.equals(e.toString())) {
+                    return e.value;
+                }
             }
-        }
+        } catch (Exception ignored) {}
         return 0;
     }
 }

@@ -39,7 +39,11 @@ public class RequestLogEntity implements Serializable {
     public void setBody(String str) {
         try {
             Object jsonString = StringUtil.fromJsonString(str, Object.class);
-            this.body = StringUtil.toJsonString(jsonString);
+            if (jsonString == null){
+                this.body = "";
+            } else {
+                this.body = StringUtil.toJsonString(jsonString);
+            }
         } catch (Exception e){
             this.body = str;
         }
