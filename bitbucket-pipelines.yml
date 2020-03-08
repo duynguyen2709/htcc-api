@@ -44,6 +44,41 @@ pipelines:
                 - (umask  077 ; echo $KEY_DEV_1 | base64 --decode > ~/.ssh/id_rsa)
                 - scp -P 22 -r ../htcc-gateway-service/src/main/resources/ root@108.61.162.225:/home/htcc-api/htcc-gateway-service
                 - ssh root@108.61.162.225 'cd /home/htcc-api/htcc-gateway-service/;./gateway.sh'
+    deploy-admin-to-dev:
+      - step:
+          name: Build Common Lib
+          caches:
+            - maven
+          script:
+            - mvn -B clean install
+          artifacts:
+            - '**/target/*.jar'
+      - step:
+          name: Build Docker Image
+          script:
+            - cd htcc-admin-service/
+            - docker build -t duyna5/htcc-admin-service .
+            - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+            - docker push duyna5/htcc-admin-service:latest
+      - parallel:
+          - step:
+              name: Deploy To Dev 1
+              script:
+                - mkdir -p ~/.ssh
+                - cd ssh/
+                - cat my_known_hosts >> ~/.ssh/known_hosts
+                - (umask  077 ; echo $KEY_DEV_1 | base64 --decode > ~/.ssh/id_rsa)
+                - scp -P 22 -r ../htcc-admin-service/src/main/resources/ root@167.179.80.90:/home/htcc-api/htcc-admin-service
+                - ssh root@167.179.80.90 'cd /home/htcc-api/htcc-admin-service/;./admin.sh'
+          - step:
+              name: Deploy To Dev 2
+              script:
+                - mkdir -p ~/.ssh
+                - cd ssh/
+                - cat my_known_hosts >> ~/.ssh/known_hosts
+                - (umask  077 ; echo $KEY_DEV_1 | base64 --decode > ~/.ssh/id_rsa)
+                - scp -P 22 -r ../htcc-admin-service/src/main/resources/ root@108.61.162.225:/home/htcc-api/htcc-admin-service
+                - ssh root@108.61.162.225 'cd /home/htcc-api/htcc-admin-service/;./admin.sh'
 
 options:
   docker: true

@@ -17,4 +17,6 @@ public class Constant {
     public static final String CLIENT_ID  = "clientId";
     public static final String COMPANY_ID = "companyId";
     public static final String USERNAME   = "username";
+
+    public static final String USER_DEFAULT_AVATAR = "https://i.pinimg.com/originals/0d/36/e7/0d36e7a476b06333d9fe9960572b66b9.jpg";
 }

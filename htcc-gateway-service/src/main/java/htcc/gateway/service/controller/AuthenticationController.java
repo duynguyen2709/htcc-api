@@ -40,7 +40,7 @@ public class AuthenticationController {
 
     @ApiOperation(value = "Đăng nhập")
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse<LoginResponse> login(@RequestBody LoginRequest request) {
+    public BaseResponse login(@RequestBody LoginRequest request) {
         BaseResponse<LoginResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             authenManager.authenticate(new UsernamePasswordAuthenticationToken(StringUtil.toJsonString(request), request.password));

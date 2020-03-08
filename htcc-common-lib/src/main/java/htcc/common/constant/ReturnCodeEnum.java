@@ -15,6 +15,8 @@ public enum ReturnCodeEnum {
     PARAM_CLIENTID_INVALID(-3, "Thiếu ClientID"),
     PARAM_DATA_INVALID(-4, "Dữ liệu không hợp lệ"),
 
+    USER_NOT_FOUND(-5, "Không tìm thấy người dùng"),
+
     ;
 
     private final int value;
