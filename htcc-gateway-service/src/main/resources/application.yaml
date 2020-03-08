@@ -26,6 +26,9 @@ eureka:
     fetch-registry: true
   instance:
     appname: ${spring.application.name}
+    leaseExpirationDurationInSeconds: 30
+  server:
+    enableSelfPreservation: false
 
 management:
   endpoints:
