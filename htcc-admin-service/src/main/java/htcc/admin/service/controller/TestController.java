@@ -1,4 +1,4 @@
-package htcc.employee.service.controller;
+package htcc.admin.service.controller;
 
 import entity.base.BaseResponse;
 import io.swagger.annotations.Api;

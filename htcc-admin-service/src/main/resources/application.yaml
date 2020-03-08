@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: htcc-admin-service
+  profiles:
+    active: ${env:local}
+  zipkin:
+    enabled: false
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    appname: ${spring.application.name}
+
+logging:
+  config: classpath:log4j2.properties

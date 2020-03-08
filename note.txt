@@ -40,3 +40,8 @@
  + Version 1.1.2:
     - Fix Logout API
     - [Gateway] Add Redis, change MySQL username & password
+
+08-03-2020 :
+ + Version 1.1.3:
+    - Init Admin Service
+    - Move common component to CommonLib

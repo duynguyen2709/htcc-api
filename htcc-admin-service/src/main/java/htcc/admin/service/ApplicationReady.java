@@ -1,4 +1,4 @@
-package htcc.employee.service;
+package htcc.admin.service;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Log4j2
 @Configuration
-@ComponentScan(basePackages = {"htcc.common.component", "htcc.employee.service"})
+@ComponentScan(basePackages = {"htcc.common.component", "htcc.admin.service"})
 public class ApplicationReady {
 
     @Autowired

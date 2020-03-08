@@ -1,0 +1,18 @@
+server:
+  port: 8202
+
+security:
+  user:
+    name: admin
+    password: admin
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka1:8761/eureka
+  instance:
+    hostname: eureka1
+
+service:
+  hazelcast:
+    useHazelcast: false
