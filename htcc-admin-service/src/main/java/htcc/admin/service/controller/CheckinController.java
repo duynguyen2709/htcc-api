@@ -1,8 +1,8 @@
 package htcc.admin.service.controller;
 
-import constant.ReturnCodeEnum;
-import entity.base.BaseResponse;
 import htcc.admin.service.entity.checkin.CheckinResponse;
+import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.entity.base.BaseResponse;
 import io.swagger.annotations.Api;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,4 +1,4 @@
-package entity.jpa;
+package htcc.common.entity.jpa;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package constant;
+package htcc.common.constant;
 
 import java.util.HashMap;
 

@@ -11,7 +11,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication
 @EnableEurekaClient
 @EnableSwagger2
-//@ComponentScan(basePackages = "htcc.common.component")
 @Log4j2
 public class Main {
 

@@ -1,10 +1,11 @@
 package htcc.gateway.service.controller;
 
-import constant.ReturnCodeEnum;
-import entity.base.BaseResponse;
+import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.entity.base.BaseResponse;
+import htcc.common.util.StringUtil;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.entity.response.LoginResponse;
-import htcc.gateway.service.service.JwtTokenService;
+import htcc.gateway.service.service.authentication.JwtTokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import util.StringUtil;
 
 @Api(tags = "Gateway APIs",
      value = "AuthenticationController",

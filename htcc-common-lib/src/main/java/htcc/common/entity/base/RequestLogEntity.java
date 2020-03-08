@@ -1,10 +1,10 @@
-package entity.base;
+package htcc.common.entity.base;
 
-import constant.ReturnCodeEnum;
+import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.util.StringUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import util.StringUtil;
 
 import java.io.Serializable;
 
@@ -45,7 +45,7 @@ public class RequestLogEntity implements Serializable {
         try {
             response = StringUtil.fromJsonString(res, BaseResponse.class);
         } catch (Exception e) {
-            response = new BaseResponse<Object>(ReturnCodeEnum.EXCEPTION);
+            response = new BaseResponse<>(ReturnCodeEnum.EXCEPTION);
             response.data = res;
         }
         returnCode = response.returnCode;

@@ -14,5 +14,18 @@ eureka:
     hostname: eureka1
 
 service:
+  debugMode: true
   hazelcast:
     useHazelcast: false
+
+spring:
+  datasource:
+    schemaName: HTCC_Admin
+    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
+    server: 127.0.0.1:3306
+    url: jdbc:mysql://${spring.datasource.server}/${spring.datasource.schemaName}?${spring.datasource.options}
+    username: ${security.user.name}
+    password: ${security.user.password}
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    validationQuery: SELECT 1

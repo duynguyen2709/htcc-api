@@ -1,5 +1,7 @@
 package htcc.gateway.service;
 
+import htcc.common.util.LoggingUtil;
+import htcc.common.util.MemoryUtil;
 import htcc.gateway.service.component.redis.RedisClient;
 import htcc.gateway.service.config.file.ServiceConfig;
 import lombok.extern.log4j.Log4j2;
@@ -9,16 +11,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MapPropertySource;
-import org.springframework.stereotype.Component;
-import util.LoggingUtil;
-import util.MemoryUtil;
-import util.StringUtil;
 
 import javax.annotation.PreDestroy;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;

@@ -1,4 +1,4 @@
-package util;
+package htcc.common.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;

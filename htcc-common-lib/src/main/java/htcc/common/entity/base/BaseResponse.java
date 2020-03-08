@@ -1,6 +1,6 @@
-package entity.base;
+package htcc.common.entity.base;
 
-import constant.ReturnCodeEnum;
+import htcc.common.constant.ReturnCodeEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

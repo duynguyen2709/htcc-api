@@ -1,4 +1,4 @@
-package service;
+package htcc.common.service;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package entity.base;
+package htcc.common.entity.base;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;

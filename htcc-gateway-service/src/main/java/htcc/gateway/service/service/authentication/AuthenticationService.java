@@ -1,6 +1,6 @@
 package htcc.gateway.service.service.authentication;
 
-import constant.ClientSystemEnum;
+import htcc.common.constant.ClientSystemEnum;
 import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.AdminUser;
 import htcc.gateway.service.entity.jpa.BaseUser;

@@ -1,9 +1,11 @@
-package component;
+package htcc.common.component;
 
-import constant.Constant;
-import constant.ServiceSystemEnum;
-import entity.base.RequestLogEntity;
-import entity.base.RequestWrapper;
+import htcc.common.constant.Constant;
+import htcc.common.constant.ServiceSystemEnum;
+import htcc.common.entity.base.RequestLogEntity;
+import htcc.common.entity.base.RequestWrapper;
+import htcc.common.util.NumberUtil;
+import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -11,8 +13,6 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.WebUtils;
-import util.NumberUtil;
-import util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

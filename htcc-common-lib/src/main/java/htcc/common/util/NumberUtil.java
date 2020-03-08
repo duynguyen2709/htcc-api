@@ -1,4 +1,4 @@
-package util;
+package htcc.common.util;
 
 public class NumberUtil {
 

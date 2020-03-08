@@ -1,12 +1,14 @@
 package htcc.gateway.service.entity.jpa;
 
-import constant.AccountStatusEnum;
-import entity.jpa.BaseJPAEntity;
+import htcc.common.constant.AccountStatusEnum;
+import htcc.common.entity.jpa.BaseJPAEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
 @Data

@@ -1,7 +1,7 @@
 package htcc.employee.service.controller;
 
-import constant.ReturnCodeEnum;
-import entity.base.BaseResponse;
+import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.entity.base.BaseResponse;
 import htcc.employee.service.entity.checkin.CheckinResponse;
 import io.swagger.annotations.Api;
 import lombok.extern.log4j.Log4j2;

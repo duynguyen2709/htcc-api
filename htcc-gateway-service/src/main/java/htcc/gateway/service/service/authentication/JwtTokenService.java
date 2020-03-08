@@ -1,27 +1,24 @@
-package htcc.gateway.service.service;
+package htcc.gateway.service.service.authentication;
 
-import constant.AccountStatusEnum;
-import constant.ClientSystemEnum;
-import constant.Constant;
+import htcc.common.constant.AccountStatusEnum;
+import htcc.common.constant.Constant;
+import htcc.common.util.NumberUtil;
+import htcc.common.util.StringUtil;
 import htcc.gateway.service.config.file.RedisBuzConfig;
 import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.BaseUser;
 import htcc.gateway.service.entity.request.LoginRequest;
-import htcc.gateway.service.service.authentication.AuthenticationService;
+import htcc.gateway.service.service.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import util.NumberUtil;
-import util.StringUtil;
 
 import java.io.Serializable;
 import java.util.Collections;

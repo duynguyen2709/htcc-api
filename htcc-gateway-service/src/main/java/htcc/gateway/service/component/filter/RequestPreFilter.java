@@ -3,7 +3,7 @@ package htcc.gateway.service.component.filter;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
-import constant.Constant;
+import htcc.common.constant.Constant;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
