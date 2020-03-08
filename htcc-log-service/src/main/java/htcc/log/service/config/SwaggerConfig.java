@@ -29,7 +29,7 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage("htcc.log.service.controller"))
                 .paths(PathSelectors.any())
                 .build()
-                .apiInfo(new ApiInfo("BaseURL : https://1612145.online/api/log/<apiname>",
+                .apiInfo(new ApiInfo("BaseURL : https://1612145.online/api/log/",
                         "Tất cả API chỉ thành công khi returnCode = 1",
                         "1.0",
                         null,

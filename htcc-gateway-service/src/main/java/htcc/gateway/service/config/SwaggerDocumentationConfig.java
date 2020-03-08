@@ -1,5 +1,7 @@
 package htcc.gateway.service.config;
 
+import htcc.gateway.service.config.file.ZuulRouteConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Primary;
@@ -17,17 +19,15 @@ public class SwaggerDocumentationConfig implements SwaggerResourcesProvider {
 
     private static final String VERSION = "2.0";
 
-    @Value("${zuul.routes.htcc-employee-service.service-id}")
-    private String employeeService;
-
-    @Value("${spring.application.name}")
-    private String gatewayService;
+    @Autowired
+    private ZuulRouteConfig routeConfig;
 
     @Override
     public List<SwaggerResource> get() {
         List<SwaggerResource> resources = new ArrayList<>();
-        resources.add(swaggerResource(gatewayService, "/v2/api-docs"));
-        resources.add(swaggerResource(employeeService, "/api/employee/v2/api-docs"));
+        resources.add(swaggerResource(routeConfig.gatewayService, "/v2/api-docs"));
+        resources.add(swaggerResource(routeConfig.employeeService, "/api/employee/v2/api-docs"));
+        resources.add(swaggerResource(routeConfig.adminService, "/api/admin/v2/api-docs"));
         return resources;
     }
 

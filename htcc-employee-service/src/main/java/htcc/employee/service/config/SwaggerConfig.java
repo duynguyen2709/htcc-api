@@ -28,7 +28,7 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage("htcc.employee.service.controller"))
                 .paths(PathSelectors.any())
                 .build()
-                .apiInfo(new ApiInfo("BaseURL : https://1612145.online/api/employee/<apiname>",
+                .apiInfo(new ApiInfo("BaseURL : https://1612145.online/api/employee/",
                         "Tất cả API chỉ thành công khi returnCode = 1",
                         "1.0",
                         null,
