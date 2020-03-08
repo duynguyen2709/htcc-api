@@ -65,9 +65,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //disable cors and csrf
-        http.cors().configurationSource(corsConfigurationSource()).and()
-                .csrf().disable().exceptionHandling();
+        //disable csrf
+        http.csrf().disable().exceptionHandling();
 
         http.authorizeRequests()
                 .antMatchers(new String[]{eurekaDashboard})
@@ -76,18 +75,6 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // jwt request for api paths
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-    }
-
-    private CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        List<String>      allows  = singletonList("*");
-        configuration.setAllowedOrigins(allows);
-        configuration.setAllowedMethods(allows);
-        configuration.setAllowedHeaders(allows);
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 
     @Bean
