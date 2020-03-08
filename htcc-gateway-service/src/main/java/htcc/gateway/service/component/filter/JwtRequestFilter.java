@@ -39,7 +39,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (uri.startsWith(Constant.BASE_API_GATEWAY_PATH + Constant.PUBLIC_API_PATH) ||
-                uri.startsWith(Constant.BASE_API_EMPLOYEE_PATH + Constant.PUBLIC_API_PATH)) {
+                uri.startsWith(Constant.BASE_API_EMPLOYEE_PATH + Constant.PUBLIC_API_PATH) ||
+                uri.startsWith(Constant.BASE_API_ADMIN_PATH + Constant.PUBLIC_API_PATH)) {
             shouldNotFilter = true;
         }
 

@@ -26,7 +26,7 @@ eureka:
     fetch-registry: true
   instance:
     appname: ${spring.application.name}
-    leaseExpirationDurationInSeconds: 30
+    leaseExpirationDurationInSeconds: 45
   server:
     enableSelfPreservation: false
 
@@ -49,13 +49,13 @@ zuul:
   routes:
     htcc-gateway-service:
       path: /gateway/**
-      service-id: htcc-gateway-service
+      serviceId: htcc-gateway-service
     htcc-employee-service:
       path: /employee/**
-      service-id: htcc-employee-service
+      serviceId: htcc-employee-service
     htcc-admin-service:
       path: /admin/**
-      service-id: htcc-admin-service
+      serviceId: htcc-admin-service
 
 ribbon:
   eureka:
