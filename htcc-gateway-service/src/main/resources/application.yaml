@@ -50,6 +50,9 @@ zuul:
     htcc-employee-service:
       path: /employee/**
       service-id: htcc-employee-service
+    htcc-admin-service:
+      path: /admin/**
+      service-id: htcc-admin-service
 
 ribbon:
   eureka:

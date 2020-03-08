@@ -1,10 +1,9 @@
 package htcc.gateway.service.component.filter;
 
-import constant.Constant;
-import constant.ReturnCodeEnum;
-import entity.base.BaseResponse;
+import htcc.common.constant.Constant;
+import htcc.common.util.StringUtil;
 import htcc.gateway.service.entity.request.LoginRequest;
-import htcc.gateway.service.service.JwtTokenService;
+import htcc.gateway.service.service.authentication.JwtTokenService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import util.StringUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

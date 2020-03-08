@@ -1,6 +1,6 @@
 package htcc.gateway.service.service.authentication;
 
-import constant.ClientSystemEnum;
+import htcc.common.constant.ClientSystemEnum;
 import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.AdminUser;
 import htcc.gateway.service.entity.jpa.BaseUser;
@@ -38,13 +38,13 @@ public class AuthenticationService {
                 case EUREKA_DASHBOARD:
                     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
                     String password = passwordEncoder.encode(securityConfig.user.password);
-                    user = new BaseUser(securityConfig.user.name, password);
+                    user = new BaseUser(securityConfig.user.name, password, 1);
                     break;
 
                 case ADMIN_WEB:
                     AdminUser admin = adminUserService.findById(req.username);
                     if (admin != null) {
-                        user = new BaseUser(admin.username, admin.password);
+                        user = new BaseUser(admin.username, admin.password, admin.status);
                     }
                     break;
 
@@ -53,7 +53,7 @@ public class AuthenticationService {
                     CompanyUser.Key key = new CompanyUser.Key(req.companyId, req.username);
                     CompanyUser companyUser = companyUserService.findById(key);
                     if (companyUser != null) {
-                        user = new BaseUser(companyUser.username, companyUser.password);
+                        user = new BaseUser(companyUser.username, companyUser.password, companyUser.status);
                     }
                     break;
             }
