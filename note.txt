@@ -48,3 +48,7 @@
     - Add more description for apis (Swagger)
     - Edit Pipeline for Admin Service
     - Edit gateway.sh script to --network="host"
+
+09-03-2020 :
+ + Version 1.1.4:
+    - [Gateway] Fix CORS

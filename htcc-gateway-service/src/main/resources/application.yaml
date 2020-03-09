@@ -41,7 +41,7 @@ logging:
 ################## Zuul Config ##################
 zuul:
   sensitiveHeaders:
-  ignoredHeaders: Access-Control-Allow-Credentials, Access-Control-Allow-Origin
+  ignoredHeaders: Access-Control-Allow-Origin
   ribbon:
     eager-load:
       enabled: true

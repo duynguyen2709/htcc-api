@@ -19,7 +19,7 @@ public class BaseResponse<T> implements Serializable {
                       example = "1")
     public int returnCode;
 
-    @ApiModelProperty(notes = "Câu mô tả lỗi xảy ra",
+    @ApiModelProperty(notes = "Câu mô tả lỗi (hiện khi xảy ra lỗi)",
                       example = "Thành công")
     public String returnMessage;
 

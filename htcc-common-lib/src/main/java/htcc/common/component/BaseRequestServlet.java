@@ -47,6 +47,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
             setLogData(wrapper, response);
             updateResponse(response);
         }
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     private String getResponsePayload(HttpServletResponse response) {
