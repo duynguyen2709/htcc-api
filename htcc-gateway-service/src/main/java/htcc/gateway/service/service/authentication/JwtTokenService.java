@@ -2,6 +2,7 @@ package htcc.gateway.service.service.authentication;
 
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.constant.Constant;
+import htcc.common.service.ICallback;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
@@ -137,8 +138,12 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 	}
 
 	public String getToken(LoginRequest request) {
-		return StringUtil.valueOf(redis.getOrSet(generateToken(request),
-				redisConfig.tokenFormat, request.clientId,
+		return StringUtil.valueOf(redis.getOrSet(new ICallback() {
+			@Override
+			public Object callback() {
+				return generateToken(request);
+			}
+		}, redisConfig.tokenFormat, request.clientId,
 				StringUtil.valueOf(request.companyId), request.username));
 	}
 

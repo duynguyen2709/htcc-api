@@ -9,10 +9,10 @@ security:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka1:8761/eureka,http://eureka2:8761/eureka
+      defaultZone: http://eureka1:8761/eureka, http://eureka2:8761/eureka
 
 service:
-  debugMode: true
+  debugMode: false
   hazelcast:
     useHazelcast: false
 
@@ -20,7 +20,7 @@ spring:
   datasource:
     schemaName: HTCC_Admin
     options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
-    server: 167.179.80.90:3306
+    server: 127.0.0.1:3306
     url: jdbc:mysql://${spring.datasource.server}/${spring.datasource.schemaName}?${spring.datasource.options}
     username: ${security.user.name}
     password: ${security.user.password}

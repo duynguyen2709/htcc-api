@@ -16,7 +16,6 @@ public class CustomExceptionHandler extends DefaultErrorAttributes {
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
-
         int returnCode = 0;
         int status = Integer.parseInt(StringUtil.valueOf(errorAttributes.getOrDefault("status", 0)));
         if (status == ReturnCodeEnum.UNAUTHORIZE.getValue()) {

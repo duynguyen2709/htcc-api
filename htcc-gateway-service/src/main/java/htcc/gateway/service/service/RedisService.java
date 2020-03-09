@@ -1,9 +1,12 @@
 package htcc.gateway.service.service;
 
+import htcc.common.service.ICallback;
 import htcc.gateway.service.component.redis.RedisClient;
 import lombok.extern.log4j.Log4j2;
 import org.redisson.api.RBucket;
 import org.springframework.stereotype.Service;
+
+import javax.security.auth.callback.Callback;
 
 @Service
 @Log4j2
@@ -37,9 +40,9 @@ public class RedisService extends RedisClient {
     }
 
     @Override
-    public Object getOrSet(Object newValue, String keyFormat, Object... params) {
+    public Object getOrSet(ICallback f, String keyFormat, Object... params) {
         if (instance == null) {
-            return newValue;
+            return f.callback();
         }
 
         String key = String.format(keyFormat, params);
@@ -48,6 +51,8 @@ public class RedisService extends RedisClient {
         if (bucket.isExists()){
             return bucket.get();
         }
+
+        Object newValue = f.callback();
 
         bucket.set(newValue);
         return newValue;

@@ -25,7 +25,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
 
         String uri = request.getRequestURI();
 
-        if (!uri.startsWith(Constant.API_PATH)) {
+        if (!uri.startsWith(Constant.API_PATH) || uri.endsWith(Constant.SWAGGER_DOCS_PATH)) {
             super.doDispatch(request, response);
             return;
         }
@@ -42,7 +42,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
         try {
             super.doDispatch(wrapper, response);
         } catch (Exception e) {
-            log.warn(e);
+            log.warn(e.getMessage());
         } finally {
             setLogData(wrapper, response);
             updateResponse(response);
@@ -85,7 +85,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
             logEnt.setBody((hasBody(logEnt.method)) ? StringUtil.valueOf(request.getBody()) : "");
             logEnt.setResponse(getResponsePayload(responseToCache));
         } catch (Exception e) {
-            log.error("setLogData ex {}", e.getMessage());
+            log.warn("setLogData ex {}", e.getMessage(), e);
         } finally {
             processLog(logEnt);
         }
