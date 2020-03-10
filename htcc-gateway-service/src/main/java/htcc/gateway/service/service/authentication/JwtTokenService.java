@@ -146,7 +146,7 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 		};
 
 		return StringUtil.valueOf(redis.getOrSet(genTokenCb,
-												config.jwt.expireSecond,
+												config.jwt.expireSecond - 1,
 												redisConfig.tokenFormat,
 												request.clientId,
 												StringUtil.valueOf(request.companyId),

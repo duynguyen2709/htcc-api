@@ -71,9 +71,7 @@ service:
 security:
   jwt:
     key: "gmDJYOtCOvOgzuC5u3XViSq8pxf7BerA"
-#    expireSecond: 86400
-    expireSecond: 60
-
+    expireSecond: 86400
 
 ################## Redis Config ##################
 redis:
