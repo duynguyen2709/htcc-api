@@ -38,8 +38,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (uri.startsWith(Constant.BASE_API_GATEWAY_PATH + Constant.PUBLIC_API_PATH) ||
                 uri.startsWith(Constant.BASE_API_EMPLOYEE_PATH + Constant.PUBLIC_API_PATH) ||
-                uri.startsWith(Constant.BASE_API_ADMIN_PATH + Constant.PUBLIC_API_PATH))
-        {
+                uri.startsWith(Constant.BASE_API_ADMIN_PATH + Constant.PUBLIC_API_PATH)) {
             shouldNotFilter = true;
         }
 
@@ -83,7 +82,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             log.warn("JWT Expired: " + e.getMessage());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } catch (Exception e) {
-            log.error("doFilterInternal ex: " + e.getMessage());
+            log.error(String.format("doFilterInternal Uri [%s] ex: ", request.getRequestURI(), e.getMessage()));
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
     }
