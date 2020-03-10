@@ -6,6 +6,9 @@ public class Constant {
 
     public static final String APPLICATION_JSON = "application/json";
 
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String BEARER        = "Bearer ";
+
     public static final String API_PATH               = "/api";
     public static final String PUBLIC_API_PATH        = "/public/";
     public static final String PRIVATE_API_PATH       = "/private/";

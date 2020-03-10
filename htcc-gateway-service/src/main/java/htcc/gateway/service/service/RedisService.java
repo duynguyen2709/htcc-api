@@ -7,6 +7,7 @@ import org.redisson.api.RBucket;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.callback.Callback;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Log4j2
@@ -29,18 +30,23 @@ public class RedisService extends RedisClient {
     }
 
     @Override
-    public void set(Object newValue, String keyFormat, Object... params) {
+    public void set(Object newValue, long ttl, String keyFormat, Object... params) {
         if (instance == null) {
             return;
         }
 
         String key = String.format(keyFormat, params);
         RBucket<Object> bucket = instance.getBucket(key);
-        bucket.set(newValue);
+
+        if (ttl <= 0) {
+            bucket.set(newValue);
+        } else {
+            bucket.set(newValue, ttl, TimeUnit.SECONDS);
+        }
     }
 
     @Override
-    public Object getOrSet(ICallback f, String keyFormat, Object... params) {
+    public Object getOrSet(ICallback f, long ttl, String keyFormat, Object... params) {
         if (instance == null) {
             return f.callback();
         }
@@ -54,7 +60,12 @@ public class RedisService extends RedisClient {
 
         Object newValue = f.callback();
 
-        bucket.set(newValue);
+        if (ttl <= 0) {
+            bucket.set(newValue);
+        } else {
+            bucket.set(newValue, ttl, TimeUnit.SECONDS);
+        }
+
         return newValue;
     }
 

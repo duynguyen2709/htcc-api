@@ -72,6 +72,7 @@ public class PrivateController {
     @ApiOperation(value = "Test token")
     @GetMapping("/test")
     public BaseResponse test(){
+        log.info("Private Test OK");
         return BaseResponse.SUCCESS;
     }
 }

@@ -138,21 +138,26 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 	}
 
 	public String getToken(LoginRequest request) {
-		return StringUtil.valueOf(redis.getOrSet(new ICallback() {
+		ICallback genTokenCb = new ICallback() {
 			@Override
 			public Object callback() {
 				return generateToken(request);
 			}
-		}, redisConfig.tokenFormat, request.clientId,
-				StringUtil.valueOf(request.companyId), request.username));
+		};
+
+		return StringUtil.valueOf(redis.getOrSet(genTokenCb,
+												config.jwt.expireSecond,
+												redisConfig.tokenFormat,
+												request.clientId,
+												StringUtil.valueOf(request.companyId),
+												request.username));
 	}
 
-	public boolean validateToken(String token) {
+	public boolean validateToken(String token) throws ExpiredJwtException {
 		try {
 			Jwts.parser().setSigningKey(config.jwt.key).parseClaimsJws(token);
 			return true;
-		} catch (MalformedJwtException | UnsupportedJwtException |
-				ExpiredJwtException | IllegalArgumentException ex) {
+		} catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
 			log.warn(String.format("Invalid JWT token [%s]: [%s]", ex.getMessage(),
 					StringUtil.valueOf(token)));
 		}

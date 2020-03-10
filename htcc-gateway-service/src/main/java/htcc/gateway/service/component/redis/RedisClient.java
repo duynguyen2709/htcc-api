@@ -127,8 +127,8 @@ public abstract class RedisClient {
     }
 
     public abstract Object get(String keyFormat, Object ...params);
-    public abstract void set(Object newValue, String keyFormat, Object ...params);
-    public abstract Object getOrSet(ICallback f, String keyFormat, Object ...params);
+    public abstract void set(Object newValue, long ttl, String keyFormat, Object ...params);
+    public abstract Object getOrSet(ICallback f, long ttl, String keyFormat, Object ...params);
     public abstract void delete(String keyFormat, Object ...params);
 
 }
