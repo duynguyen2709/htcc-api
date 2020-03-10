@@ -33,7 +33,7 @@ public class PrivateController {
 
     @ApiOperation(value = "API Logout")
     @PostMapping("/logout/{clientId}")
-    public BaseResponse<Object> logout(@PathVariable("clientId") int clientId,
+    public BaseResponse logout(@PathVariable("clientId") int clientId,
                                        @RequestParam(required = false) String companyId,
                                        @RequestParam(required = true) String username,
                                        @RequestHeader("Authorization") String authorization) {
@@ -72,6 +72,7 @@ public class PrivateController {
     @ApiOperation(value = "Test token")
     @GetMapping("/test")
     public BaseResponse test(){
+        log.info("Private Test OK");
         return BaseResponse.SUCCESS;
     }
 }

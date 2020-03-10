@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CheckinController {
 
     @GetMapping("/checkin")
-    public BaseResponse<CheckinResponse> getCheckinInfo(@RequestParam(required = true) String companyId,
+    public BaseResponse getCheckinInfo(@RequestParam(required = true) String companyId,
                                                         @RequestParam(required = true) String username) {
         BaseResponse<CheckinResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {

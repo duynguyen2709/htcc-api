@@ -19,8 +19,8 @@ public class BaseResponse<T> implements Serializable {
                       example = "1")
     public int returnCode;
 
-    @ApiModelProperty(notes = "Câu mô tả lỗi xảy ra",
-                      example = "SUCCESS")
+    @ApiModelProperty(notes = "Câu mô tả lỗi (hiện khi xảy ra lỗi)",
+                      example = "Thành công")
     public String returnMessage;
 
     @ApiModelProperty(notes = "Dữ liệu trả về")
@@ -32,6 +32,11 @@ public class BaseResponse<T> implements Serializable {
     public BaseResponse(ReturnCodeEnum e) {
         this.returnCode = e.getValue();
         this.returnMessage = e.getMessage();
+    }
+
+    public BaseResponse(ReturnCodeEnum e, Object data) {
+        this(e);
+        this.data = (T)data;
     }
 
     public BaseResponse(Exception e){

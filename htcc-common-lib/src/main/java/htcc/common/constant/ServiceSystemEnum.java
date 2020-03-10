@@ -7,7 +7,8 @@ public enum ServiceSystemEnum {
     GATEWAY(1),
     EMPLOYEE(2),
     MANAGER (3),
-    LOG(4)
+    LOG(4),
+    ADMIN(5)
 
     ;
 

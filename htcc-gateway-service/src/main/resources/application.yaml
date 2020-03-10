@@ -26,6 +26,9 @@ eureka:
     fetch-registry: true
   instance:
     appname: ${spring.application.name}
+    leaseExpirationDurationInSeconds: 45
+  server:
+    enableSelfPreservation: false
 
 management:
   endpoints:
@@ -38,6 +41,7 @@ logging:
 ################## Zuul Config ##################
 zuul:
   sensitiveHeaders:
+  ignoredHeaders: Access-Control-Allow-Origin
   ribbon:
     eager-load:
       enabled: true
@@ -46,13 +50,13 @@ zuul:
   routes:
     htcc-gateway-service:
       path: /gateway/**
-      service-id: htcc-gateway-service
+      serviceId: htcc-gateway-service
     htcc-employee-service:
       path: /employee/**
-      service-id: htcc-employee-service
+      serviceId: htcc-employee-service
     htcc-admin-service:
       path: /admin/**
-      service-id: htcc-admin-service
+      serviceId: htcc-admin-service
 
 ribbon:
   eureka:
@@ -68,7 +72,6 @@ security:
   jwt:
     key: "gmDJYOtCOvOgzuC5u3XViSq8pxf7BerA"
     expireSecond: 86400
-
 
 ################## Redis Config ##################
 redis:

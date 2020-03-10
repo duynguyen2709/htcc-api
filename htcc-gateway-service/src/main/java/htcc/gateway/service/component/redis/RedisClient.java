@@ -1,5 +1,6 @@
 package htcc.gateway.service.component.redis;
 
+import htcc.common.service.ICallback;
 import htcc.gateway.service.config.file.RedisFileConfig;
 import lombok.extern.log4j.Log4j2;
 import org.redisson.Redisson;
@@ -126,8 +127,8 @@ public abstract class RedisClient {
     }
 
     public abstract Object get(String keyFormat, Object ...params);
-    public abstract void set(Object newValue, String keyFormat, Object ...params);
-    public abstract Object getOrSet(Object newValue, String keyFormat, Object ...params);
+    public abstract void set(Object newValue, long ttl, String keyFormat, Object ...params);
+    public abstract Object getOrSet(ICallback f, long ttl, String keyFormat, Object ...params);
     public abstract void delete(String keyFormat, Object ...params);
 
 }

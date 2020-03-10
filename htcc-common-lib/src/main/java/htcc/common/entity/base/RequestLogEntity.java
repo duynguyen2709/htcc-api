@@ -44,11 +44,12 @@ public class RequestLogEntity implements Serializable {
     public void setResponse(String res) {
         try {
             response = StringUtil.fromJsonString(res, BaseResponse.class);
+            returnCode = response.returnCode;
         } catch (Exception e) {
             response = new BaseResponse<>(ReturnCodeEnum.EXCEPTION);
             response.data = res;
+            returnCode = response.returnCode;
         }
-        returnCode = response.returnCode;
     }
 
     public void setBody(String str) {

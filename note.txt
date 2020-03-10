@@ -43,5 +43,16 @@
 
 08-03-2020 :
  + Version 1.1.3:
-    - Init Admin Service
+    - Init Admin Service & API GetUserInfo, UpdateUserInfo
     - Move common component to CommonLib
+    - Add more description for apis (Swagger)
+    - Edit Pipeline for Admin Service
+    - Edit gateway.sh script to --network="host"
+
+09-03-2020 :
+ + Version 1.1.4:
+    - [Gateway] Fix CORS
+
+10-03-2020 :
+ + Version 1.1.5:
+    - [Gateway] Auto Expired Token

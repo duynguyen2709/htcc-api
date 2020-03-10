@@ -3,9 +3,11 @@ package htcc.employee.service.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMethod;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.ResponseMessageBuilder;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
@@ -39,7 +41,15 @@ public class SwaggerConfig {
                 .globalResponseMessage(RequestMethod.GET, responseMessages)
                 .globalResponseMessage(RequestMethod.POST, responseMessages)
                 .globalResponseMessage(RequestMethod.PUT, responseMessages)
-                .globalResponseMessage(RequestMethod.DELETE, responseMessages);
+                .globalResponseMessage(RequestMethod.DELETE, responseMessages)
+                .globalOperationParameters(Arrays.asList(new ParameterBuilder()
+                                                        .name("Authorization")
+                                                        .description("[Header] Token khi đăng nhập")
+                                                        .defaultValue("Bearer TOKEN")
+                                                        .modelRef(new ModelRef("string"))
+                                                        .parameterType("header")
+                                                        .required(true)
+                                                        .build()));
     }
 
     @Bean

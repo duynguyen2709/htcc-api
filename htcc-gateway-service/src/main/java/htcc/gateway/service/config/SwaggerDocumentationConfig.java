@@ -26,8 +26,8 @@ public class SwaggerDocumentationConfig implements SwaggerResourcesProvider {
     public List<SwaggerResource> get() {
         List<SwaggerResource> resources = new ArrayList<>();
         resources.add(swaggerResource(routeConfig.gatewayService, "/v2/api-docs"));
-        resources.add(swaggerResource(routeConfig.employeeService, "/api/employee/v2/api-docs"));
         resources.add(swaggerResource(routeConfig.adminService, "/api/admin/v2/api-docs"));
+        resources.add(swaggerResource(routeConfig.employeeService, "/api/employee/v2/api-docs"));
         return resources;
     }
 
