@@ -17,6 +17,9 @@ service:
   debugMode: true
   hazelcast:
     useHazelcast: false
+    enableRest: true
+    monitorLevel: "OFF"
+    address: 127.0.0.1:5701
 
 spring:
   datasource:

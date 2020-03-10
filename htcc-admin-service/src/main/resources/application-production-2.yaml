@@ -16,7 +16,10 @@ eureka:
 service:
   debugMode: false
   hazelcast:
-    useHazelcast: false
+    useHazelcast: true
+    enableRest: true
+    monitorLevel: "OFF"
+    address: 10.25.96.4:5701
 
 spring:
   datasource:
