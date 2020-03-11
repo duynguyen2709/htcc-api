@@ -19,7 +19,7 @@ service:
     useHazelcast: true
     enableRest: true
     monitorLevel: "OFF"
-    address: 10.25.96.3:5701
+    address: 10.25.96.3
 
 spring:
   datasource:
