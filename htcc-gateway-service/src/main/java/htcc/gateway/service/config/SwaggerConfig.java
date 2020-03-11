@@ -6,9 +6,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.UriComponentsBuilder;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.ResponseMessageBuilder;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
@@ -18,6 +20,7 @@ import springfox.documentation.swagger.web.UiConfiguration;
 
 import javax.servlet.ServletContext;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,6 +55,14 @@ public class SwaggerConfig {
                 .globalResponseMessage(RequestMethod.POST, responseMessages)
                 .globalResponseMessage(RequestMethod.PUT, responseMessages)
                 .globalResponseMessage(RequestMethod.DELETE, responseMessages)
+                .globalOperationParameters(Arrays.asList(new ParameterBuilder()
+                        .name("Authorization")
+                        .description("[Header] Token khi đăng nhập")
+                        .defaultValue("Bearer TOKEN")
+                        .modelRef(new ModelRef("string"))
+                        .parameterType("header")
+                        .required(true)
+                        .build()))
                 .pathProvider(new CustomPathProvider(servletContext));
     }
 

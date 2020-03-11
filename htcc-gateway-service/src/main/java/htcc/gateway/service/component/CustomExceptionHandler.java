@@ -9,6 +9,8 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Map;
 
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+
 @Component
 @Log4j2
 public class CustomExceptionHandler extends DefaultErrorAttributes {
@@ -16,11 +18,12 @@ public class CustomExceptionHandler extends DefaultErrorAttributes {
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
-        int returnCode = 0;
-        int status = Integer.parseInt(StringUtil.valueOf(errorAttributes.getOrDefault("status", 0)));
-        if (status == ReturnCodeEnum.UNAUTHORIZE.getValue()) {
-            returnCode = ReturnCodeEnum.UNAUTHORIZE.getValue();
-        }
+        int status = 0;
+        try {
+            status = Integer.parseInt(StringUtil.valueOf(errorAttributes.getOrDefault("status", 0)));
+        } catch (Exception ignored) {}
+
+        int returnCode = getReturnCode(status);
 
         String error = StringUtil.valueOf(errorAttributes.get("error"));
         errorAttributes.clear();
@@ -30,4 +33,15 @@ public class CustomExceptionHandler extends DefaultErrorAttributes {
         return errorAttributes;
     }
 
+    private int getReturnCode(int status) {
+        ReturnCodeEnum e = ReturnCodeEnum.fromInt(status);
+        switch (e) {
+            case TOKEN_EXPIRED:
+                return ReturnCodeEnum.TOKEN_EXPIRED.getValue();
+            case UNAUTHORIZE:
+                return ReturnCodeEnum.UNAUTHORIZE.getValue();
+            default:
+                return ReturnCodeEnum.EXCEPTION.getValue();
+        }
+    }
 }

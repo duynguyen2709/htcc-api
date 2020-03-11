@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "Gateway APIs",
+@Api(tags = "Login API (Không cần gửi token trong header)",
      value = "AuthenticationController",
-     description = "API public để đăng nhập.")
+     description = "API public để đăng nhập")
 @RestController
 @Log4j2
 @RequestMapping("/public")

@@ -7,7 +7,7 @@ public enum ReturnCodeEnum {
     INIT(2, "Đang xử lý"),
     SUCCESS(1, "Thành công"),
     EXCEPTION(0, "Hệ thống đang có lỗi. Vui lòng thử lại sau"),
-    UNAUTHORIZE(401, "Xác thực thất bại"),
+    UNAUTHORIZE(401, "Xác thực token thất bại"),
     PERMISSION_DENIED(403, "Không có quyền truy cập"),
     WRONG_USERNAME_OR_PASSWORD(-1, "Sai tên đăng nhập hoặc mật khẩu"),
     ACCOUNT_LOCKED(-2, "Tài khoản đã bị khóa"),
@@ -16,6 +16,9 @@ public enum ReturnCodeEnum {
     PARAM_DATA_INVALID(-4, "Dữ liệu không hợp lệ"),
 
     USER_NOT_FOUND(-5, "Không tìm thấy người dùng"),
+    OLD_PASSWORD_NOT_MATCH(-6, "Mật khẩu cũ không khớp"),
+    NEW_PASSWORD_MUST_DIFFER_FROM_OLD_PASSWORD(-7, "Mật khẩu mới không được trùng với mật khẩu cũ"),
+    TOKEN_EXPIRED(-8, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại")
 
     ;
 
@@ -38,7 +41,7 @@ public enum ReturnCodeEnum {
     }
 
     public static ReturnCodeEnum fromInt(int iValue) {
-        return map.get(iValue);
+        return map.getOrDefault(iValue, EXCEPTION);
     }
 
     public String toString() {
