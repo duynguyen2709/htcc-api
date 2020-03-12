@@ -43,7 +43,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             shouldNotFilter = true;
         }
 
-        if (uri.endsWith(Constant.SWAGGER_DOCS_PATH)) {
+        if (uri.contains(Constant.SWAGGER_DOCS_PATH)) {
             shouldNotFilter = true;
         }
 
