@@ -56,3 +56,7 @@
 10-03-2020 :
  + Version 1.1.5:
     - [Gateway] Auto Expired Token
+
+11-03-2020 :
+ + Version 1.1.6:
+    - [Gateway] API ChangePassword

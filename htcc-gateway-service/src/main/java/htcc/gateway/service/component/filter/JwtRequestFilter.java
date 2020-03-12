@@ -1,6 +1,7 @@
 package htcc.gateway.service.component.filter;
 
 import htcc.common.constant.Constant;
+import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.service.authentication.JwtTokenService;
@@ -79,10 +80,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
             chain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
-            log.warn("JWT Expired: " + e.getMessage());
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            log.warn(e.getMessage());
+            response.sendError(ReturnCodeEnum.TOKEN_EXPIRED.getValue(), e.getMessage());
         } catch (Exception e) {
-            log.error(String.format("doFilterInternal Uri [%s] ex: ", request.getRequestURI(), e.getMessage()));
+            log.error(String.format("doFilterInternal Uri [%s] ex: %s", request.getRequestURI(), e.getMessage()));
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
     }
