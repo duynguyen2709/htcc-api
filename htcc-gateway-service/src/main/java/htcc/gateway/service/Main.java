@@ -13,8 +13,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableEurekaServer
 @EnableZuulProxy
 @EnableSwagger2
-@EnableSwaggerDocs(basePackage = "htcc.gateway.service.controller",
-                   baseUrl = "https://1612145.online/api/gateway/")
 public class Main {
 	public static void main(String[] args) {
 		SpringApplication.run(Main.class, args);
