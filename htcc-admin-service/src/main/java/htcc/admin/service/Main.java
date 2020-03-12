@@ -1,5 +1,6 @@
 package htcc.admin.service;
 
+import htcc.common.component.annotation.EnableSwaggerDocs;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,7 +12,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication
 @EnableEurekaClient
 @EnableSwagger2
-@Log4j2
+@EnableSwaggerDocs(basePackage = "htcc.admin.service.controller",
+                   baseUrl = "https://1612145.online/api/admin/")
 public class Main {
 
 	public static void main(String[] args) {

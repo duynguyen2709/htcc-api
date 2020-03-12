@@ -97,7 +97,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (!requestTokenHeader.startsWith(Constant.BEARER)) {
-            log.error("requestTokenHeader not starts with BEARER");
+            log.error("requestTokenHeader not starts with BEARER: {}", requestTokenHeader);
             return null;
         }
 

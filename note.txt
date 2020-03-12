@@ -60,3 +60,7 @@
 11-03-2020 :
  + Version 1.1.6:
     - [Gateway] API ChangePassword
+
+12-03-2020 :
+ + Version 1.1.7:
+    - [Common] Add @EnableSwaggerDocs annotation in common lib
