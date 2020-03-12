@@ -1,5 +1,7 @@
 package htcc.common.config;
 
+import com.fasterxml.classmate.TypeResolver;
+import htcc.common.entity.base.BaseResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +13,7 @@ import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.ResponseMessageBuilder;
 import springfox.documentation.schema.ModelRef;
+import springfox.documentation.schema.WildcardType;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
@@ -21,12 +24,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static springfox.documentation.schema.AlternateTypeRules.newRule;
+
 @Configuration
 @Log4j2
 public class SwaggerDocsConfig {
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    private TypeResolver typeResolver;
 
     @Bean
     public Docket docket(){
@@ -59,7 +67,11 @@ public class SwaggerDocsConfig {
                         .modelRef(new ModelRef("string"))
                         .parameterType("header")
                         .required(true)
-                        .build()));
+                        .build()))
+                .alternateTypeRules(newRule(
+                        typeResolver.resolve(BaseResponse.class, typeResolver.resolve(WildcardType.class)),
+                        typeResolver.resolve(WildcardType.class))
+                );
     }
 
     @Bean

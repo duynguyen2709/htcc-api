@@ -8,6 +8,7 @@ import htcc.gateway.service.entity.response.LoginResponse;
 import htcc.gateway.service.service.authentication.JwtTokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -40,7 +41,7 @@ public class AuthenticationController {
 
     @ApiOperation(value = "Đăng nhập")
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse login(@RequestBody LoginRequest request) {
+    public BaseResponse<LoginResponse> login(@RequestBody LoginRequest request) {
         BaseResponse<LoginResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             authenManager.authenticate(new UsernamePasswordAuthenticationToken(StringUtil.toJsonString(request), request.password));
