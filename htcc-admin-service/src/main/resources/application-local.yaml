@@ -20,7 +20,7 @@ service:
     enableRest: true
     monitorLevel: "OFF"
     address: 127.0.0.1
-    port: 5702
+    port: 5701
 
 spring:
   datasource:

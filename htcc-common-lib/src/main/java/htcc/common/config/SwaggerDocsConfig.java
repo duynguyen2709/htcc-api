@@ -49,7 +49,10 @@ public class SwaggerDocsConfig {
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(new ApiInfo("BaseURL : " + baseUrl,
-                        "Tất cả API chỉ thành công khi returnCode = 1",
+                        "Tất cả API chỉ thành công khi returnCode = 1\n" +
+                        "[Path]: Gửi theo format /abc/xyz/1\n" +
+                        "[Query]: Gửi theo format /abc?key=value\n" +
+                        "[Body]: Gửi trong request body",
                         "1.0",
                         null,
                         "1612145",
