@@ -67,4 +67,5 @@
 
 13-03-2020 :
  + Version 1.1.8:
-    - [Gateway] Never expire token for Mobile
+    - [Gateway] Never expire token for Mobile; add FeignClient to call Admin/Employee on login
+    to get user info

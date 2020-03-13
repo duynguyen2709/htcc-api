@@ -64,6 +64,15 @@ ribbon:
   ReadTimeout: 30000
   ConnectTimeout: 30000
 
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+
 ################## Service Config ##################
 service:
   debugMode: false
