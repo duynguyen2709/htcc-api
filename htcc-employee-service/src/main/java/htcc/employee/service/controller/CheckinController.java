@@ -9,9 +9,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
-@Api(tags = "API điểm danh",
-     description = "API điểm danh của nhân viên")
+//
+//@Api(tags = "API điểm danh",
+//     description = "API điểm danh của nhân viên")
+@ApiIgnore
 @RestController
 @Log4j2
 public class CheckinController {
