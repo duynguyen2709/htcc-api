@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "${zuul.routes.htcc-employee-service.serviceId}",
-             fallback = AdminServiceClientFallback.class)
+             fallback = EmployeeServiceClient.class)
 public interface EmployeeServiceClient {
 
     @GetMapping("/users/{companyId}/{username}")
