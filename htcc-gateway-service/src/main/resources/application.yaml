@@ -78,6 +78,7 @@ service:
   debugMode: false
 
 security:
+  bypassJWT: false
   jwt:
     key: "gmDJYOtCOvOgzuC5u3XViSq8pxf7BerA"
     expireSecond: 86400

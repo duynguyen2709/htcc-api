@@ -3,6 +3,7 @@ package htcc.gateway.service.component.filter;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.util.StringUtil;
+import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.service.authentication.JwtTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -28,8 +29,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenService jwtTokenService;
 
+    @Autowired
+    private SecurityConfig securityConfig;
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        if (securityConfig.bypassJWT) {
+            return true;
+        }
+
         String  uri             = request.getRequestURI();
         boolean shouldNotFilter = false;
 

@@ -11,6 +11,7 @@ public class SecurityConfig {
 
     public JWTConfig jwt;
     public InMemoryUser user;
+    public boolean bypassJWT = false;
 
     @Data
     public static class JWTConfig {
