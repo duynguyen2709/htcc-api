@@ -64,3 +64,7 @@
 12-03-2020 :
  + Version 1.1.7:
     - [Common] Add @EnableSwaggerDocs annotation; move HazelcastConfig & Redis to common
+
+13-03-2020 :
+ + Version 1.1.8:
+    - [Gateway] Never expire token for Mobile

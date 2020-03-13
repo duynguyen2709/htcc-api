@@ -2,6 +2,7 @@ package htcc.gateway.service.service.authentication;
 
 import htcc.common.component.redis.RedisService;
 import htcc.common.constant.AccountStatusEnum;
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.Constant;
 import htcc.common.service.ICallback;
 import htcc.common.util.DateTimeUtil;
@@ -102,35 +103,34 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 		return Jwts.parser().setSigningKey(config.jwt.key).parseClaimsJws(token).getBody();
 	}
 
-	private boolean isTokenExpired(String token) {
-		boolean ignore = ignoreTokenExpire(token);
-		if (ignore){
-			return true;
-		}
-
-		Date expiration = getExpireDate(token);
-		return expiration.before(new Date());
-	}
-
-	private boolean ignoreTokenExpire(String token) {
-		return false;
-	}
-
 	private String generateToken(LoginRequest request) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(Constant.CLIENT_ID, request.clientId);
 		claims.put(Constant.COMPANY_ID, StringUtil.valueOf(request.companyId));
 
 		long now = System.currentTimeMillis();
-		log.info(String.format("Generate new token for [%s-%s-%s], expired at [%s]",
-				request.clientId, StringUtil.valueOf(request.companyId) ,request.username,
-				DateTimeUtil.parseTimestampToDateString(now + config.jwt.expireSecond * 1000)));
 
-		return Jwts.builder().setClaims(claims)
-				.setSubject(request.username)
-				.setIssuedAt(new Date(now))
-				.setExpiration(new Date(now + config.jwt.expireSecond * 1000))
-				.signWith(SignatureAlgorithm.HS512, config.jwt.key).compact();
+		// mobile never expire token
+		if (request.clientId == ClientSystemEnum.MOBILE.getValue()) {
+			log.info(String.format("Generate new token for [%s-%s-%s]",
+					request.clientId, StringUtil.valueOf(request.companyId) ,request.username));
+
+			return Jwts.builder().setClaims(claims)
+					.setSubject(request.username)
+					.setIssuedAt(new Date(now))
+					.signWith(SignatureAlgorithm.HS512, config.jwt.key).compact();
+		} else {
+			log.info(String.format("Generate new token for [%s-%s-%s], expired at [%s]",
+					request.clientId, StringUtil.valueOf(request.companyId) ,request.username,
+					DateTimeUtil.parseTimestampToDateString(now + config.jwt.expireSecond * 1000)));
+
+			return Jwts.builder().setClaims(claims)
+					.setSubject(request.username)
+					.setIssuedAt(new Date(now))
+					.setExpiration(new Date(now + config.jwt.expireSecond * 1000))
+					.signWith(SignatureAlgorithm.HS512, config.jwt.key).compact();
+		}
+
 	}
 
 	public String getToken(LoginRequest request) {
