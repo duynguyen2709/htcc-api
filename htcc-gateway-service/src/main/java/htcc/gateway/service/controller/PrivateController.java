@@ -1,14 +1,13 @@
 package htcc.gateway.service.controller;
 
+import htcc.common.component.redis.RedisService;
 import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.gateway.service.config.file.RedisBuzConfig;
 import htcc.gateway.service.entity.jpa.BaseUser;
 import htcc.gateway.service.entity.request.ChangePasswordRequest;
 import htcc.gateway.service.entity.request.LoginRequest;
-import htcc.gateway.service.service.RedisService;
 import htcc.gateway.service.service.authentication.AuthenticationService;
 import htcc.gateway.service.service.authentication.JwtTokenService;
 import io.swagger.annotations.Api;
@@ -38,9 +37,6 @@ public class PrivateController {
     private RedisService redis;
 
     @Autowired
-    private RedisBuzConfig redisConf;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @ApiOperation(value = "API Logout")
@@ -57,7 +53,7 @@ public class PrivateController {
                 response = new BaseResponse(ReturnCodeEnum.PERMISSION_DENIED);
             }
 
-            redis.delete(redisConf.tokenFormat, clientId, companyId, username);
+            redis.delete(redis.buzConfig.tokenFormat, clientId, companyId, username);
         } catch (Exception e) {
             log.error("[logout] ex", e);
             response = new BaseResponse(e);
@@ -96,7 +92,7 @@ public class PrivateController {
                 return new BaseResponse(ReturnCodeEnum.EXCEPTION);
             }
 
-            redis.delete(redisConf.tokenFormat, clientId, req.companyId, req.username);
+            redis.delete(redis.buzConfig.tokenFormat, clientId, req.companyId, req.username);
         } catch (Exception e) {
             log.error("[changePassword] ex", e);
             response = new BaseResponse(e);

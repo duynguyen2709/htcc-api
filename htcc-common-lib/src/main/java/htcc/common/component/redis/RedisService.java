@@ -1,12 +1,10 @@
-package htcc.gateway.service.service;
+package htcc.common.component.redis;
 
 import htcc.common.service.ICallback;
-import htcc.gateway.service.component.redis.RedisClient;
 import lombok.extern.log4j.Log4j2;
 import org.redisson.api.RBucket;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.callback.Callback;
 import java.util.concurrent.TimeUnit;
 
 @Service

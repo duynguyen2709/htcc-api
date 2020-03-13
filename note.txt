@@ -63,4 +63,4 @@
 
 12-03-2020 :
  + Version 1.1.7:
-    - [Common] Add @EnableSwaggerDocs annotation; move HazelcastConfig to common
+    - [Common] Add @EnableSwaggerDocs annotation; move HazelcastConfig & Redis to common

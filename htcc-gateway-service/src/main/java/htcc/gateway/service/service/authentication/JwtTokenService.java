@@ -1,16 +1,15 @@
 package htcc.gateway.service.service.authentication;
 
+import htcc.common.component.redis.RedisService;
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.constant.Constant;
 import htcc.common.service.ICallback;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
-import htcc.gateway.service.config.file.RedisBuzConfig;
 import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.BaseUser;
 import htcc.gateway.service.entity.request.LoginRequest;
-import htcc.gateway.service.service.RedisService;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +41,6 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 
 	@Autowired
 	private RedisService redis;
-
-	@Autowired
-	private RedisBuzConfig redisConfig;
 	//</editor-fold>
 
 	@Override
@@ -147,7 +143,7 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 
 		return StringUtil.valueOf(redis.getOrSet(genTokenCb,
 												config.jwt.expireSecond - 1,
-												redisConfig.tokenFormat,
+												redis.buzConfig.tokenFormat,
 												request.clientId,
 												StringUtil.valueOf(request.companyId),
 												request.username));
