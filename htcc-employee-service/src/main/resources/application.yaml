@@ -42,3 +42,20 @@ logging:
 ################## Service Config ##################
 service:
   debugMode: false
+  allowDeleteCheckin: false
+
+################## Redis Config ##################
+redis:
+  delimiterAddress: ;
+  scanInterval: 5000
+  slaveConnectionMinimumIdleSize: 10
+  slaveConnectionPoolSize: 100
+  masterConnectionMinimumIdleSize: 10
+  masterConnectionPoolSize: 100
+  idleConnectionTimeout: 10000
+  connectTimeout: 10000
+  responseTimeout: 10000
+  retryAttempts: 3
+  retryInterval: 1000
+  readMode: SLAVE
+  masterAddress:

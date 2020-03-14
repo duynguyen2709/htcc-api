@@ -28,5 +28,4 @@ public class RedisFileConfig {
     private int     retryAttempts                   = 3;
     private int     retryInterval                   = 1000;
     private String  readMode                        = "SLAVE";
-    private boolean kryoCodec                       = true;
 }

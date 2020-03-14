@@ -35,21 +35,10 @@ public abstract class RedisClient {
 
     protected RedissonClient instance = null;
 
-    public boolean useRedis = false;
-
     @Bean
     private RedissonClient redisClient() {
-        useRedis = config.isUseRedis();
-        if (!useRedis) {
-            return instance;
-        }
-
         try {
             Config redisConfig = new Config();
-
-            if (config.isKryoCodec()) {
-                redisConfig.setCodec(new KryoCodec());
-            }
 
             if (config.isUseMaster()) {
                 String[] nodeAddress = config.getNodeAddresses().split(config.getDelimiterAddress());
@@ -87,6 +76,7 @@ public abstract class RedisClient {
             }
 
             instance = Redisson.create(redisConfig);
+            log.info("$$$ RedisClient Init Succeed $$$");
         } catch (Exception e){
             log.error("RedisClient Init ex: " + e.getMessage(),e);
             System.exit(3);

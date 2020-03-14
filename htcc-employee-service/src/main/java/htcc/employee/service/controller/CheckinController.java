@@ -1,48 +1,182 @@
 package htcc.employee.service.controller;
 
+import htcc.common.constant.CheckinTypeEnum;
+import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.util.DateTimeUtil;
+import htcc.common.util.StringUtil;
+import htcc.employee.service.entity.checkin.CheckinModel;
 import htcc.employee.service.entity.checkin.CheckinRequest;
 import htcc.employee.service.entity.checkin.CheckinResponse;
+import htcc.employee.service.service.redis.RedisCheckinService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
-//
-//@Api(tags = "API điểm danh",
-//     description = "API điểm danh của nhân viên")
-@ApiIgnore
+@Api(tags = "API điểm danh",
+     description = "API điểm danh của nhân viên")
 @RestController
 @Log4j2
 public class CheckinController {
 
+    @Autowired
+    private RedisCheckinService redis;
+
+    @Value("${service.allowDeleteCheckin}")
+    private boolean allowDeleteCheckin;
+
     @ApiOperation(value = "Kiểm tra thông tin điểm danh của nhân viên", response = CheckinResponse.class)
-    @GetMapping("/checkin")
-    public BaseResponse getCheckinInfo(@ApiParam(value = "[Query] Mã công ty", required = true) @RequestParam(required = true) String companyId,
-                                       @ApiParam(value = "[Query] Tên đăng nhập", required = true) @RequestParam(required = true) String username) {
+    @GetMapping("/checkin/{companyId}/{username}/{yyyyMMdd}")
+    public BaseResponse getCheckinInfo(@ApiParam(value = "[Path] Mã công ty", required = true) @PathVariable(required = true) String companyId,
+                                       @ApiParam(value = "[Path] Tên đăng nhập", required = true) @PathVariable(required = true) String username,
+                                       @ApiParam(value = "[Path] Ngày (yyyyMMdd) (nếu ko gửi sẽ lấy ngày hiện tại)", required = false) @PathVariable(required = false) String yyyyMMdd) {
+
         BaseResponse<CheckinResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        String date = StringUtil.valueOf(yyyyMMdd);
+
         try {
-            response.data = new CheckinResponse();
+            if (!date.isEmpty()){
+                if (date.equalsIgnoreCase("undefined")){
+                    date = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+                }
+                else if (DateTimeUtil.parseStringToDate(date, "yyyyMMdd") == null) {
+                    return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, String.format("Ngày %s không hợp lệ định dạng yyyyMMdd", yyyyMMdd));
+                }
+            } else {
+                date = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+            }
+
+            CheckinResponse data = new CheckinResponse();
+
+            CheckinModel checkinModel = redis.getCheckinData(companyId, username, date);
+            if (checkinModel == null){
+                data.hasCheckedIn = false;
+            } else {
+                data.hasCheckedIn = true;
+                data.checkinTime = DateTimeUtil.parseTimestampToString(checkinModel.clientTime, "HH:mm");
+            }
+
+            CheckinModel checkoutModel = redis.getCheckoutData(companyId, username, date);
+            if (checkoutModel == null){
+                data.hasCheckedOut = false;
+            } else {
+                data.hasCheckedOut = true;
+                data.checkoutTime = DateTimeUtil.parseTimestampToString(checkoutModel.clientTime, "HH:mm");
+            }
+
+            response.data = data;
         } catch (Exception e){
-            log.error(String.format("getCheckinInfo [%s - %s] ex", companyId, username), e);
+            log.error(String.format("getCheckinInfo [%s - %s - %s] ex", companyId, username, date), e);
             response = new BaseResponse<>(e);
         }
         return response;
     }
 
-    @ApiOperation(value = "Điểm danh vào", response = CheckinResponse.class)
+
+
+
+    @ApiOperation(value = "Điểm danh vào", response = BaseResponse.class)
     @PostMapping("/checkin")
-    public BaseResponse checkin(@ApiParam(value = "[Body] Thông tin điểm danh", required = true) @RequestBody CheckinRequest request) {
-        BaseResponse<CheckinResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+    public BaseResponse checkin(@ApiParam(value = "[Body] Thông tin điểm danh vào", required = true) @RequestBody CheckinRequest request) {
+        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        CheckinModel model = new CheckinModel(request, CheckinTypeEnum.CHECKIN.getValue());
+
         try {
-            response.data = new CheckinResponse();
+            String error = model.isValid();
+            if (!error.isEmpty()) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, error);
+                return response;
+            }
+
+            if (redis.getCheckinData(model) != null) {
+                response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_ALREADY);
+                return response;
+            }
+
         } catch (Exception e){
             log.error(String.format("checkin [%s - %s] ex", request.companyId, request.username), e);
+            response = new BaseResponse<>(e);
+        } finally {
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
+                redis.setCheckinData(model);
+            }
+        }
+        return response;
+    }
+
+
+
+
+    @ApiOperation(value = "Điểm danh ra", response = BaseResponse.class)
+    @PostMapping("/checkout")
+    public BaseResponse checkout(@ApiParam(value = "[Body] Thông tin điểm danh ra", required = true) @RequestBody CheckinRequest request) {
+        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        CheckinModel model = new CheckinModel(request, CheckinTypeEnum.CHECKOUT.getValue());
+
+        try {
+            String error = model.isValid();
+            if (!error.isEmpty()) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, error);
+                return response;
+            }
+
+            if (redis.getCheckinData(model) == null) {
+                response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKIN);
+                return response;
+            }
+
+            if (redis.getCheckoutData(model) != null) {
+                response = new BaseResponse<>(ReturnCodeEnum.CHECKOUT_ALREADY);
+                return response;
+            }
+
+        } catch (Exception e){
+            log.error(String.format("checkout [%s - %s] ex", request.companyId, request.username), e);
+            response = new BaseResponse<>(e);
+        } finally {
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
+                redis.setCheckoutData(model);
+            }
+        }
+        return response;
+    }
+
+
+
+    @ApiOperation(value = "Xóa thông tin điểm danh (testing)", response = BaseResponse.class)
+    @DeleteMapping("/checkin/{companyId}/{username}/{yyyyMMdd}")
+    public BaseResponse deleteCheckinInfo(@ApiParam(value = "[Path] Mã công ty", required = true) @PathVariable(required = true) String companyId,
+                                       @ApiParam(value = "[Path] Tên đăng nhập", required = true) @PathVariable(required = true) String username,
+                                       @ApiParam(value = "[Path] Ngày (yyyyMMdd) (nếu ko gửi sẽ lấy ngày hiện tại)", required = false) @PathVariable(required = false) String yyyyMMdd) throws Exception {
+        if (!allowDeleteCheckin){
+            throw new Exception("Method Not Supported");
+        }
+
+        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        String date = StringUtil.valueOf(yyyyMMdd);
+        try {
+            if (!date.isEmpty()){
+                if (date.equalsIgnoreCase("undefined")){
+                    date = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+                }
+                else if (DateTimeUtil.parseStringToDate(date, "yyyyMMdd") == null) {
+                    return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, String.format("Ngày %s không hợp lệ định dạng yyyyMMdd", yyyyMMdd));
+                }
+            } else {
+                date = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+            }
+
+            redis.deleteCheckinData(companyId, username, date);
+        } catch (Exception e){
+            log.error(String.format("deleteCheckinInfo [%s - %s - %s] ex", companyId, username, date), e);
             response = new BaseResponse<>(e);
         }
         return response;
     }
+
 }

@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix="redis-buz")
 public class RedisBuzConfig {
     public String tokenFormat = "TOKEN-%s-%s-%s"; // clientId-companyId-username
+    public String checkinFormat = "CHECKIN-%s-%s-%s"; // companyId-username-date
+    public String checkoutFormat = "CHECKOUT-%s-%s-%s"; // companyId-username-date
 }

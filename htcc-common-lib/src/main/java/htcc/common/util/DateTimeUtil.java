@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.*;
 import java.util.Date;
 
 @Log4j2
@@ -35,13 +36,30 @@ public class DateTimeUtil {
         }
     }
 
-    public static Date parseStringToDate(String str){
+    public static Date parseStringToDate(String str, String format) {
         try {
-            return new SimpleDateFormat(DATE_FORMAT).parse(str);
+            return new SimpleDateFormat(format).parse(str);
         } catch (Exception e){
-            log.warn("parseStringToDate {}", str);
+            log.warn("parseStringToDate {} - {}", str, format);
             return null;
         }
+    }
+
+    public static Date parseStringToDate(String str){
+        return parseStringToDate(str, DATE_FORMAT);
+    }
+
+    public static long getSecondUntilEndOfDay() {
+        LocalDate today = LocalDate.now();
+
+        LocalDateTime zdtStart = LocalDateTime.now();
+        LocalDateTime zdtStop  = today.atTime(23, 59, 59, 999);
+
+        Instant start = zdtStart.toInstant(ZoneOffset.MIN);
+        Instant stop  = zdtStop.toInstant(ZoneOffset.MIN);
+
+        Duration timeElapsed = Duration.between(start, stop);
+        return timeElapsed.toMillis() / 1000;
     }
 
 }

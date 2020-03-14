@@ -1,6 +1,7 @@
 package htcc.common.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.net.InetAddresses;
 import com.google.gson.*;
 
 import java.io.IOException;
@@ -53,6 +54,10 @@ public class StringUtil {
         public JsonElement serialize(Double src, Type typeOfSrc, JsonSerializationContext context) {
             return src == src.longValue() ? new JsonPrimitive(src.longValue()) : new JsonPrimitive(src);
         }
+    }
+
+    public static boolean isIPAddress(String str) {
+        return InetAddresses.isInetAddress(str);
     }
 
 }
