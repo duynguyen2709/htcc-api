@@ -1,16 +1,23 @@
 package htcc.gateway.service.config;
 
+import com.fasterxml.classmate.TypeResolver;
 import htcc.common.constant.Constant;
+import htcc.common.entity.base.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.util.UriComponentsBuilder;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.ResponseMessageBuilder;
+import springfox.documentation.schema.AlternateTypeRule;
+import springfox.documentation.schema.AlternateTypeRules;
 import springfox.documentation.schema.ModelRef;
+import springfox.documentation.schema.WildcardType;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
@@ -25,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static springfox.documentation.schema.AlternateTypeRules.newRule;
 import static springfox.documentation.spring.web.paths.Paths.removeAdjacentForwardSlashes;
 import static springfox.documentation.spring.web.paths.RelativePathProvider.ROOT;
 
@@ -34,17 +42,23 @@ public class SwaggerConfig {
     @Autowired
     private ServletContext servletContext;
 
+    @Autowired
+    private TypeResolver typeResolver;
+
     @Bean
     public Docket api() throws IOException {
-        List<ResponseMessage> responseMessages =
-                Collections.singletonList(new ResponseMessageBuilder().code(200).message("SUCCESS").build());
+        List<ResponseMessage> responseMessages = Collections.singletonList(new ResponseMessageBuilder()
+                .code(200).message("SUCCESS").build());
 
         return new Docket(DocumentationType.SWAGGER_2).select()
                 .apis(RequestHandlerSelectors.basePackage("htcc.gateway.service.controller"))
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(new ApiInfo("BaseURL : https://1612145.online/",
-                        "Tất cả API chỉ thành công khi returnCode = 1",
+                        "Tất cả API chỉ thành công khi returnCode = 1\n" +
+                                "[Path]: Gửi theo format /abc/xyz/1\n" +
+                                "[Query]: Gửi theo format /abc?key=value\n" +
+                                "[Body]: Gửi trong request body",
                         "1.0",
                         null,
                         "1612145",
@@ -63,7 +77,12 @@ public class SwaggerConfig {
                         .parameterType("header")
                         .required(true)
                         .build()))
-                .pathProvider(new CustomPathProvider(servletContext));
+                .pathProvider(new CustomPathProvider(servletContext))
+                .alternateTypeRules(newRule(
+                        typeResolver.resolve(BaseResponse.class,
+                        typeResolver.resolve(WildcardType.class)),
+                        typeResolver.resolve(WildcardType.class))
+                );
     }
 
     private static class CustomPathProvider extends AbstractPathProvider {

@@ -64,11 +64,21 @@ ribbon:
   ReadTimeout: 30000
   ConnectTimeout: 30000
 
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+
 ################## Service Config ##################
 service:
   debugMode: false
 
 security:
+  bypassJWT: false
   jwt:
     key: "gmDJYOtCOvOgzuC5u3XViSq8pxf7BerA"
     expireSecond: 86400

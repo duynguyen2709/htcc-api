@@ -1,13 +1,17 @@
 package htcc.gateway.service.controller;
 
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.entity.response.LoginResponse;
+import htcc.gateway.service.feign.AdminServiceClient;
+import htcc.gateway.service.feign.EmployeeServiceClient;
 import htcc.gateway.service.service.authentication.JwtTokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -38,14 +42,24 @@ public class AuthenticationController {
     @Autowired
     private UserDetailsService jwtUserDetailService;
 
+    @Autowired
+    private AdminServiceClient adminClient;
+
+    @Autowired
+    private EmployeeServiceClient employeeClient;
+
     @ApiOperation(value = "Đăng nhập")
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse login(@RequestBody LoginRequest request) {
+    public BaseResponse<LoginResponse> login(@RequestBody LoginRequest request) {
         BaseResponse<LoginResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             authenManager.authenticate(new UsernamePasswordAuthenticationToken(StringUtil.toJsonString(request), request.password));
-            String token = jwtTokenService.getToken(request);
-            response.data = new LoginResponse(token);
+
+            LoginResponse data = new LoginResponse();
+            data.token = jwtTokenService.getToken(request);
+            data.user = getUserInfo(request);
+
+            response.data = data;
 
         } catch (BadCredentialsException e) {
             // wrong password
@@ -62,6 +76,23 @@ public class AuthenticationController {
         }
 
         return response;
+    }
+
+    private Object getUserInfo(LoginRequest request){
+        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        ClientSystemEnum e = ClientSystemEnum.fromInt(request.clientId);
+        switch (e) {
+            case ADMIN_WEB:
+                response = adminClient.getUserInfo(request.username);
+                break;
+            case MOBILE:
+            case MANAGER_WEB:
+                response = employeeClient.getUserInfo(request.companyId, request.username);
+                break;
+            default:
+                return null;
+        }
+        return (response != null) ? response.data : null;
     }
 
 }

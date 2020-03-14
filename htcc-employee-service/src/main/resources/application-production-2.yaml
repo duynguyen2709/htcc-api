@@ -1,0 +1,28 @@
+server:
+  port: 8200
+
+security:
+  user:
+    name: htcc
+    password: 6h5K8dapxfFdVKAS
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka1:8761/eureka, http://eureka2:8761/eureka
+  instance:
+    hostname: eureka2
+
+service:
+  debugMode: false
+  hazelcast:
+    useHazelcast: true
+    enableRest: true
+    monitorLevel: "OFF"
+    address: 10.25.96.4
+    port: 5702
+
+spring:
+  datasource:
+    schemaName: HTCC_Employee
+    server: 10.25.96.3:3306

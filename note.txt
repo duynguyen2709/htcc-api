@@ -60,3 +60,13 @@
 11-03-2020 :
  + Version 1.1.6:
     - [Gateway] API ChangePassword
+
+12-03-2020 :
+ + Version 1.1.7:
+    - [Common] Add @EnableSwaggerDocs annotation; move HazelcastConfig & Redis to common
+
+13-03-2020 :
+ + Version 1.1.8:
+    - [Gateway] Never expire token for Mobile; add FeignClient to call Admin/Employee on login
+    to get user info; Add BypassJWT local
+    - [Employee] Add Get/Update EmployeeInfo

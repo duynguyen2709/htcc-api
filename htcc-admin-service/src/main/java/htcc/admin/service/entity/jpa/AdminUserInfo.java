@@ -43,7 +43,6 @@ public class AdminUserInfo extends BaseJPAEntity {
     public String phoneNumber = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "Default (không cần set)")
     public String avatar = "";
 

@@ -1,4 +1,5 @@
 security:
+  bypassJWT: true
   user:
     name: admin
     password: admin
@@ -23,6 +24,7 @@ spring:
     username: ${security.user.name}
     password: ${security.user.password}
     testWhileIdle: true
+    testOnBorrow: true
     timeBetweenEvictionRunsMillis: 60000
     validationQuery: SELECT 1
 

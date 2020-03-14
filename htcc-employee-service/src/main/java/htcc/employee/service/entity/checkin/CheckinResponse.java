@@ -20,6 +20,12 @@ public class CheckinResponse implements Serializable {
     @ApiModelProperty(notes = "Có thể điểm danh hôm nay không (trừ ngày nghỉ)")
     public boolean canCheckin = true;
 
+    @ApiModelProperty(notes = "Chỉ được dùng wifi")
+    public boolean forceUseWifi = false;
+
+    @ApiModelProperty(notes = "IP Subnet của mạng wifi cho phép")
+    public String allowWifiIP = "";
+
     @ApiModelProperty(notes = "Giờ cho phép thực hiện điểm danh vào " +
                                 " (sau thời gian này là vào trễ)",
                       example = "08:30")
@@ -29,6 +35,10 @@ public class CheckinResponse implements Serializable {
                                 "(trước thời gian này là về trễ)",
                       example = "17:30")
     public String validCheckoutTime = "";
+
+    @ApiModelProperty(notes = "Khoảng cách cho phép thực hiện điểm danh",
+                      example = "10m")
+    public int minAllowDistance = 10;
 
     @ApiModelProperty(notes = "Tọa độ cho phép thực hiện điểm danh",
                       example = "10.762462")

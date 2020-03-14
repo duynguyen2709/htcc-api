@@ -1,8 +1,8 @@
 package htcc.gateway.service;
 
+import htcc.common.component.redis.RedisClient;
 import htcc.common.util.LoggingUtil;
 import htcc.common.util.MemoryUtil;
-import htcc.gateway.service.component.redis.RedisClient;
 import htcc.gateway.service.config.file.ServiceConfig;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

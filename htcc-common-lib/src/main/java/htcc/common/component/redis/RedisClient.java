@@ -1,7 +1,8 @@
-package htcc.gateway.service.component.redis;
+package htcc.common.component.redis;
 
+import htcc.common.entity.config.RedisBuzConfig;
+import htcc.common.entity.config.RedisFileConfig;
 import htcc.common.service.ICallback;
-import htcc.gateway.service.config.file.RedisFileConfig;
 import lombok.extern.log4j.Log4j2;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
@@ -10,25 +11,34 @@ import org.redisson.codec.KryoCodec;
 import org.redisson.config.Config;
 import org.redisson.config.ReadMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 @Log4j2
 @Component
+@ConditionalOnProperty(
+        value="redis.useRedis",
+        havingValue = "true",
+        matchIfMissing = false)
+@Import({RedisFileConfig.class, RedisBuzConfig.class})
 public abstract class RedisClient {
 
     @Autowired
     private RedisFileConfig config;
+
+    @Autowired
+    public RedisBuzConfig buzConfig;
 
     protected RedissonClient instance = null;
 
     public boolean useRedis = false;
 
     @Bean
-    private RedissonClient init() {
+    private RedissonClient redisClient() {
         useRedis = config.isUseRedis();
         if (!useRedis) {
             return instance;
@@ -132,3 +142,4 @@ public abstract class RedisClient {
     public abstract void delete(String keyFormat, Object ...params);
 
 }
+

@@ -14,5 +14,15 @@ eureka:
     hostname: eureka1
 
 service:
+  debugMode: true
   hazelcast:
     useHazelcast: false
+    enableRest: true
+    monitorLevel: "OFF"
+    address: 127.0.0.1
+    port: 5702
+
+spring:
+  datasource:
+    schemaName: HTCC_Employee
+    server: 127.0.0.1:3306
