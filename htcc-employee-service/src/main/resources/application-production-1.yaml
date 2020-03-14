@@ -17,7 +17,7 @@ service:
   debugMode: false
   allowDeleteCheckin: true
   hazelcast:
-    useHazelcast: true
+    useHazelcast: false
     enableRest: true
     monitorLevel: "OFF"
     address: 10.25.96.3
