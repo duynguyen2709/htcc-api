@@ -11,7 +11,6 @@ import htcc.gateway.service.feign.EmployeeServiceClient;
 import htcc.gateway.service.service.authentication.JwtTokenService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -33,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/public")
 public class AuthenticationController {
 
+    //<editor-fold defaultstate="collapsed" desc="Autowired">
     @Autowired
     private AuthenticationManager authenManager;
 
@@ -47,6 +47,7 @@ public class AuthenticationController {
 
     @Autowired
     private EmployeeServiceClient employeeClient;
+    //</editor-fold>
 
     @ApiOperation(value = "Đăng nhập")
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)

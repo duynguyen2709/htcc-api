@@ -76,13 +76,14 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
     private void setLogData(RequestWrapper request, HttpServletResponse responseToCache) {
         RequestLogEntity logEnt = new RequestLogEntity();
         try {
+            logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
+            logEnt.setResponseTime(System.currentTimeMillis());
             logEnt.setMethod(request.getMethod());
             logEnt.setPath(request.getRequestURI());
             logEnt.setParams(request.getParameterMap());
             logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
-            logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
-            logEnt.setResponseTime(System.currentTimeMillis());
             logEnt.setServiceId(ServiceSystemEnum.getServiceFromUri(logEnt.path));
+            logEnt.setIp(request);
             logEnt.setBody((hasBody(logEnt.method)) ? StringUtil.valueOf(request.getBody()) : "");
             logEnt.setResponse(getResponsePayload(responseToCache));
         } catch (Exception e) {
