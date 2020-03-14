@@ -97,8 +97,4 @@ redis:
   retryAttempts: 3
   retryInterval: 1000
   readMode: SLAVE
-  kryoCodec: true
   masterAddress:
-
-redis-buz:
-  tokenFormat: TOKEN-%s-%s-%s # clientId-companyId-username

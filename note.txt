@@ -70,3 +70,10 @@
     - [Gateway] Never expire token for Mobile; add FeignClient to call Admin/Employee on login
     to get user info; Add BypassJWT local
     - [Employee] Add Get/Update EmployeeInfo
+
+14-03-2020:
+ + Version 1.1.9:
+    - Build stable release v1.1.9
+
+ + Version 1.2.0:
+    - [Employee] API Checkin

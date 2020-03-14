@@ -15,6 +15,7 @@ eureka:
 
 service:
   debugMode: true
+  allowDeleteCheckin: true
   hazelcast:
     useHazelcast: false
     enableRest: true
@@ -26,3 +27,9 @@ spring:
   datasource:
     schemaName: HTCC_Employee
     server: 127.0.0.1:3306
+
+redis:
+  useRedis: true
+  password:
+  useMaster: false
+  nodeAddresses: 127.0.0.1:6379

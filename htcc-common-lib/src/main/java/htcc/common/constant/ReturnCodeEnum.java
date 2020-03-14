@@ -18,8 +18,10 @@ public enum ReturnCodeEnum {
     USER_NOT_FOUND(-5, "Không tìm thấy người dùng"),
     OLD_PASSWORD_NOT_MATCH(-6, "Mật khẩu cũ không khớp"),
     NEW_PASSWORD_MUST_DIFFER_FROM_OLD_PASSWORD(-7, "Mật khẩu mới không được trùng với mật khẩu cũ"),
-    TOKEN_EXPIRED(-8, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại")
-
+    TOKEN_EXPIRED(-8, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại"),
+    CHECKIN_ALREADY(-9, "Đã thực hiện điểm danh vào hôm nay"),
+    CHECKOUT_ALREADY(-10, "Đã thực hiện điểm danh ra hôm nay"),
+    NOT_CHECKIN(-11, "Chưa thực hiện điểm danh vào hôm nay"),
     ;
 
     private final int value;

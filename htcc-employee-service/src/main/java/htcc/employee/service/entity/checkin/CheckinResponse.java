@@ -29,16 +29,16 @@ public class CheckinResponse implements Serializable {
     @ApiModelProperty(notes = "Giờ cho phép thực hiện điểm danh vào " +
                                 " (sau thời gian này là vào trễ)",
                       example = "08:30")
-    public String validCheckinTime = "";
+    public String validCheckinTime = "08:30";
 
     @ApiModelProperty(notes = "Giờ cho phép thực hiện điểm danh ra " +
                                 "(trước thời gian này là về trễ)",
                       example = "17:30")
-    public String validCheckoutTime = "";
+    public String validCheckoutTime = "17:30";
 
-    @ApiModelProperty(notes = "Khoảng cách cho phép thực hiện điểm danh",
-                      example = "10m")
-    public int minAllowDistance = 10;
+    @ApiModelProperty(notes = "Khoảng cách cho phép thực hiện điểm danh (theo m)",
+                      example = "10")
+    public long maxAllowDistance = 20000;
 
     @ApiModelProperty(notes = "Tọa độ cho phép thực hiện điểm danh",
                       example = "10.762462")
