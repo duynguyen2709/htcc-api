@@ -66,8 +66,6 @@ public class CheckinModel implements Serializable {
             return String.format("Thời gian gửi request {%s} không hợp lệ", this.clientTime);
         }
 
-        log.info(String.format("%s - %s - %s", serverTime, clientTime, Math.abs(serverTime - clientTime)));
-
         if (Math.abs(serverTime - clientTime) > 5 * 60 * 1000) {
             return "Thời gian gửi request quá 5 phút";
         }
