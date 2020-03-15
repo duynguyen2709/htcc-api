@@ -5,6 +5,7 @@ import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.BaseUser;
 import htcc.gateway.service.entity.request.ChangePasswordRequest;
 import htcc.gateway.service.entity.request.LoginRequest;
@@ -37,6 +38,9 @@ public class PrivateController {
     private RedisService redis;
 
     @Autowired
+    private SecurityConfig securityConfig;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @ApiOperation(value = "API Logout")
@@ -52,12 +56,23 @@ public class PrivateController {
                 log.warn(String.format("Logout failed for client %s | company %s | username %s | token %s",
                         clientId, companyId, username, authorization.substring(7)));
                 response = new BaseResponse(ReturnCodeEnum.PERMISSION_DENIED);
+                return response;
             }
 
             redis.delete(redis.buzConfig.tokenFormat, clientId, companyId, username);
         } catch (Exception e) {
             log.error("[logout] ex", e);
             response = new BaseResponse(e);
+        } finally {
+            // blacklist token
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
+                long ttl = 0;
+                if (clientId != ClientSystemEnum.MOBILE.getValue()) {
+                    ttl = securityConfig.jwt.expireSecond;
+                }
+
+                redis.set(token, ttl, redis.buzConfig.blacklistTokenFormat, clientId, companyId, username);
+            }
         }
         return response;
     }
