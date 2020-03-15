@@ -13,6 +13,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import javax.validation.constraints.*;
 
 @Entity
@@ -20,7 +21,9 @@ import javax.validation.constraints.*;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @ApiModel(description = "Thông tin user")
-public class AdminUserInfo extends BaseJPAEntity {
+public class AdminUser extends BaseJPAEntity {
+
+    private static final long serialVersionUID = 1926368583005150807L;
 
     @Id
     @ApiModelProperty(notes = "Tên đăng nhập",
@@ -45,6 +48,15 @@ public class AdminUserInfo extends BaseJPAEntity {
     @Column
     @ApiModelProperty(notes = "Default (không cần set)")
     public String avatar = "";
+
+    @Transient
+    @Column
+    @ApiModelProperty(notes = "Cấp độ tài khoản (0: SuperAdmin / 1: Admin)")
+    public int role = 1;
+
+    @Column
+    @ApiModelProperty(notes = "Trạng thái tài khoản (1: Active / 0: Blocked)")
+    public int status = 1;
 
     @Override
     public boolean isValid() {

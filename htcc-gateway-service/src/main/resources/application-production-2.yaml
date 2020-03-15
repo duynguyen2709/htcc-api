@@ -14,17 +14,12 @@ eureka:
     hostname: eureka2
 
 spring:
-  datasource:
-    schemaName: HTCC_Authentication
-    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
+  admin-datasource:
+    schemaName: HTCC_Admin
     server: 10.25.96.3:3306
-    url: jdbc:mysql://${spring.datasource.server}/${spring.datasource.schemaName}?${spring.datasource.options}
-    username: ${security.user.name}
-    password: ${security.user.password}
-    testWhileIdle: true
-    testOnBorrow: true
-    timeBetweenEvictionRunsMillis: 60000
-    validationQuery: SELECT 1
+  company-datasource:
+    schemaName: HTCC_Company
+    server: 10.25.96.3:3306
 
 redis:
   useRedis: true

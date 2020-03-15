@@ -8,6 +8,8 @@ spring:
     enabled: false
   jmx:
     enabled: false
+  main:
+    allow-bean-definition-overriding: true
   jpa:
     hibernate:
       naming:
@@ -16,6 +18,16 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
+  admin-datasource:
+    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
+    url: jdbc:mysql://${spring.admin-datasource.server}/${spring.admin-datasource.schemaName}?${spring.admin-datasource.options}
+    username: ${security.user.name}
+    password: ${security.user.password}
+  company-datasource:
+    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
+    url: jdbc:mysql://${spring.company-datasource.server}/${spring.company-datasource.schemaName}?${spring.company-datasource.options}
+    username: ${security.user.name}
+    password: ${security.user.password}
 
 ################## Eureka Config ##################
 eureka:

@@ -69,6 +69,7 @@
  + Version 1.1.8:
     - [Gateway] Never expire token for Mobile; add FeignClient to call Admin/Employee on login
     to get user info; Add BypassJWT local
+
     - [Employee] Add Get/Update EmployeeInfo
 
 14-03-2020:
@@ -77,3 +78,8 @@
 
  + Version 1.2.0:
     - [Employee] API Checkin
+    - [Gateway] add Blacklist token
+
+15-03-2020:
+ + Version 1.2.1:
+    - [Gateway] Split Database, Fix bug Logout

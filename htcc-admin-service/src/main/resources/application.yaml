@@ -16,6 +16,15 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
+  datasource:
+    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
+    url: jdbc:mysql://${spring.datasource.server}/${spring.datasource.schemaName}?${spring.datasource.options}
+    username: ${security.user.name}
+    password: ${security.user.password}
+    testWhileIdle: true
+    testOnBorrow: true
+    timeBetweenEvictionRunsMillis: 60000
+    validationQuery: SELECT 1
 
 ################## Eureka Config ##################
 eureka:

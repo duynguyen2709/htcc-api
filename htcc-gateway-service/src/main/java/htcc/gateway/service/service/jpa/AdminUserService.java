@@ -1,8 +1,8 @@
 package htcc.gateway.service.service.jpa;
 
 import htcc.common.service.BaseJPAService;
-import htcc.gateway.service.entity.jpa.AdminUser;
-import htcc.gateway.service.repository.jpa.AdminUserRepository;
+import htcc.gateway.service.entity.jpa.admin.AdminUser;
+import htcc.gateway.service.repository.jpa.admin.AdminUserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

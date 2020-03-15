@@ -11,8 +11,10 @@ import org.redisson.codec.KryoCodec;
 import org.redisson.config.Config;
 import org.redisson.config.ReadMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
@@ -20,10 +22,6 @@ import java.util.Arrays;
 
 @Log4j2
 @Component
-@ConditionalOnProperty(
-        value="redis.useRedis",
-        havingValue = "true",
-        matchIfMissing = false)
 @Import({RedisFileConfig.class, RedisBuzConfig.class})
 public abstract class RedisClient {
 
@@ -36,7 +34,10 @@ public abstract class RedisClient {
     protected RedissonClient instance = null;
 
     @Bean
+    @ConditionalOnProperty(name="redis.useRedis", havingValue="true")
     private RedissonClient redisClient() {
+        log.info(" ################################### useRedis {}", config.isUseRedis());
+
         try {
             Config redisConfig = new Config();
 

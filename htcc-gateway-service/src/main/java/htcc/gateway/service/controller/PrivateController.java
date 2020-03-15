@@ -46,8 +46,9 @@ public class PrivateController {
                                @ApiParam(value = "[Query] username", required = true) @RequestParam(required = true) String username,
                                @RequestHeader("Authorization") String authorization) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        String token = authorization.substring(Constant.BEARER.length());
         try {
-            if (!validPermission(authorization, clientId, companyId, username)) {
+            if (!validPermission(token, clientId, companyId, username)) {
                 log.warn(String.format("Logout failed for client %s | company %s | username %s | token %s",
                         clientId, companyId, username, authorization.substring(7)));
                 response = new BaseResponse(ReturnCodeEnum.PERMISSION_DENIED);

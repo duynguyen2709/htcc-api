@@ -68,6 +68,8 @@ public class RequestLogEntity implements Serializable {
         this.ip = request.getHeader("X-FORWARDED-FOR");
         if (StringUtil.valueOf(this.ip).isEmpty()) {
             this.ip = request.getRemoteAddr();
+        } else if (this.ip.contains(",")){
+            this.ip = this.ip.split(",")[0];
         }
     }
 }

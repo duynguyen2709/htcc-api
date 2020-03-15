@@ -25,7 +25,7 @@ service:
 
 spring:
   datasource:
-    schemaName: HTCC_Employee
+    schemaName: HTCC_Company
     server: 10.25.96.3:3306
 
 redis:
