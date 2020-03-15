@@ -1,7 +1,7 @@
 security:
   user:
-    name: admin
-    password: admin
+    name: root
+    password:
 
 server:
   port: 8761
@@ -30,7 +30,7 @@ service:
   debugMode: true
 
 redis:
-  useRedis: true
+  useRedis: false
   password:
   useMaster: false
   nodeAddresses: 127.0.0.1:6379
