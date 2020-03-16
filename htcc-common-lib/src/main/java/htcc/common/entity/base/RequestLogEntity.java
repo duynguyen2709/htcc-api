@@ -4,11 +4,13 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.util.StringUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
 
 @Data
+@ToString
 @Log4j2
 @NoArgsConstructor
 public class RequestLogEntity implements Serializable {

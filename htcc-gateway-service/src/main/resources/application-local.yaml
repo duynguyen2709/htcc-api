@@ -34,3 +34,7 @@ redis:
   password:
   useMaster: false
   nodeAddresses: 127.0.0.1:6379
+
+kafka:
+  enabled: true
+  bootstrapAddress: 127.0.0.1:9092

@@ -89,3 +89,11 @@ redis:
 
 redis-buz:
   tokenFormat: TOKEN-%s-%s-%s # clientId-companyId-username
+
+################## Kafka Config ##################
+kafka:
+  topic:
+    requestLog:
+      name: REQUEST-LOG
+      partition: 1
+
