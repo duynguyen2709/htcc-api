@@ -83,3 +83,8 @@
 15-03-2020:
  + Version 1.2.1:
     - [Gateway] Split Database, Fix bug Logout
+
+16-03-2020:
+ + Version 1.2.2:
+    - [Employee] Merge Checkin & Checkout API
+    - [Admin] CRUD AdminUser

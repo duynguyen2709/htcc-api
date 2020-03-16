@@ -84,7 +84,7 @@ public class CheckinController {
     @PostMapping("/checkin")
     public BaseResponse checkin(@ApiParam(value = "[Body] Thông tin điểm danh vào", required = true) @RequestBody CheckinRequest request) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
-        CheckinModel model = new CheckinModel(request, CheckinTypeEnum.CHECKIN.getValue());
+        CheckinModel model = new CheckinModel(request);
 
         try {
             String error = model.isValid();
@@ -93,9 +93,26 @@ public class CheckinController {
                 return response;
             }
 
-            if (redis.getCheckinData(model) != null) {
-                response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_ALREADY);
-                return response;
+            /*
+             TODO: Verify Checkin Info (Get Company Info, Long & Lat to compare)
+             Not Implemented
+            */
+
+            if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
+                if (redis.getCheckinData(model) != null) {
+                    response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_ALREADY);
+                    return response;
+                }
+            } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
+                if (redis.getCheckinData(model) == null) {
+                    response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKIN);
+                    return response;
+                }
+
+                if (redis.getCheckoutData(model) != null) {
+                    response = new BaseResponse<>(ReturnCodeEnum.CHECKOUT_ALREADY);
+                    return response;
+                }
             }
 
         } catch (Exception e){
@@ -103,48 +120,17 @@ public class CheckinController {
             response = new BaseResponse<>(e);
         } finally {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
-                redis.setCheckinData(model);
+                if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
+                    redis.setCheckinData(model);
+                } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
+                    redis.setCheckoutData(model);
+                }
             }
         }
         return response;
     }
 
 
-
-
-    @ApiOperation(value = "Điểm danh ra", response = BaseResponse.class)
-    @PostMapping("/checkout")
-    public BaseResponse checkout(@ApiParam(value = "[Body] Thông tin điểm danh ra", required = true) @RequestBody CheckinRequest request) {
-        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
-        CheckinModel model = new CheckinModel(request, CheckinTypeEnum.CHECKOUT.getValue());
-
-        try {
-            String error = model.isValid();
-            if (!error.isEmpty()) {
-                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, error);
-                return response;
-            }
-
-            if (redis.getCheckinData(model) == null) {
-                response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKIN);
-                return response;
-            }
-
-            if (redis.getCheckoutData(model) != null) {
-                response = new BaseResponse<>(ReturnCodeEnum.CHECKOUT_ALREADY);
-                return response;
-            }
-
-        } catch (Exception e){
-            log.error(String.format("checkout [%s - %s] ex", request.companyId, request.username), e);
-            response = new BaseResponse<>(e);
-        } finally {
-            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
-                redis.setCheckoutData(model);
-            }
-        }
-        return response;
-    }
 
 
 

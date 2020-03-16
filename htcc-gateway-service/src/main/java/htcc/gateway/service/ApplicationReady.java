@@ -36,16 +36,16 @@ public class ApplicationReady {
         // print config from file
         LoggingUtil.printConfig(configurableEnvironment);
 
-        // print memory usage for monitoring
-        if (serviceConfig.isDebugMode()) {
-            ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-
-            ses.scheduleAtFixedRate(new Runnable() {
-                @Override public void run() {
-                    MemoryUtil.printMemory();
-                }
-            }, 0, 30, TimeUnit.SECONDS);
-        }
+//        // print memory usage for monitoring
+//        if (serviceConfig.isDebugMode()) {
+//            ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+//
+//            ses.scheduleAtFixedRate(new Runnable() {
+//                @Override public void run() {
+//                    MemoryUtil.printMemory();
+//                }
+//            }, 0, 30, TimeUnit.SECONDS);
+//        }
 
     }
 

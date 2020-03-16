@@ -155,6 +155,7 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 					user.clientId, user.companyId, user.username));
 
 			if (token.equalsIgnoreCase(blacklistToken)){
+				log.warn("Token {} in blacklist", token);
 				return false;
 			}
 

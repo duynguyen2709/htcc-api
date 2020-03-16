@@ -2,7 +2,9 @@ package htcc.admin.service.controller;
 
 import htcc.admin.service.entity.jpa.AdminUser;
 import htcc.admin.service.service.jpa.AdminUserInfoService;
+import htcc.admin.service.service.redis.RedisTokenService;
 import htcc.common.constant.AccountStatusEnum;
+import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.util.StringUtil;
@@ -11,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +30,11 @@ public class AdminUserController {
 
     @Autowired
     private AdminUserInfoService service;
+
+    @Autowired
+    private RedisTokenService redis;
+
+
 
     @ApiOperation(value = "Lấy thông tin của các user", response = AdminUser.class)
     @GetMapping("/users")
@@ -70,6 +78,36 @@ public class AdminUserController {
 
 
 
+    @ApiOperation(value = "Tạo quản trị viên mới", response = AdminUser.class)
+    @PostMapping("/users")
+    public BaseResponse createUser(@ApiParam(value = "[Body] Thông tin user mới", required = true)
+                                    @RequestBody AdminUser user) {
+        BaseResponse<AdminUser> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        try {
+            if (!user.isValid()) {
+                throw new ConstraintViolationException(
+                        "Thông tin user không hợp lệ: " + StringUtil.toJsonString(user), null);
+            }
+
+            user.password = new BCryptPasswordEncoder().encode(user.password);
+            user.role = 1;
+            user.status = 1;
+            user.avatar = Constant.USER_DEFAULT_AVATAR;
+
+            response.data = service.create(user);
+        } catch (ConstraintViolationException| TransactionSystemException e) {
+            log.warn("[createUser] ConstraintViolationException: " + e.getMessage());
+            response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, e.getMessage());
+        } catch (Exception e){
+            log.error("[createUser] ex", e);
+            response = new BaseResponse<>(e);
+        }
+        return response;
+    }
+
+
+
+
     @ApiOperation(value = "Cập nhật thông tin của user hiện tại", response = AdminUser.class)
     @PutMapping("/users/{username}")
     public BaseResponse update(@ApiParam(value = "[Path] Tên đăng nhập", required = true)
@@ -80,18 +118,21 @@ public class AdminUserController {
         try {
             if (!user.isValid()) {
                 throw new ConstraintViolationException(
-                        "Param Invalid " + StringUtil.toJsonString(user), null);
+                        "Thông tin user không hợp lệ: " + StringUtil.toJsonString(user), null);
             }
 
             AdminUser oldUser = service.findById(username);
             if (oldUser == null) {
                 return new BaseResponse<>(ReturnCodeEnum.USER_NOT_FOUND);
             }
-
+            user.username = oldUser.username;
+            user.password = oldUser.password;
             user.role = oldUser.role;
             user.status = oldUser.status;
-            user = service.update(user);
-            response.data = user;
+            user.avatar = oldUser.avatar;
+
+            response.data = service.update(user);
+
         } catch (ConstraintViolationException| TransactionSystemException e) {
             log.warn("[update] ConstraintViolationException: " + e.getMessage());
             response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, e.getMessage());
@@ -107,9 +148,9 @@ public class AdminUserController {
 
     @ApiOperation(value = "Khóa/Mở khóa tài khoản", response = AdminUser.class)
     @PutMapping("/users/{username}/status/{newStatus}")
-    public BaseResponse lockAccount(@ApiParam(value = "[Path] Tên đăng nhập", required = true)
+    public BaseResponse lockAccount(@ApiParam(value = "[Path] Tên đăng nhập", required = true, defaultValue = "admin")
                                @PathVariable("username") String username,
-                               @ApiParam(value = "[Path] Trạng thái mới cần update", required = true)
+                               @ApiParam(value = "[Path] Trạng thái mới cần update", required = true, defaultValue = "0")
                                @PathVariable int newStatus) {
         BaseResponse<AdminUser> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -133,10 +174,45 @@ public class AdminUserController {
             log.warn("[lockAccount] ConstraintViolationException: " + e.getMessage());
             response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, e.getMessage());
         } catch (Exception e){
-            log.error("[update] ex", e);
+            log.error("[lockAccount] ex", e);
             response = new BaseResponse<>(e);
         } finally {
-            // TODO: blacklist or delete token
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()){
+                if (newStatus == AccountStatusEnum.BLOCK.getValue()) {
+                    redis.setBlacklistToken(username);
+                } else if (newStatus == AccountStatusEnum.ACTIVE.getValue()) {
+                    redis.deleteBlacklistToken(username);
+                }
+            }
+        }
+        return response;
+    }
+
+
+
+    @ApiOperation(value = "Xóa user", response = BaseResponse.class)
+    @DeleteMapping("/users/{username}")
+    public BaseResponse deleteUser(@ApiParam(value = "[Path] Tên đăng nhập", required = true, defaultValue = "admin")
+                               @PathVariable("username") String username) {
+        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        try {
+            AdminUser oldUser = service.findById(username);
+            if (oldUser == null) {
+                return new BaseResponse<>(ReturnCodeEnum.USER_NOT_FOUND);
+            }
+
+            if (oldUser.role == 0) {
+                return new BaseResponse<>(ReturnCodeEnum.PERMISSION_DENIED);
+            }
+
+            service.delete(username);
+        } catch (Exception e){
+            log.error("[deleteUser] ex", e);
+            response = new BaseResponse<>(e);
+        } finally {
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()){
+                redis.deleteBlacklistToken(username);
+            }
         }
         return response;
     }

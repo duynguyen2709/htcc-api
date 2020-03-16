@@ -43,6 +43,9 @@ public class PrivateController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+
+
+
     @ApiOperation(value = "API Logout")
     @PostMapping("/logout/{clientId}")
     public BaseResponse logout(@ApiParam(value = "[Path] clientId", defaultValue = "1", required = true) @PathVariable("clientId") int clientId,
@@ -76,6 +79,9 @@ public class PrivateController {
         }
         return response;
     }
+
+
+
 
     @ApiOperation(value = "API ChangePassword")
     @PutMapping("/changepassword/{clientId}")
@@ -131,6 +137,9 @@ public class PrivateController {
 
         return false;
     }
+
+
+
 
     @ApiOperation(value = "Test token")
     @GetMapping("/test")

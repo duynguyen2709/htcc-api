@@ -2,6 +2,8 @@ server:
   port: 8202
 
 security:
+  jwt:
+    expireSecond: 86400
   user:
     name: admin
     password: admin
@@ -26,3 +28,10 @@ spring:
   datasource:
     schemaName: HTCC_Admin
     server: 127.0.0.1:3306
+
+redis:
+  useRedis: true
+  password:
+  useMaster: false
+  masterAddress: 127.0.0.1:6379
+  nodeAddresses: 127.0.0.1:6379

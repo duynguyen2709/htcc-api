@@ -60,7 +60,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException {
-        long start = System.currentTimeMillis();
         try {
             String jwtToken = getTokenFromHeader(request);
             if (jwtToken == null || !jwtTokenService.validateToken(jwtToken)) {
@@ -85,9 +84,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 detail.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(detail);
             }
-
-            long end = System.currentTimeMillis();
-            log.info("Check Token done in {} ms", (end - start));
 
             chain.doFilter(request, response);
         } catch (ExpiredJwtException e) {

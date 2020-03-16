@@ -3,8 +3,6 @@ package htcc.employee.service.entity.checkin;
 import htcc.common.constant.CheckinTypeEnum;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 
@@ -41,13 +39,13 @@ public class CheckinModel implements Serializable {
     public float longitude;
 
     @Min(0)
-    public float validLatitude;
+    public float validLatitude = 0.0f;
 
     @Min(0)
-    public float validLongitude;
+    public float validLongitude = 0.0f;
 
     @Min(0)
-    public int minAllowDistance = 10;
+    public int maxAllowDistance = 10;
 
     public boolean usedWifi = false;
 
@@ -83,16 +81,16 @@ public class CheckinModel implements Serializable {
     }
 
 
-    public CheckinModel(CheckinRequest request, int type) {
+    public CheckinModel(CheckinRequest request) {
         this.companyId = request.companyId;
         this.username = request.username;
-        this.type = type;
+        this.type = request.type;
         this.clientTime = request.clientTime;
         this.latitude = request.latitude;
         this.longitude = request.longitude;
-        this.validLatitude = request.validLatitude;
-        this.validLongitude = request.validLongitude;
-        this.minAllowDistance = request.minAllowDistance;
+//        this.validLatitude = request.validLatitude;
+//        this.validLongitude = request.validLongitude;
+//        this.maxAllowDistance = request.maxAllowDistance;
         this.usedWifi = request.usedWifi;
         this.ip = request.ip;
         this.serverTime = System.currentTimeMillis();

@@ -36,8 +36,6 @@ public abstract class RedisClient {
     @Bean
     @ConditionalOnProperty(name="redis.useRedis", havingValue="true")
     private RedissonClient redisClient() {
-        log.info(" ################################### useRedis {}", config.isUseRedis());
-
         try {
             Config redisConfig = new Config();
 
@@ -77,7 +75,7 @@ public abstract class RedisClient {
             }
 
             instance = Redisson.create(redisConfig);
-            log.info("$$$ RedisClient Init Succeed $$$");
+            log.info("############### RedisClient Init Succeed ###############");
         } catch (Exception e){
             log.error("RedisClient Init ex: " + e.getMessage(),e);
             System.exit(3);
@@ -111,7 +109,7 @@ public abstract class RedisClient {
             return true;
 
         } catch (Exception e){
-            log.info(String.format("Lock [%s] ex: %s", key, e.getMessage()));
+            log.error(String.format("Lock [%s] ex: %s", key, e.getMessage()));
             return false;
         }
     }
@@ -123,7 +121,7 @@ public abstract class RedisClient {
                 lock.unlock();
 
         } catch (Exception e){
-            log.info(String.format("Unlock [%s] ex: %s", key, e.getMessage()));
+            log.error(String.format("Unlock [%s] ex: %s", key, e.getMessage()));
         }
     }
 
