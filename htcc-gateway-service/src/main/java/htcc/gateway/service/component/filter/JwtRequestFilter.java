@@ -60,8 +60,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException {
+        String jwtToken = getTokenFromHeader(request);
         try {
-            String jwtToken = getTokenFromHeader(request);
             if (jwtToken == null || !jwtTokenService.validateToken(jwtToken)) {
                 throw new Exception(String.format("JWT Token [%s] Invalid", jwtToken));
             }
@@ -87,7 +87,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
             chain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
-            log.warn(e.getMessage());
+            log.warn(String.format("%s : %s", e.getMessage(), jwtToken));
             response.sendError(ReturnCodeEnum.TOKEN_EXPIRED.getValue(), e.getMessage());
         } catch (Exception e) {
             log.error(String.format("doFilterInternal Uri [%s] ex: %s", request.getRequestURI(), e.getMessage()));

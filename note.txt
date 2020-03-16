@@ -86,5 +86,7 @@
 
 16-03-2020:
  + Version 1.2.2:
-    - [Employee] Merge Checkin & Checkout API
+    - [Employee] Merge Checkin & Checkout API;
+                Fix bug Date PathVariable can not be null -> change to QueryParam
+
     - [Admin] CRUD AdminUser

@@ -17,6 +17,9 @@ public class CheckinResponse implements Serializable {
 
     private static final long serialVersionUID = 5926468583005150709L;
 
+    @ApiModelProperty(notes = "Ngày gửi request")
+    public String date = "";
+
     @ApiModelProperty(notes = "Có thể điểm danh hôm nay không (trừ ngày nghỉ)")
     public boolean canCheckin = true;
 

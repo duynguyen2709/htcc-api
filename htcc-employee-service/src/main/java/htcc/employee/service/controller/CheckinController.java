@@ -31,29 +31,30 @@ public class CheckinController {
     private boolean allowDeleteCheckin;
 
     @ApiOperation(value = "Kiểm tra thông tin điểm danh của nhân viên", response = CheckinResponse.class)
-    @GetMapping("/checkin/{companyId}/{username}/{yyyyMMdd}")
+    @GetMapping("/checkin/{companyId}/{username}")
     public BaseResponse getCheckinInfo(@ApiParam(value = "[Path] Mã công ty", required = true) @PathVariable(required = true) String companyId,
                                        @ApiParam(value = "[Path] Tên đăng nhập", required = true) @PathVariable(required = true) String username,
-                                       @ApiParam(value = "[Path] Ngày (yyyyMMdd) (nếu ko gửi sẽ lấy ngày hiện tại)", required = false) @PathVariable(required = false) String yyyyMMdd) {
+                                       @ApiParam(value = "[Query] Ngày (yyyyMMdd) (nếu ko gửi sẽ lấy ngày hiện tại)", required = false) @RequestParam(name = "date", required = false) String date) {
 
         BaseResponse<CheckinResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
-        String date = StringUtil.valueOf(yyyyMMdd);
+        String yyyyMMdd = StringUtil.valueOf(date);
 
         try {
-            if (!date.isEmpty()){
-                if (date.equalsIgnoreCase("undefined")){
-                    date = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+            if (!yyyyMMdd.isEmpty()){
+                if (yyyyMMdd.equalsIgnoreCase("undefined")){
+                    yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
                 }
-                else if (DateTimeUtil.parseStringToDate(date, "yyyyMMdd") == null) {
-                    return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, String.format("Ngày %s không hợp lệ định dạng yyyyMMdd", yyyyMMdd));
+                else if (DateTimeUtil.parseStringToDate(yyyyMMdd, "yyyyMMdd") == null) {
+                    return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, String.format("Ngày %s không hợp lệ định dạng yyyyMMdd", date));
                 }
             } else {
-                date = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+                yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
             }
 
             CheckinResponse data = new CheckinResponse();
+            data.date = yyyyMMdd;
 
-            CheckinModel checkinModel = redis.getCheckinData(companyId, username, date);
+            CheckinModel checkinModel = redis.getCheckinData(companyId, username, yyyyMMdd);
             if (checkinModel == null){
                 data.hasCheckedIn = false;
             } else {
@@ -61,7 +62,7 @@ public class CheckinController {
                 data.checkinTime = DateTimeUtil.parseTimestampToString(checkinModel.clientTime, "HH:mm");
             }
 
-            CheckinModel checkoutModel = redis.getCheckoutData(companyId, username, date);
+            CheckinModel checkoutModel = redis.getCheckoutData(companyId, username, yyyyMMdd);
             if (checkoutModel == null){
                 data.hasCheckedOut = false;
             } else {
@@ -71,7 +72,7 @@ public class CheckinController {
 
             response.data = data;
         } catch (Exception e){
-            log.error(String.format("getCheckinInfo [%s - %s - %s] ex", companyId, username, date), e);
+            log.error(String.format("getCheckinInfo [%s - %s - %s] ex", companyId, username, yyyyMMdd), e);
             response = new BaseResponse<>(e);
         }
         return response;
@@ -135,31 +136,32 @@ public class CheckinController {
 
 
     @ApiOperation(value = "Xóa thông tin điểm danh (testing)", response = BaseResponse.class)
-    @DeleteMapping("/checkin/{companyId}/{username}/{yyyyMMdd}")
+    @DeleteMapping("/checkin/{companyId}/{username}")
     public BaseResponse deleteCheckinInfo(@ApiParam(value = "[Path] Mã công ty", required = true) @PathVariable(required = true) String companyId,
                                        @ApiParam(value = "[Path] Tên đăng nhập", required = true) @PathVariable(required = true) String username,
-                                       @ApiParam(value = "[Path] Ngày (yyyyMMdd) (nếu ko gửi sẽ lấy ngày hiện tại)", required = false) @PathVariable(required = false) String yyyyMMdd) throws Exception {
+                                       @ApiParam(value = "[Query] Ngày (yyyyMMdd) (nếu ko gửi sẽ lấy ngày hiện tại)", required = false)
+                                              @PathVariable(name = "date", required = false) String date) throws Exception {
         if (!allowDeleteCheckin){
             throw new Exception("Method Not Supported");
         }
 
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
-        String date = StringUtil.valueOf(yyyyMMdd);
+        String yyyyMMdd = StringUtil.valueOf(date);
         try {
-            if (!date.isEmpty()){
-                if (date.equalsIgnoreCase("undefined")){
-                    date = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+            if (!yyyyMMdd.isEmpty()){
+                if (yyyyMMdd.equalsIgnoreCase("undefined")){
+                    yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
                 }
-                else if (DateTimeUtil.parseStringToDate(date, "yyyyMMdd") == null) {
-                    return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, String.format("Ngày %s không hợp lệ định dạng yyyyMMdd", yyyyMMdd));
+                else if (DateTimeUtil.parseStringToDate(yyyyMMdd, "yyyyMMdd") == null) {
+                    return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, String.format("Ngày %s không hợp lệ định dạng yyyyMMdd", date));
                 }
             } else {
-                date = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+                yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
             }
 
-            redis.deleteCheckinData(companyId, username, date);
+            redis.deleteCheckinData(companyId, username, yyyyMMdd);
         } catch (Exception e){
-            log.error(String.format("deleteCheckinInfo [%s - %s - %s] ex", companyId, username, date), e);
+            log.error(String.format("deleteCheckinInfo [%s - %s - %s] ex", companyId, username, yyyyMMdd), e);
             response = new BaseResponse<>(e);
         }
         return response;
