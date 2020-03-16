@@ -4,6 +4,7 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaAdmin;
@@ -24,6 +25,7 @@ public class KafkaTopicConfig {
     @Value(value = "#{new Integer('${kafka.topic.requestLog.partition}')}")
     private Integer requestLogPartition;
 
+    @ConditionalOnProperty(value= "kafka.enabled")
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
@@ -31,6 +33,7 @@ public class KafkaTopicConfig {
         return new KafkaAdmin(configs);
     }
 
+    @ConditionalOnProperty(value= "kafka.enabled")
     @Bean
     public NewTopic logTopic() {
         return new NewTopic(requestLogTopicName, requestLogPartition, (short) 1);

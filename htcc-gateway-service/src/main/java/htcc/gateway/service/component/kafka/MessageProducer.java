@@ -14,7 +14,8 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 @Log4j2
 @Component
 public class MessageProducer {
-    @Autowired
+
+    @Autowired(required=false)
     private KafkaTemplate<String, RequestLogEntity> requestLogEntityKafkaTemplate;
 
     @Value(value = "${kafka.topic.requestLog.name}")

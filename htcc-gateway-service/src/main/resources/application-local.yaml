@@ -36,5 +36,5 @@ redis:
   nodeAddresses: 127.0.0.1:6379
 
 kafka:
-  enabled: true
+  enabled: false
   bootstrapAddress: 127.0.0.1:9092

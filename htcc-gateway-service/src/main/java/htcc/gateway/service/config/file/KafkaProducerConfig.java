@@ -5,6 +5,7 @@ import htcc.common.entity.base.RequestLogEntity;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -21,6 +22,7 @@ public class KafkaProducerConfig {
     @Value(value= "${kafka.bootstrapAddress}")
     private String bootstrapAddress;
 
+    @ConditionalOnProperty(value= "kafka.enabled")
     @Bean
     public ProducerFactory<String, RequestLogEntity> requestLogProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
@@ -36,6 +38,7 @@ public class KafkaProducerConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
+    @ConditionalOnProperty(value= "kafka.enabled")
     @Bean
     public KafkaTemplate<String, RequestLogEntity> apiLogKafkaTemplate() {
         return new KafkaTemplate<>(requestLogProducerFactory());
