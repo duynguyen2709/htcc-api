@@ -90,3 +90,7 @@
                 Fix bug Date PathVariable can not be null -> change to QueryParam
 
     - [Admin] CRUD AdminUser
+
+17-03-2020:
+ + Version 1.2.3:
+    - [Common] Edit logging in services

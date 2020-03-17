@@ -41,7 +41,7 @@ public class CheckinResponse implements Serializable {
 
     @ApiModelProperty(notes = "Khoảng cách cho phép thực hiện điểm danh (theo m)",
                       example = "10")
-    public long maxAllowDistance = 20000;
+    public long maxAllowDistance = 100000;
 
     @ApiModelProperty(notes = "Tọa độ cho phép thực hiện điểm danh",
                       example = "10.762462")

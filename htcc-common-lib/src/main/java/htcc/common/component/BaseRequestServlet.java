@@ -25,9 +25,18 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
 
         String uri = request.getRequestURI();
 
-        if (!uri.startsWith(Constant.API_PATH) || uri.endsWith(Constant.SWAGGER_DOCS_PATH)) {
+//        if (!uri.startsWith(Constant.API_PATH) || uri.endsWith(Constant.SWAGGER_DOCS_PATH)) {
+//            super.doDispatch(request, response);
+//            return;
+//        }
+
+        if (shouldNotProcessLog(uri)) {
             super.doDispatch(request, response);
             return;
+        }
+
+        if (request.getAttribute(Constant.REQUEST_TIME) == null){
+            request.setAttribute(Constant.REQUEST_TIME, System.currentTimeMillis());
         }
 
         if (!(request instanceof ContentCachingRequestWrapper)) {
@@ -107,5 +116,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
 
     // each service implement its way to handle log
     protected abstract void processLog(RequestLogEntity logEntity);
+
+    protected abstract boolean shouldNotProcessLog(String uri);
 
 }
