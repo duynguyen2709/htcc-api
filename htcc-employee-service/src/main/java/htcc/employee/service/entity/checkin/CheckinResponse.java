@@ -49,7 +49,7 @@ public class CheckinResponse implements Serializable {
 
     @ApiModelProperty(notes = "Tọa độ cho phép thực hiện điểm danh",
                       example = "108.682762")
-    public float validLongitude = 108.682762f;
+    public float validLongitude = 106.682752f;
 
     @ApiModelProperty(notes = "Đã điểm danh vào hay chưa")
     public boolean hasCheckedIn = false;
