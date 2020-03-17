@@ -28,3 +28,10 @@ logging:
 
 service:
   debugMode: false
+
+################## Kafka Config ##################
+kafka:
+  topic:
+    requestLog:
+      name: REQUEST-LOG
+      partition: 1

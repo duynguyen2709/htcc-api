@@ -8,12 +8,27 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
+import java.util.Map;
 
 @Data
 @ToString
 @Log4j2
 @NoArgsConstructor
 public class RequestLogEntity implements Serializable {
+
+    public RequestLogEntity(Map<String, Object> requestLogHashMap) {
+        this.serviceId = (int) requestLogHashMap.get("serviceId");
+        this.method = (String) requestLogHashMap.get("method");
+        this.path = (String) requestLogHashMap.get("path");
+        this.request = (String) requestLogHashMap.get("request");
+        this.params = requestLogHashMap.get("params");
+        this.body = requestLogHashMap.get("body");
+        this.requestTime = (long) requestLogHashMap.get("responseTime");
+        this.responseTime = (long) requestLogHashMap.get("responseTime");
+        this.returnCode = (int) requestLogHashMap.get("returnCode");
+        this.setResponse(requestLogHashMap.get("response").toString());
+    }
+
     // Service Identity
     public int serviceId = 0;
 
@@ -42,6 +57,19 @@ public class RequestLogEntity implements Serializable {
     public int returnCode = 1;
 
     public BaseResponse<Object> response;
+
+    public RequestLogEntity(int serviceId, String method, String path, String request, Object params, Object body, long requestTime, long responseTime, int returnCode, BaseResponse<Object> response) {
+        this.serviceId = serviceId;
+        this.method = method;
+        this.path = path;
+        this.request = request;
+        this.params = params;
+        this.body = body;
+        this.requestTime = requestTime;
+        this.responseTime = responseTime;
+        this.returnCode = returnCode;
+        this.response = response;
+    }
 
     public void setResponse(String res) {
         try {
