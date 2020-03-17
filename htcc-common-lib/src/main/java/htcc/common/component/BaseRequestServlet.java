@@ -25,12 +25,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
 
         String uri = request.getRequestURI();
 
-//        if (!uri.startsWith(Constant.API_PATH) || uri.endsWith(Constant.SWAGGER_DOCS_PATH)) {
-//            super.doDispatch(request, response);
-//            return;
-//        }
-
-        if (shouldNotProcessLog(uri)) {
+        if (shouldNotProcessLog(uri) || uri.endsWith(Constant.SWAGGER_DOCS_PATH)) {
             super.doDispatch(request, response);
             return;
         }

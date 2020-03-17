@@ -11,12 +11,12 @@ public class RequestLoggingServlet extends BaseRequestServlet {
 
     @Override
     protected void processLog(RequestLogEntity logEntity) {
-        log.info(String.format("%s , Total Time : %sMs ",
+        log.info(String.format("%s , Total Time : %sms ",
                 StringUtil.toJsonString(logEntity), (logEntity.responseTime - logEntity.requestTime)));
     }
 
     @Override
     protected boolean shouldNotProcessLog(String uri) {
-        return (!uri.startsWith(Constant.API_PATH) || uri.endsWith(Constant.SWAGGER_DOCS_PATH));
+        return (!uri.startsWith(Constant.API_PATH));
     }
 }
