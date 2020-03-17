@@ -95,3 +95,4 @@
  + Version 1.2.3:
     - [Common] Edit logging in services
     - [Admin] Add API for getting self info
+    - [Gateway] Remove authorization in Logout
