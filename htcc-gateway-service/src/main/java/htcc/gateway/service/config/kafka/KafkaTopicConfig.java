@@ -1,4 +1,4 @@
-package htcc.gateway.service.config.file;
+package htcc.gateway.service.config.kafka;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;

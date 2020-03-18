@@ -1,4 +1,4 @@
-package htcc.gateway.service.config.file;
+package htcc.gateway.service.config.kafka;
 
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import htcc.common.entity.base.RequestLogEntity;

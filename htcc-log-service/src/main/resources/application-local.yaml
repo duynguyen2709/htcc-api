@@ -30,5 +30,4 @@ spring:
     validationQuery: SELECT 1
 
 kafka:
-  enabled: false
   bootstrapAddress: 127.0.0.1:9092
