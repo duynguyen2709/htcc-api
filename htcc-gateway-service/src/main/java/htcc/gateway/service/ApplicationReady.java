@@ -1,8 +1,8 @@
 package htcc.gateway.service;
 
+import htcc.common.component.redis.RedisClient;
 import htcc.common.util.LoggingUtil;
 import htcc.common.util.MemoryUtil;
-import htcc.gateway.service.component.redis.RedisClient;
 import htcc.gateway.service.config.file.ServiceConfig;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +36,16 @@ public class ApplicationReady {
         // print config from file
         LoggingUtil.printConfig(configurableEnvironment);
 
-        // print memory usage for monitoring
-        if (serviceConfig.isDebugMode()) {
-            ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
-
-            ses.scheduleAtFixedRate(new Runnable() {
-                @Override public void run() {
-                    MemoryUtil.printMemory();
-                }
-            }, 0, 60, TimeUnit.SECONDS);
-        }
+//        // print memory usage for monitoring
+//        if (serviceConfig.isDebugMode()) {
+//            ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+//
+//            ses.scheduleAtFixedRate(new Runnable() {
+//                @Override public void run() {
+//                    MemoryUtil.printMemory();
+//                }
+//            }, 0, 30, TimeUnit.SECONDS);
+//        }
 
     }
 

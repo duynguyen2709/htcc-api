@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class ZuulRouteConfig {
 
-    @Value("${spring.application.name}")
+    @Value("${zuul.routes.htcc-gateway-service.serviceId}")
     public String gatewayService;
 
-    @Value("${zuul.routes.htcc-employee-service.service-id}")
+    @Value("${zuul.routes.htcc-employee-service.serviceId}")
     public String employeeService;
 
-    @Value("${zuul.routes.htcc-admin-service.service-id}")
+    @Value("${zuul.routes.htcc-admin-service.serviceId}")
     public String adminService;
 
 }

@@ -14,5 +14,22 @@ eureka:
     hostname: eureka1
 
 service:
+  debugMode: true
+  allowDeleteCheckin: true
   hazelcast:
     useHazelcast: false
+    enableRest: true
+    monitorLevel: "OFF"
+    address: 127.0.0.1
+    port: 5702
+
+spring:
+  datasource:
+    schemaName: HTCC_Company
+    server: 127.0.0.1:3306
+
+redis:
+  useRedis: true
+  password:
+  useMaster: false
+  nodeAddresses: 127.0.0.1:6379

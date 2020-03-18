@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -68,14 +69,17 @@ public class RequestLogEntity implements Serializable, LogEntity {
 
     public BaseResponse<Object> response;
 
+    public String ip = "";
+
     public void setResponse(String res) {
         try {
             response = StringUtil.fromJsonString(res, BaseResponse.class);
+            returnCode = response.returnCode;
         } catch (Exception e) {
             response = new BaseResponse<>(ReturnCodeEnum.EXCEPTION);
             response.data = res;
+            returnCode = response.returnCode;
         }
-        returnCode = response.returnCode;
     }
 
     public void setBody(String str) {
@@ -117,5 +121,14 @@ public class RequestLogEntity implements Serializable, LogEntity {
                 + "`responseTime` bigint NOT NULL DEFAULT '0',"
                 + "`userIP` varchar(32) DEFAULT '',"
                 + "`updDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,";
+    }
+    
+    public void setIp(HttpServletRequest request){
+        this.ip = request.getHeader("X-FORWARDED-FOR");
+        if (StringUtil.valueOf(this.ip).isEmpty()) {
+            this.ip = request.getRemoteAddr();
+        } else if (this.ip.contains(",")){
+            this.ip = this.ip.split(",")[0];
+        }
     }
 }

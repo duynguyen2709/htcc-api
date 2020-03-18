@@ -7,14 +7,22 @@ public enum ReturnCodeEnum {
     INIT(2, "Đang xử lý"),
     SUCCESS(1, "Thành công"),
     EXCEPTION(0, "Hệ thống đang có lỗi. Vui lòng thử lại sau"),
-    UNAUTHORIZE(401, "Không có quyền truy cập"),
-    PERMISSION_DENIED(403, ""),
+    UNAUTHORIZE(401, "Xác thực token thất bại"),
+    PERMISSION_DENIED(403, "Không có quyền truy cập"),
     WRONG_USERNAME_OR_PASSWORD(-1, "Sai tên đăng nhập hoặc mật khẩu"),
     ACCOUNT_LOCKED(-2, "Tài khoản đã bị khóa"),
 
     PARAM_CLIENTID_INVALID(-3, "Thiếu ClientID"),
     PARAM_DATA_INVALID(-4, "Dữ liệu không hợp lệ"),
 
+    USER_NOT_FOUND(-5, "Không tìm thấy người dùng"),
+    OLD_PASSWORD_NOT_MATCH(-6, "Mật khẩu cũ không khớp"),
+    NEW_PASSWORD_MUST_DIFFER_FROM_OLD_PASSWORD(-7, "Mật khẩu mới không được trùng với mật khẩu cũ"),
+    TOKEN_EXPIRED(-8, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại"),
+    CHECKIN_ALREADY(-9, "Đã thực hiện điểm danh vào hôm nay"),
+    CHECKOUT_ALREADY(-10, "Đã thực hiện điểm danh ra hôm nay"),
+    NOT_CHECKIN(-11, "Chưa thực hiện điểm danh vào hôm nay"),
+    CHECKIN_TIME_NOT_VALID(-12, "Thời gian điểm danh không hợp lệ");
     ;
 
     private final int value;
@@ -36,7 +44,7 @@ public enum ReturnCodeEnum {
     }
 
     public static ReturnCodeEnum fromInt(int iValue) {
-        return map.get(iValue);
+        return map.getOrDefault(iValue, EXCEPTION);
     }
 
     public String toString() {

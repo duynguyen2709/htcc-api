@@ -1,6 +1,7 @@
 package htcc.gateway.service.component.filter;
 
 import htcc.common.component.BaseRequestServlet;
+import htcc.common.constant.Constant;
 import htcc.common.entity.base.RequestLogEntity;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.component.kafka.MessageProducer;
@@ -25,7 +26,13 @@ public class RequestLoggingServlet extends BaseRequestServlet {
             producer.sendRequestLogMessage(logEntity);
         }
         else {
-            log.info(StringUtil.toJsonString(logEntity));
+            log.info(String.format("%s , Total Time : %sms\n",
+                StringUtil.toJsonString(logEntity), (logEntity.responseTime - logEntity.requestTime)));
         }
+    }
+
+    @Override
+    protected boolean shouldNotProcessLog(String uri) {
+        return (!uri.startsWith(Constant.API_PATH));
     }
 }

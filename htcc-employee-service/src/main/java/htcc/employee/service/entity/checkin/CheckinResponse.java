@@ -17,18 +17,31 @@ public class CheckinResponse implements Serializable {
 
     private static final long serialVersionUID = 5926468583005150709L;
 
+    @ApiModelProperty(notes = "Ngày gửi request")
+    public String date = "";
+
     @ApiModelProperty(notes = "Có thể điểm danh hôm nay không (trừ ngày nghỉ)")
     public boolean canCheckin = true;
+
+    @ApiModelProperty(notes = "Chỉ được dùng wifi")
+    public boolean forceUseWifi = false;
+
+    @ApiModelProperty(notes = "IP Subnet của mạng wifi cho phép")
+    public String allowWifiIP = "";
 
     @ApiModelProperty(notes = "Giờ cho phép thực hiện điểm danh vào " +
                                 " (sau thời gian này là vào trễ)",
                       example = "08:30")
-    public String validCheckinTime = "";
+    public String validCheckinTime = "08:30";
 
     @ApiModelProperty(notes = "Giờ cho phép thực hiện điểm danh ra " +
                                 "(trước thời gian này là về trễ)",
                       example = "17:30")
-    public String validCheckoutTime = "";
+    public String validCheckoutTime = "17:30";
+
+    @ApiModelProperty(notes = "Khoảng cách cho phép thực hiện điểm danh (theo m)",
+                      example = "10")
+    public long maxAllowDistance = 100000;
 
     @ApiModelProperty(notes = "Tọa độ cho phép thực hiện điểm danh",
                       example = "10.762462")
@@ -36,7 +49,7 @@ public class CheckinResponse implements Serializable {
 
     @ApiModelProperty(notes = "Tọa độ cho phép thực hiện điểm danh",
                       example = "108.682762")
-    public float validLongitude = 108.682762f;
+    public float validLongitude = 106.682752f;
 
     @ApiModelProperty(notes = "Đã điểm danh vào hay chưa")
     public boolean hasCheckedIn = false;

@@ -19,15 +19,12 @@ public class SwaggerDocumentationConfig implements SwaggerResourcesProvider {
 
     private static final String VERSION = "2.0";
 
-    @Autowired
-    private ZuulRouteConfig routeConfig;
-
     @Override
     public List<SwaggerResource> get() {
         List<SwaggerResource> resources = new ArrayList<>();
-        resources.add(swaggerResource(routeConfig.gatewayService, "/v2/api-docs"));
-        resources.add(swaggerResource(routeConfig.employeeService, "/api/employee/v2/api-docs"));
-        resources.add(swaggerResource(routeConfig.adminService, "/api/admin/v2/api-docs"));
+        resources.add(swaggerResource("Gateway", "/v2/api-docs"));
+        resources.add(swaggerResource("Admin", "/api/admin/v2/api-docs"));
+        resources.add(swaggerResource("Nhân Viên", "/api/employee/v2/api-docs"));
         return resources;
     }
 

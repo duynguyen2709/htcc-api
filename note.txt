@@ -43,5 +43,60 @@
 
 08-03-2020 :
  + Version 1.1.3:
-    - Init Admin Service
+    - Init Admin Service & API GetUserInfo, UpdateUserInfo
     - Move common component to CommonLib
+    - Add more description for apis (Swagger)
+    - Edit Pipeline for Admin Service
+    - Edit gateway.sh script to --network="host"
+
+09-03-2020 :
+ + Version 1.1.4:
+    - [Gateway] Fix CORS
+
+10-03-2020 :
+ + Version 1.1.5:
+    - [Gateway] Auto Expired Token
+
+11-03-2020 :
+ + Version 1.1.6:
+    - [Gateway] API ChangePassword
+
+12-03-2020 :
+ + Version 1.1.7:
+    - [Common] Add @EnableSwaggerDocs annotation; move HazelcastConfig & Redis to common
+
+13-03-2020 :
+ + Version 1.1.8:
+    - [Gateway] Never expire token for Mobile; add FeignClient to call Admin/Employee on login
+    to get user info; Add BypassJWT local
+
+    - [Employee] Add Get/Update EmployeeInfo
+
+14-03-2020:
+ + Version 1.1.9:
+    - Build stable release v1.1.9
+
+ + Version 1.2.0:
+    - [Employee] API Checkin
+    - [Gateway] add Blacklist token
+
+15-03-2020:
+ + Version 1.2.1:
+    - [Gateway] Split Database, Fix bug Logout
+
+16-03-2020:
+ + Version 1.2.2:
+    - [Employee] Merge Checkin & Checkout API;
+                Fix bug Date PathVariable can not be null -> change to QueryParam
+
+    - [Admin] CRUD AdminUser
+
+17-03-2020:
+ + Version 1.2.3:
+    - [Common] Edit logging in services
+    - [Admin] Add API for getting self info
+    - [Gateway] Remove authorization in Logout
+
+18-03-2020:
+ + Version 1.2.4:
+    - [Employee] Add Title in EmployeeInfo

@@ -1,17 +1,17 @@
 package htcc.gateway.service.service.authentication;
 
+import htcc.common.component.redis.RedisService;
 import htcc.common.constant.AccountStatusEnum;
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.Constant;
+import htcc.common.service.ICallback;
+import htcc.common.util.DateTimeUtil;
 import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
-import htcc.gateway.service.config.file.RedisBuzConfig;
 import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.BaseUser;
 import htcc.gateway.service.entity.request.LoginRequest;
-import htcc.gateway.service.service.RedisService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -42,9 +42,6 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 
 	@Autowired
 	private RedisService redis;
-
-	@Autowired
-	private RedisBuzConfig redisConfig;
 	//</editor-fold>
 
 	@Override
@@ -93,10 +90,6 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 		return new LoginRequest(clientId, companyId, username, "");
 	}
 
-	private Date getExpireDate(String token) {
-		return getClaim(token, Claims::getExpiration);
-	}
-
 	private <T> T getClaim(String token, Function<Claims, T> claimsResolver) {
 		final Claims claims = getAllClaims(token);
 		return claimsResolver.apply(claims);
@@ -106,20 +99,6 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 		return Jwts.parser().setSigningKey(config.jwt.key).parseClaimsJws(token).getBody();
 	}
 
-	private boolean isTokenExpired(String token) {
-		boolean ignore = ignoreTokenExpire(token);
-		if (ignore){
-			return true;
-		}
-
-		Date expiration = getExpireDate(token);
-		return expiration.before(new Date());
-	}
-
-	private boolean ignoreTokenExpire(String token) {
-		return false;
-	}
-
 	private String generateToken(LoginRequest request) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(Constant.CLIENT_ID, request.clientId);
@@ -127,22 +106,65 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 
 		long now = System.currentTimeMillis();
 
-		return Jwts.builder().setClaims(claims)
-				.setSubject(request.username)
-				.setIssuedAt(new Date(now))
-				.setExpiration(new Date(now + config.jwt.expireSecond * 1000))
-				.signWith(SignatureAlgorithm.HS512, config.jwt.key).compact();
+		// mobile never expire token
+		if (request.clientId == ClientSystemEnum.MOBILE.getValue()) {
+			log.info(String.format("Generate new token for [%s-%s-%s]",
+					request.clientId, StringUtil.valueOf(request.companyId) ,request.username));
+
+			return Jwts.builder().setClaims(claims)
+					.setSubject(request.username)
+					.setIssuedAt(new Date(now))
+					.signWith(SignatureAlgorithm.HS512, config.jwt.key).compact();
+		} else {
+			log.info(String.format("Generate new token for [%s-%s-%s], expired at [%s]",
+					request.clientId, StringUtil.valueOf(request.companyId) ,request.username,
+					DateTimeUtil.parseTimestampToDateString(now + config.jwt.expireSecond * 1000)));
+
+			return Jwts.builder().setClaims(claims)
+					.setSubject(request.username)
+					.setIssuedAt(new Date(now))
+					.setExpiration(new Date(now + config.jwt.expireSecond * 1000))
+					.signWith(SignatureAlgorithm.HS512, config.jwt.key).compact();
+		}
+
 	}
 
 	public String getToken(LoginRequest request) {
-		return StringUtil.valueOf(redis.getOrSet(generateToken(request),
-				redisConfig.tokenFormat, request.clientId,
-				StringUtil.valueOf(request.companyId), request.username));
+		ICallback genTokenCb = new ICallback() {
+			@Override
+			public Object callback() {
+				return generateToken(request);
+			}
+		};
+
+		return StringUtil.valueOf(redis.getOrSet(genTokenCb,
+												config.jwt.expireSecond - 1,
+												redis.buzConfig.tokenFormat,
+												request.clientId,
+												StringUtil.valueOf(request.companyId),
+												request.username));
 	}
 
-	public boolean validateToken(String token, String reqUsername) {
-		String username = getUsername(token);
-		return (username.equals(reqUsername) && !isTokenExpired(token));
+	public boolean validateToken(String token) throws ExpiredJwtException {
+		try {
+			// try parse token
+			LoginRequest user = getLoginInfo(token);
+
+			// check token in Blacklist
+			String blacklistToken = StringUtil.valueOf(redis.get(redis.buzConfig.blacklistTokenFormat,
+					user.clientId, user.companyId, user.username));
+
+			if (token.equalsIgnoreCase(blacklistToken)){
+				log.warn("Token {} in blacklist", token);
+				return false;
+			}
+
+			return true;
+		} catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
+			log.warn(String.format("Invalid JWT token [%s]: [%s]", ex.getMessage(),
+					StringUtil.valueOf(token)));
+		}
+		return false;
 	}
 
 }

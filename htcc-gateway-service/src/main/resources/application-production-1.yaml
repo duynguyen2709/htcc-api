@@ -9,25 +9,21 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka2:8761/eureka, http://eureka1:8761/eureka
+      defaultZone: http://eureka1:8761/eureka, http://eureka2:8761/eureka
   instance:
     hostname: eureka1
 
 spring:
-  datasource:
-    schemaName: HTCC_Authentication
-    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
-    server: 167.179.80.90:3306
-    url: jdbc:mysql://${spring.datasource.server}/${spring.datasource.schemaName}?${spring.datasource.options}
-    username: ${security.user.name}
-    password: ${security.user.password}
-    testWhileIdle: true
-    timeBetweenEvictionRunsMillis: 60000
-    validationQuery: SELECT 1
+  admin-datasource:
+    schemaName: HTCC_Admin
+    server: 127.0.0.1:3306
+  company-datasource:
+    schemaName: HTCC_Company
+    server: 127.0.0.1:3306
 
 redis:
   useRedis: true
   password: abc@123
   useMaster: true
-  masterAddress: 10.25.96.3:6379
+  masterAddress: 127.0.0.1:6379
   nodeAddresses: 10.25.96.4:6379
