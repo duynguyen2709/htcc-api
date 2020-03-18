@@ -17,6 +17,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableFeignClients
 public class Main {
 	public static void main(String[] args) {
+		System.setProperty("tomcat.util.http.parser.HttpParser.requestTargetAllow","{}");
 		SpringApplication.run(Main.class, args);
 	}
 }

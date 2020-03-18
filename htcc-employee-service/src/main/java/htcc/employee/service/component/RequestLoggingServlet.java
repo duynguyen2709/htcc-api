@@ -10,7 +10,7 @@ public class RequestLoggingServlet extends BaseRequestServlet {
 
     @Override
     protected void processLog(RequestLogEntity logEntity) {
-        log.info(String.format("%s , Total Time : %sms ",
+        log.info(String.format("%s , Total Time : %sms\n",
                 StringUtil.toJsonString(logEntity), (logEntity.responseTime - logEntity.requestTime)));
     }
 

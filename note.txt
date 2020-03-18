@@ -96,3 +96,7 @@
     - [Common] Edit logging in services
     - [Admin] Add API for getting self info
     - [Gateway] Remove authorization in Logout
+
+18-03-2020:
+ + Version 1.2.4:
+    - [Employee] Add Title in EmployeeInfo
