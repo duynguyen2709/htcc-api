@@ -29,6 +29,19 @@ public class RequestLogEntity implements Serializable {
         this.setResponse(requestLogHashMap.get("response").toString());
     }
 
+    public RequestLogEntity(long dateTime, int serviceId, String method, String path, String request, Object params, Object body, long requestTime, long responseTime, int returnCode, BaseResponse<Object> response) {
+        this.serviceId = serviceId;
+        this.method = method;
+        this.path = path;
+        this.request = request;
+        this.params = params;
+        this.body = body;
+        this.requestTime = requestTime;
+        this.responseTime = responseTime;
+        this.returnCode = returnCode;
+        this.response = response;
+    }
+
     // Service Identity
     public int serviceId = 0;
 
@@ -58,18 +71,7 @@ public class RequestLogEntity implements Serializable {
 
     public BaseResponse<Object> response;
 
-    public RequestLogEntity(int serviceId, String method, String path, String request, Object params, Object body, long requestTime, long responseTime, int returnCode, BaseResponse<Object> response) {
-        this.serviceId = serviceId;
-        this.method = method;
-        this.path = path;
-        this.request = request;
-        this.params = params;
-        this.body = body;
-        this.requestTime = requestTime;
-        this.responseTime = responseTime;
-        this.returnCode = returnCode;
-        this.response = response;
-    }
+
 
     public void setResponse(String res) {
         try {

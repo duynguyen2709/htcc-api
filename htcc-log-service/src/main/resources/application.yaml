@@ -29,6 +29,8 @@ logging:
 service:
   debugMode: false
 
+timezone: Asia/Ho_Chi_Minh
+
 ################## Kafka Config ##################
 kafka:
   topic:
