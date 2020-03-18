@@ -17,6 +17,9 @@ public class CheckinResponse implements Serializable {
 
     private static final long serialVersionUID = 5926468583005150709L;
 
+    @ApiModelProperty(notes = "Ngày gửi request")
+    public String date = "";
+
     @ApiModelProperty(notes = "Có thể điểm danh hôm nay không (trừ ngày nghỉ)")
     public boolean canCheckin = true;
 
@@ -38,7 +41,7 @@ public class CheckinResponse implements Serializable {
 
     @ApiModelProperty(notes = "Khoảng cách cho phép thực hiện điểm danh (theo m)",
                       example = "10")
-    public long maxAllowDistance = 20000;
+    public long maxAllowDistance = 100000;
 
     @ApiModelProperty(notes = "Tọa độ cho phép thực hiện điểm danh",
                       example = "10.762462")
@@ -46,7 +49,7 @@ public class CheckinResponse implements Serializable {
 
     @ApiModelProperty(notes = "Tọa độ cho phép thực hiện điểm danh",
                       example = "108.682762")
-    public float validLongitude = 108.682762f;
+    public float validLongitude = 106.682752f;
 
     @ApiModelProperty(notes = "Đã điểm danh vào hay chưa")
     public boolean hasCheckedIn = false;

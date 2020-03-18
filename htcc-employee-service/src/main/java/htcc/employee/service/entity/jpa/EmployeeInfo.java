@@ -61,6 +61,13 @@ public class EmployeeInfo extends BaseJPAEntity {
 
     @Column
     @NotEmpty
+    @ApiModelProperty(notes = "(*) Chức danh/ Cấp độ nhân viên",
+                      example = "Junior Developer")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public String title = "";
+
+    @Column
+    @NotEmpty
     @ApiModelProperty(notes = "Họ tên",
                       example = "NGUYỄN ANH DUY")
     public String fullName = "";
@@ -102,7 +109,9 @@ public class EmployeeInfo extends BaseJPAEntity {
 
     @Override
     public boolean isValid() {
-        return (StringUtil.valueOf(phoneNumber).length() >= 10 &&
+        return (!StringUtil.valueOf(username).isEmpty() &&
+                !StringUtil.valueOf(address).isEmpty() &&
+                StringUtil.valueOf(phoneNumber).length() >= 10 &&
                 StringUtil.valueOf(identityCardNo).length() >= 9 &&
                 this.birthDate != null);
     }
@@ -113,6 +122,7 @@ public class EmployeeInfo extends BaseJPAEntity {
         this.employeeId = other.employeeId;
         this.officeId = other.officeId;
         this.department = other.department;
+        this.title = other.title;
         this.avatar = other.avatar;
     }
 

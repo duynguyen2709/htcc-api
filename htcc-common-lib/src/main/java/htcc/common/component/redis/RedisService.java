@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 public class RedisService extends RedisClient {
 
+    private static final String LOCK = "LOCK-";
+
     @Override
     public Object get(String keyFormat, Object... params) {
         if (instance == null) {
@@ -34,12 +36,23 @@ public class RedisService extends RedisClient {
         }
 
         String key = String.format(keyFormat, params);
-        RBucket<Object> bucket = instance.getBucket(key);
+        try {
+            if (!lock(LOCK + key)) {
+                throw new Exception("Lock " + key + " failed!");
+            }
 
-        if (ttl <= 0) {
-            bucket.set(newValue);
-        } else {
-            bucket.set(newValue, ttl, TimeUnit.SECONDS);
+            RBucket<Object> bucket = instance.getBucket(key);
+
+            if (ttl <= 0) {
+                bucket.set(newValue);
+            }
+            else {
+                bucket.set(newValue, ttl, TimeUnit.SECONDS);
+            }
+        } catch (Exception e) {
+            log.error(String.format("Redis Set [%s] ex %s : ", key, e.getMessage()),e);
+        } finally {
+            unlock(LOCK + key);
         }
     }
 
@@ -50,21 +63,31 @@ public class RedisService extends RedisClient {
         }
 
         String key = String.format(keyFormat, params);
+        try {
+            if (!lock(LOCK + key)) {
+                throw new Exception("Lock " + key + " failed!");
+            }
 
-        RBucket<Object> bucket = instance.getBucket(key);
-        if (bucket.isExists()){
-            return bucket.get();
+            RBucket<Object> bucket = instance.getBucket(key);
+            if (bucket.isExists()) {
+                return bucket.get();
+            }
+
+            Object newValue = f.callback();
+
+            if (ttl <= 0) {
+                bucket.set(newValue);
+            } else {
+                bucket.set(newValue, ttl, TimeUnit.SECONDS);
+            }
+
+            return newValue;
+        } catch (Exception e){
+            log.error(String.format("Redis getOrSet [%s] ex %s : ", key, e.getMessage()),e);
+            return null;
+        } finally {
+            unlock(LOCK + key);
         }
-
-        Object newValue = f.callback();
-
-        if (ttl <= 0) {
-            bucket.set(newValue);
-        } else {
-            bucket.set(newValue, ttl, TimeUnit.SECONDS);
-        }
-
-        return newValue;
     }
 
     @Override
@@ -75,9 +98,19 @@ public class RedisService extends RedisClient {
 
         String key = String.format(keyFormat, params);
 
-        RBucket<Object> bucket = instance.getBucket(key);
-        if (bucket.isExists()){
-            bucket.delete();
+        try {
+            if (!lock(LOCK + key)) {
+                throw new Exception("Lock " + key + " failed!");
+            }
+
+            RBucket<Object> bucket = instance.getBucket(key);
+            if (bucket.isExists()) {
+                bucket.delete();
+            }
+        } catch (Exception e) {
+            log.error(String.format("Redis delete [%s] ex %s : ", key, e.getMessage()),e);
+        } finally {
+            unlock(LOCK + key);
         }
     }
 

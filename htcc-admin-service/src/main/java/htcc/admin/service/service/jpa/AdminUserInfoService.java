@@ -1,6 +1,6 @@
 package htcc.admin.service.service.jpa;
 
-import htcc.admin.service.entity.jpa.AdminUserInfo;
+import htcc.admin.service.entity.jpa.AdminUser;
 import htcc.admin.service.jpa.AdminUserInfoRepository;
 import htcc.common.constant.Constant;
 import htcc.common.service.BaseJPAService;
@@ -13,29 +13,29 @@ import java.util.Optional;
 
 @Service
 @Log4j2
-public class AdminUserInfoService extends BaseJPAService<AdminUserInfo, String> {
+public class AdminUserInfoService extends BaseJPAService<AdminUser, String> {
 
     @Autowired
     private AdminUserInfoRepository repo;
 
     @Override
-    public List<AdminUserInfo> findAll() {
+    public List<AdminUser> findAll() {
         return repo.findAll();
     }
 
     @Override
-    public AdminUserInfo findById(String key) {
-        Optional<AdminUserInfo> user = repo.findById(key);
+    public AdminUser findById(String key) {
+        Optional<AdminUser> user = repo.findById(key);
         return user.orElse(null);
     }
 
     @Override
-    public AdminUserInfo create(AdminUserInfo adminUser) {
+    public AdminUser create(AdminUser adminUser) {
         return repo.save(adminUser);
     }
 
     @Override
-    public AdminUserInfo update(AdminUserInfo adminUser) {
+    public AdminUser update(AdminUser adminUser) {
         adminUser.avatar = Constant.USER_DEFAULT_AVATAR;
         return repo.save(adminUser);
     }

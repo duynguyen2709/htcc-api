@@ -25,9 +25,13 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
 
         String uri = request.getRequestURI();
 
-        if (!uri.startsWith(Constant.API_PATH) || uri.endsWith(Constant.SWAGGER_DOCS_PATH)) {
+        if (shouldNotProcessLog(uri) || uri.endsWith(Constant.SWAGGER_DOCS_PATH)) {
             super.doDispatch(request, response);
             return;
+        }
+
+        if (request.getAttribute(Constant.REQUEST_TIME) == null){
+            request.setAttribute(Constant.REQUEST_TIME, System.currentTimeMillis());
         }
 
         if (!(request instanceof ContentCachingRequestWrapper)) {
@@ -76,13 +80,14 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
     private void setLogData(RequestWrapper request, HttpServletResponse responseToCache) {
         RequestLogEntity logEnt = new RequestLogEntity();
         try {
+            logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
+            logEnt.setResponseTime(System.currentTimeMillis());
             logEnt.setMethod(request.getMethod());
             logEnt.setPath(request.getRequestURI());
             logEnt.setParams(request.getParameterMap());
             logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
-            logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
-            logEnt.setResponseTime(System.currentTimeMillis());
             logEnt.setServiceId(ServiceSystemEnum.getServiceFromUri(logEnt.path));
+            logEnt.setIp(request);
             logEnt.setBody((hasBody(logEnt.method)) ? StringUtil.valueOf(request.getBody()) : "");
             logEnt.setResponse(getResponsePayload(responseToCache));
         } catch (Exception e) {
@@ -106,5 +111,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
 
     // each service implement its way to handle log
     protected abstract void processLog(RequestLogEntity logEntity);
+
+    protected abstract boolean shouldNotProcessLog(String uri);
 
 }

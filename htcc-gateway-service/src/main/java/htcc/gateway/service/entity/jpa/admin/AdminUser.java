@@ -1,4 +1,4 @@
-package htcc.gateway.service.entity.jpa;
+package htcc.gateway.service.entity.jpa.admin;
 
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.entity.jpa.BaseJPAEntity;

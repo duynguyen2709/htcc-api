@@ -90,10 +90,6 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 		return new LoginRequest(clientId, companyId, username, "");
 	}
 
-	private Date getExpireDate(String token) {
-		return getClaim(token, Claims::getExpiration);
-	}
-
 	private <T> T getClaim(String token, Function<Claims, T> claimsResolver) {
 		final Claims claims = getAllClaims(token);
 		return claimsResolver.apply(claims);
@@ -151,7 +147,18 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 
 	public boolean validateToken(String token) throws ExpiredJwtException {
 		try {
-			Jwts.parser().setSigningKey(config.jwt.key).parseClaimsJws(token);
+			// try parse token
+			LoginRequest user = getLoginInfo(token);
+
+			// check token in Blacklist
+			String blacklistToken = StringUtil.valueOf(redis.get(redis.buzConfig.blacklistTokenFormat,
+					user.clientId, user.companyId, user.username));
+
+			if (token.equalsIgnoreCase(blacklistToken)){
+				log.warn("Token {} in blacklist", token);
+				return false;
+			}
+
 			return true;
 		} catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException ex) {
 			log.warn(String.format("Invalid JWT token [%s]: [%s]", ex.getMessage(),

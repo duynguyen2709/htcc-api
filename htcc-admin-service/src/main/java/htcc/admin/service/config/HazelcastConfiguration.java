@@ -12,10 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@ConditionalOnProperty(
-        value="service.hazelcast.useHazelcast",
-        havingValue = "true",
-        matchIfMissing = false)
+@ConditionalOnProperty( value="service.hazelcast.useHazelcast",
+        havingValue = "true")
 @Import({HazelcastFileConfig.class})
 public class HazelcastConfiguration {
 

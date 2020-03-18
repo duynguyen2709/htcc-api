@@ -1,5 +1,5 @@
 security:
-  bypassJWT: true
+  bypassJWT: false
   user:
     name: admin
     password: admin
@@ -16,17 +16,12 @@ eureka:
   numberRegistrySyncRetries: 0
 
 spring:
-  datasource:
-    schemaName: HTCC_Authentication
-    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
+  admin-datasource:
+    schemaName: HTCC_Admin
     server: 127.0.0.1:3306
-    url: jdbc:mysql://${spring.datasource.server}/${spring.datasource.schemaName}?${spring.datasource.options}
-    username: ${security.user.name}
-    password: ${security.user.password}
-    testWhileIdle: true
-    testOnBorrow: true
-    timeBetweenEvictionRunsMillis: 60000
-    validationQuery: SELECT 1
+  company-datasource:
+    schemaName: HTCC_Company
+    server: 127.0.0.1:3306
 
 service:
   debugMode: true
@@ -35,4 +30,5 @@ redis:
   useRedis: true
   password:
   useMaster: false
+  masterAddress: 127.0.0.1:6379
   nodeAddresses: 127.0.0.1:6379

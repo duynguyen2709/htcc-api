@@ -5,6 +5,8 @@ import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.util.StringUtil;
+import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.BaseUser;
 import htcc.gateway.service.entity.request.ChangePasswordRequest;
 import htcc.gateway.service.entity.request.LoginRequest;
@@ -37,29 +39,50 @@ public class PrivateController {
     private RedisService redis;
 
     @Autowired
+    private SecurityConfig securityConfig;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @ApiOperation(value = "API Logout")
-    @PostMapping("/logout/{clientId}")
-    public BaseResponse logout(@ApiParam(value = "[Path] clientId", defaultValue = "1", required = true) @PathVariable("clientId") int clientId,
-                               @ApiParam(value = "[Query] companyId", required = false) @RequestParam(required = false) String companyId,
-                               @ApiParam(value = "[Query] username", required = true) @RequestParam(required = true) String username,
-                               @RequestHeader("Authorization") String authorization) {
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
-        try {
-            if (!validPermission(authorization, clientId, companyId, username)) {
-                log.warn(String.format("Logout failed for client %s | company %s | username %s | token %s",
-                        clientId, companyId, username, authorization.substring(7)));
-                response = new BaseResponse(ReturnCodeEnum.PERMISSION_DENIED);
-            }
 
-            redis.delete(redis.buzConfig.tokenFormat, clientId, companyId, username);
+
+
+    @ApiOperation(value = "API Logout")
+    @PostMapping("/logout")
+    public BaseResponse logout(@RequestHeader("Authorization") String authorization) {
+        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        String token = authorization.substring(Constant.BEARER.length());
+        LoginRequest loginInfo = tokenService.getLoginInfo(token);
+        try {
+            loginInfo = tokenService.getLoginInfo(token);
+
+            redis.delete(redis.buzConfig.tokenFormat,
+                    loginInfo.clientId,
+                    StringUtil.valueOf(loginInfo.companyId),
+                    loginInfo.username);
+
         } catch (Exception e) {
             log.error("[logout] ex", e);
             response = new BaseResponse(e);
+        } finally {
+            // blacklist token
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
+                long ttl = 0;
+                if (loginInfo.clientId != ClientSystemEnum.MOBILE.getValue()) {
+                    ttl = securityConfig.jwt.expireSecond;
+                }
+
+                redis.set(token, ttl, redis.buzConfig.blacklistTokenFormat,
+                        loginInfo.clientId,
+                        StringUtil.valueOf(loginInfo.companyId),
+                        loginInfo.username);
+            }
         }
         return response;
     }
+
+
+
 
     @ApiOperation(value = "API ChangePassword")
     @PutMapping("/changepassword/{clientId}")
@@ -115,6 +138,9 @@ public class PrivateController {
 
         return false;
     }
+
+
+
 
     @ApiOperation(value = "Test token")
     @GetMapping("/test")

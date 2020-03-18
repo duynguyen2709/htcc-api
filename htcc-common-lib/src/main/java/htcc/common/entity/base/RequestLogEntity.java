@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 
 @Data
@@ -41,6 +42,8 @@ public class RequestLogEntity implements Serializable {
 
     public BaseResponse<Object> response;
 
+    public String ip = "";
+
     public void setResponse(String res) {
         try {
             response = StringUtil.fromJsonString(res, BaseResponse.class);
@@ -58,6 +61,15 @@ public class RequestLogEntity implements Serializable {
             this.body = (obj != null) ? obj : "";
         } catch (Exception e) {
             this.body = str;
+        }
+    }
+
+    public void setIp(HttpServletRequest request){
+        this.ip = request.getHeader("X-FORWARDED-FOR");
+        if (StringUtil.valueOf(this.ip).isEmpty()) {
+            this.ip = request.getRemoteAddr();
+        } else if (this.ip.contains(",")){
+            this.ip = this.ip.split(",")[0];
         }
     }
 }
