@@ -8,15 +8,21 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 @Data
 @ToString
 @Log4j2
 @NoArgsConstructor
-public class RequestLogEntity implements Serializable {
+public class RequestLogEntity implements Serializable, LogEntity {
 
     public RequestLogEntity(Map<String, Object> requestLogHashMap) {
+        this.createTime = (long) requestLogHashMap.get("createTime");
         this.serviceId = (int) requestLogHashMap.get("serviceId");
         this.method = (String) requestLogHashMap.get("method");
         this.path = (String) requestLogHashMap.get("path");
@@ -29,18 +35,9 @@ public class RequestLogEntity implements Serializable {
         this.setResponse(requestLogHashMap.get("response").toString());
     }
 
-    public RequestLogEntity(long dateTime, int serviceId, String method, String path, String request, Object params, Object body, long requestTime, long responseTime, int returnCode, BaseResponse<Object> response) {
-        this.serviceId = serviceId;
-        this.method = method;
-        this.path = path;
-        this.request = request;
-        this.params = params;
-        this.body = body;
-        this.requestTime = requestTime;
-        this.responseTime = responseTime;
-        this.returnCode = returnCode;
-        this.response = response;
-    }
+    private String tableName = "RequestLog";
+
+    public long createTime = new Date().getTime();
 
     // Service Identity
     public int serviceId = 0;
@@ -71,8 +68,6 @@ public class RequestLogEntity implements Serializable {
 
     public BaseResponse<Object> response;
 
-
-
     public void setResponse(String res) {
         try {
             response = StringUtil.fromJsonString(res, BaseResponse.class);
@@ -90,5 +85,37 @@ public class RequestLogEntity implements Serializable {
         } catch (Exception e) {
             this.body = str;
         }
+    }
+
+    @Override
+    public Map<String, Object> getHashMap() {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("serviceId", this.getServiceId());
+        parameters.put("requestURL", this.getServiceId());
+        parameters.put("method", this.getMethod());
+        parameters.put("path", this.getPath());
+        parameters.put("params", this.getParams());
+        parameters.put("body", this.getBody());
+        parameters.put("response", this.getResponse());
+        parameters.put("returnCode", this.getReturnCode());
+        parameters.put("requestTime", this.getRequestTime());
+        parameters.put("responseTime", this.getResponseTime());
+        return parameters;
+    }
+
+    @Override
+    public String getSQLCreateTableSchemaScript() {
+        return    "`serviceId` int NOT NULL DEFAULT '0',"
+                + "`requestURL` varchar(256) NOT NULL DEFAULT '',"
+                + "`method` varchar(8) NOT NULL DEFAULT '',"
+                + "`path` varchar(256) NOT NULL DEFAULT '',"
+                + "`params` varchar(256) NOT NULL DEFAULT '',"
+                + "`body` varchar(4096) NOT NULL DEFAULT '',"
+                + "`response` text NOT NULL,"
+                + "`returnCode` int NOT NULL DEFAULT '1',"
+                + "`requestTime` bigint NOT NULL DEFAULT '0',"
+                + "`responseTime` bigint NOT NULL DEFAULT '0',"
+                + "`userIP` varchar(32) DEFAULT '',"
+                + "`updDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,";
     }
 }

@@ -2,7 +2,7 @@ package htcc.log.service.component.kafka;
 
 
 import htcc.common.entity.base.RequestLogEntity;
-import htcc.log.service.repository.RequestLogDAO;
+import htcc.log.service.repository.LogDAO;
 import lombok.extern.log4j.Log4j2;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,9 @@ import java.util.concurrent.CountDownLatch;
 @Log4j2
 @Component
 public class MessageListener {
-    private CountDownLatch requestLatch = new CountDownLatch(1);
 
     @Autowired
-    private RequestLogDAO requestLogDAO;
+    private LogDAO logDAO;
 
     @KafkaListener(
             topics = "${kafka.topic.requestLog.name}",
@@ -28,10 +27,8 @@ public class MessageListener {
         Map<String, Object> map = (Map<String, Object>) consumerRecord.value();
         RequestLogEntity requestLog = new RequestLogEntity(map);
 
-        requestLogDAO.setTableName("ApiLog");
-        requestLogDAO.addRequestLog(requestLog);
+        logDAO.addLog(requestLog);
 
         log.info("Receive request message: " + requestLog.toString());
-        requestLatch.countDown();
     }
 }
