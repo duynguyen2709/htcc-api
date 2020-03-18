@@ -33,6 +33,7 @@ public class RequestLogEntity implements Serializable, LogEntity {
         this.requestTime = (long) requestLogHashMap.get("responseTime");
         this.responseTime = (long) requestLogHashMap.get("responseTime");
         this.returnCode = (int) requestLogHashMap.get("returnCode");
+        this.ip = (String) requestLogHashMap.get("ip");
         this.setResponse(requestLogHashMap.get("response").toString());
     }
 
@@ -100,10 +101,11 @@ public class RequestLogEntity implements Serializable, LogEntity {
         parameters.put("path", this.getPath());
         parameters.put("params", this.getParams());
         parameters.put("body", this.getBody());
-        parameters.put("response", this.getResponse());
+        parameters.put("response", StringUtil.toJsonString(this.getResponse()));
         parameters.put("returnCode", this.getReturnCode());
         parameters.put("requestTime", this.getRequestTime());
         parameters.put("responseTime", this.getResponseTime());
+        parameters.put("userIP", this.getIp());
         return parameters;
     }
 

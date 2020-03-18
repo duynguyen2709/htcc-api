@@ -1,8 +1,8 @@
 security:
   bypassJWT: false
   user:
-    name: root
-    password:
+    name: admin
+    password: admin
 
 server:
   port: 8761
