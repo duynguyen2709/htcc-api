@@ -99,14 +99,21 @@ public class CheckinController {
              Not Implemented
             */
 
+            // Verify time
             if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
                 if (redis.getCheckinData(model) != null) {
                     response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_ALREADY);
                     return response;
                 }
             } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
-                if (redis.getCheckinData(model) == null) {
+                CheckinModel checkinData = redis.getCheckinData(model);
+                if (checkinData == null) {
                     response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKIN);
+                    return response;
+                }
+
+                if (model.clientTime <= checkinData.clientTime) {
+                    response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_TIME_NOT_VALID);
                     return response;
                 }
 

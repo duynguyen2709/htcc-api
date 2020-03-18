@@ -73,7 +73,7 @@ public class CheckinModel implements Serializable {
             return "Loại điểm danh không hợp lệ";
         }
 
-        if (usedWifi && !StringUtil.isIPAddress(ip)) {
+        if (usedWifi && !StringUtil.isIPAddress(StringUtil.valueOf(ip))) {
             return String.format("IP %s không hợp lệ", ip);
         }
 
