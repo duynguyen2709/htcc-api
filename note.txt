@@ -100,3 +100,9 @@
 18-03-2020:
  + Version 1.2.4:
     - [Employee] Add Title in EmployeeInfo
+
+19-03-2020:
+ + Version 1.3.0:
+    - [Log] Handle Kafka & LogDAO insert
+    - [Gateway] Send Kafka
+    - [Common] Add Base Kafka

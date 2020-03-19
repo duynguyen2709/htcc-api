@@ -8,5 +8,5 @@ docker run -p 8200:8200 -d \
         --name htcc-employee-service \
         --network="host" \
         -e "TZ=Asia/Ho_Chi_Minh" \
-        -e "JAVA_OPTS=-Xmx256m -Dspring.profiles.active=production-1 -Dspring.config.location=file:/conf/" \
+        -e "JAVA_OPTS=-Xmx128m -Dspring.profiles.active=production-1 -Dspring.config.location=file:/conf/" \
         duyna5/htcc-employee-service

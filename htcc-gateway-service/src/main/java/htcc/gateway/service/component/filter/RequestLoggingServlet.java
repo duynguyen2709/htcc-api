@@ -1,34 +1,25 @@
 package htcc.gateway.service.component.filter;
 
 import htcc.common.component.BaseRequestServlet;
-import htcc.common.component.LoggingConfiguration;
+import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.Constant;
 import htcc.common.entity.base.RequestLogEntity;
 import htcc.common.util.StringUtil;
-import htcc.gateway.service.component.kafka.MessageProducer;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 
 @Log4j2
 public class RequestLoggingServlet extends BaseRequestServlet {
 
-    @Value(value = "${kafka.enabled}")
-    private boolean KafkaEnabled;
-
     @Autowired
-    private ApplicationContext applicationContext;
+    private KafkaProducerService kafka;
 
     @Override
     protected void processLog(RequestLogEntity logEntity) {
         log.info(String.format("%s , Total Time : %sms\n",
                 StringUtil.toJsonString(logEntity), (logEntity.responseTime - logEntity.requestTime)));
 
-        if (KafkaEnabled) {
-            MessageProducer producer = applicationContext.getBean(MessageProducer.class);
-            producer.sendRequestLogMessage(logEntity);
-        }
+        kafka.sendMessage(kafka.getBuzConfig().apiLog.topicName, logEntity);
     }
 
     @Override

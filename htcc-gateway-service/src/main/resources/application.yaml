@@ -110,11 +110,3 @@ redis:
   retryInterval: 1000
   readMode: SLAVE
   masterAddress:
-
-################## Kafka Config ##################
-kafka:
-  topic:
-    requestLog:
-      name: REQUEST-LOG
-      partition: 1
-
