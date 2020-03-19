@@ -1,0 +1,23 @@
+zookeeper1:
+    image: digitalwonderland/zookeeper
+    container_name: zookeeper1
+    environment:
+        - ZOOKEEPER_ID=1
+        - ZOOKEEPER_SERVER_1=172.17.0.1
+        - ZOOKEEPER_CLIENT_PORT=2181
+    ports:
+        - 2181:2181
+        - 2888:2888
+        - 3888:3888
+
+kafka1:
+    image: wurstmeister/kafka
+    container_name: kafka1
+    environment:
+        - KAFKA_ADVERTISED_PORT=9092
+        - KAFKA_ADVERTISED_HOST_NAME=172.17.0.1
+        - KAFKA_ZOOKEEPER_CONNECT=172.17.0.1:2181
+        - KAFKA_LOG_RETENTION_BYTES=500000000
+        - KAFKA_HEAP_OPTS="-Xmx384M -Xms256M"
+    ports:
+        - 9092:9092

@@ -16,7 +16,6 @@ import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
 
 @Log4j2
 public abstract class BaseRequestServlet extends DispatcherServlet {
@@ -81,6 +80,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
     private void setLogData(RequestWrapper request, HttpServletResponse responseToCache) {
         RequestLogEntity logEnt = new RequestLogEntity();
         try {
+            //logEnt.setRequestId(LoggingConfiguration.getTraceId());
             logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
             logEnt.setResponseTime(System.currentTimeMillis());
             logEnt.setMethod(request.getMethod());

@@ -27,7 +27,7 @@ service:
   debugMode: true
 
 redis:
-  useRedis: false
+  useRedis: true
   password:
   useMaster: false
   masterAddress: 127.0.0.1:6379

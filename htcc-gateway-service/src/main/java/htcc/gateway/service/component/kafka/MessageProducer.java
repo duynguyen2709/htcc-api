@@ -2,6 +2,7 @@ package htcc.gateway.service.component.kafka;
 
 
 import htcc.common.entity.base.RequestLogEntity;
+import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,13 +28,13 @@ public class MessageProducer {
 
             @Override
             public void onSuccess(SendResult<String, RequestLogEntity> result) {
-                log.info("Sent message=[" + requestLogEntity.toString() + "] with offset=[" + result.getRecordMetadata()
+                log.info("Sent message=[" + StringUtil.toJsonString(requestLogEntity) + "] with offset=[" + result.getRecordMetadata()
                         .offset() + "]");
             }
 
             @Override
             public void onFailure(Throwable ex) {
-                log.error("Unable to send message=[" + requestLogEntity.toString() + "] due to : " + ex.getMessage());
+                log.error("Unable to send message=[" + StringUtil.toJsonString(requestLogEntity) + "] due to : " + ex.getMessage());
             }
         });
     }
