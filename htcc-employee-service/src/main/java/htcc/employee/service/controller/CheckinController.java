@@ -1,7 +1,6 @@
 package htcc.employee.service.controller;
 
 import htcc.common.constant.CheckinTypeEnum;
-import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.util.DateTimeUtil;
@@ -9,7 +8,7 @@ import htcc.common.util.StringUtil;
 import htcc.employee.service.entity.checkin.CheckinModel;
 import htcc.employee.service.entity.checkin.CheckinRequest;
 import htcc.employee.service.entity.checkin.CheckinResponse;
-import htcc.employee.service.service.redis.RedisCheckinService;
+import htcc.employee.service.service.CheckInService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,10 +24,12 @@ import org.springframework.web.bind.annotation.*;
 public class CheckinController {
 
     @Autowired
-    private RedisCheckinService redis;
+    private CheckInService service;
 
     @Value("${service.allowDeleteCheckin}")
     private boolean allowDeleteCheckin;
+
+
 
     @ApiOperation(value = "Kiểm tra thông tin điểm danh của nhân viên", response = CheckinResponse.class)
     @GetMapping("/checkin/{companyId}/{username}")
@@ -41,34 +42,22 @@ public class CheckinController {
 
         try {
             if (!yyyyMMdd.isEmpty()){
-                if (yyyyMMdd.equalsIgnoreCase("undefined")){
-                    yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
-                }
-                else if (DateTimeUtil.parseStringToDate(yyyyMMdd, "yyyyMMdd") == null) {
+                if (DateTimeUtil.parseStringToDate(yyyyMMdd, "yyyyMMdd") == null) {
                     return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, String.format("Ngày %s không hợp lệ định dạng yyyyMMdd", date));
                 }
             } else {
                 yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
             }
 
-            CheckinResponse data = new CheckinResponse();
-            data.date = yyyyMMdd;
+            CheckinResponse data = new CheckinResponse(yyyyMMdd);
 
-            CheckinModel checkinModel = redis.getCheckinData(companyId, username, yyyyMMdd);
-            if (checkinModel == null){
-                data.hasCheckedIn = false;
-            } else {
-                data.hasCheckedIn = true;
-                data.checkinTime = DateTimeUtil.parseTimestampToString(checkinModel.clientTime, "HH:mm");
-            }
+            // get today checkin info
+            CheckinModel checkinModel = service.getCheckInLog(companyId, username, yyyyMMdd);
+            data.setHasCheckedIn(checkinModel);
 
-            CheckinModel checkoutModel = redis.getCheckoutData(companyId, username, yyyyMMdd);
-            if (checkoutModel == null){
-                data.hasCheckedOut = false;
-            } else {
-                data.hasCheckedOut = true;
-                data.checkoutTime = DateTimeUtil.parseTimestampToString(checkoutModel.clientTime, "HH:mm");
-            }
+            // get today checkout info
+            CheckinModel checkoutModel = service.getCheckOutLog(companyId, username, yyyyMMdd);
+            data.setHasCheckedOut(checkoutModel);
 
             response.data = data;
         } catch (Exception e){
@@ -101,12 +90,12 @@ public class CheckinController {
 
             // Verify time
             if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
-                if (redis.getCheckinData(model) != null) {
+                if (service.getCheckInLog(model) != null) {
                     response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_ALREADY);
                     return response;
                 }
             } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
-                CheckinModel checkinData = redis.getCheckinData(model);
+                CheckinModel checkinData = service.getCheckInLog(model);
                 if (checkinData == null) {
                     response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKIN);
                     return response;
@@ -117,7 +106,7 @@ public class CheckinController {
                     return response;
                 }
 
-                if (redis.getCheckoutData(model) != null) {
+                if (service.getCheckOutLog(model) != null) {
                     response = new BaseResponse<>(ReturnCodeEnum.CHECKOUT_ALREADY);
                     return response;
                 }
@@ -129,9 +118,9 @@ public class CheckinController {
         } finally {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
                 if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
-                    redis.setCheckinData(model);
+                    service.setCheckInLog(model);
                 } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
-                    redis.setCheckoutData(model);
+                    service.setCheckOutLog(model);
                 }
             }
         }
@@ -156,17 +145,14 @@ public class CheckinController {
         String yyyyMMdd = StringUtil.valueOf(date);
         try {
             if (!yyyyMMdd.isEmpty()){
-                if (yyyyMMdd.equalsIgnoreCase("undefined")){
-                    yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
-                }
-                else if (DateTimeUtil.parseStringToDate(yyyyMMdd, "yyyyMMdd") == null) {
+                if (DateTimeUtil.parseStringToDate(yyyyMMdd, "yyyyMMdd") == null) {
                     return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, String.format("Ngày %s không hợp lệ định dạng yyyyMMdd", date));
                 }
             } else {
                 yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
             }
 
-            redis.deleteCheckinData(companyId, username, yyyyMMdd);
+            service.deleteCheckInLog(companyId, username, yyyyMMdd);
         } catch (Exception e){
             log.error(String.format("deleteCheckinInfo [%s - %s - %s] ex", companyId, username, yyyyMMdd), e);
             response = new BaseResponse<>(e);

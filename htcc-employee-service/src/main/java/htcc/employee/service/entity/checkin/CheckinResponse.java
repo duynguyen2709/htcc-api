@@ -1,5 +1,6 @@
 package htcc.employee.service.entity.checkin;
 
+import htcc.common.util.DateTimeUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -67,4 +68,26 @@ public class CheckinResponse implements Serializable {
                       example = "17:35")
     public String checkoutTime = "";
 
+
+    public CheckinResponse(String yyyyMMdd){
+        this.date = yyyyMMdd;
+    }
+
+    public void setHasCheckedIn(CheckinModel model) {
+        if (model == null){
+            this.hasCheckedIn = false;
+        } else {
+            this.hasCheckedIn = true;
+            this.checkinTime = DateTimeUtil.parseTimestampToString(model.clientTime, "HH:mm");
+        }
+    }
+
+    public void setHasCheckedOut(CheckinModel model){
+        if (model == null){
+            this.hasCheckedOut = false;
+        } else {
+            this.hasCheckedOut = true;
+            this.checkoutTime = DateTimeUtil.parseTimestampToString(model.clientTime, "HH:mm");
+        }
+    }
 }

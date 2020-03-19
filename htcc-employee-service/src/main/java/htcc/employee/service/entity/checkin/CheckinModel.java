@@ -64,8 +64,8 @@ public class CheckinModel implements Serializable {
             return String.format("Thời gian gửi request {%s} không hợp lệ", this.clientTime);
         }
 
-        if (Math.abs(serverTime - clientTime) > 5 * 60 * 1000) {
-            return "Thời gian gửi request quá 5 phút";
+        if (Math.abs(serverTime - clientTime) > 3 * 60 * 1000) {
+            return "Thời gian gửi request quá 3 phút";
         }
 
         if (type != CheckinTypeEnum.CHECKIN.getValue() &&
@@ -88,6 +88,7 @@ public class CheckinModel implements Serializable {
         this.clientTime = request.clientTime;
         this.latitude = request.latitude;
         this.longitude = request.longitude;
+//        this.validTime = request.validTime;
 //        this.validLatitude = request.validLatitude;
 //        this.validLongitude = request.validLongitude;
 //        this.maxAllowDistance = request.maxAllowDistance;
