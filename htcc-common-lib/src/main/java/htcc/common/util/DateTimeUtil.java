@@ -12,6 +12,8 @@ public class DateTimeUtil {
 
     private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final String HHMM_FORMAT = "HH:mm";
+
 
     public static String parseTimestampToDateString(long timestamp){
         return parseTimestampToString(timestamp, DATETIME_FORMAT);
@@ -60,6 +62,30 @@ public class DateTimeUtil {
 
         Duration timeElapsed = Duration.between(start, stop);
         return timeElapsed.toMillis() / 1000;
+    }
+
+    public static boolean isBefore(long time, String validTime) {
+        try {
+            String HHmm = parseTimestampToString(time, HHMM_FORMAT);
+            Date   dt   = parseStringToDate(HHmm, HHMM_FORMAT);
+            Date   dt2  = parseStringToDate(validTime, HHMM_FORMAT);
+            return dt.compareTo(dt2) <= 0;
+        } catch (Exception e){
+            log.warn("isBefore time: {} - validTime {} ex", time, validTime, e);
+            return false;
+        }
+    }
+
+    public static boolean isAfter(long time, String validTime) {
+        try {
+            String HHmm = parseTimestampToString(time, HHMM_FORMAT);
+            Date   dt   = parseStringToDate(HHmm, HHMM_FORMAT);
+            Date   dt2  = parseStringToDate(validTime, HHMM_FORMAT);
+            return dt.compareTo(dt2) >= 0;
+        } catch (Exception e){
+            log.warn("isAfter time: {} - validTime {} ex {}", time, validTime, e.getMessage());
+            return false;
+        }
     }
 
 }

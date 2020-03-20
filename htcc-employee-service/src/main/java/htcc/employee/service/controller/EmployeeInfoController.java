@@ -3,8 +3,6 @@ package htcc.employee.service.controller;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.entity.checkin.CheckinRequest;
-import htcc.employee.service.entity.checkin.CheckinResponse;
 import htcc.employee.service.entity.jpa.EmployeeInfo;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import io.swagger.annotations.*;
@@ -14,7 +12,6 @@ import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Api(tags = "API thông tin cá nhân",

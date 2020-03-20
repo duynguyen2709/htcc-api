@@ -1,4 +1,4 @@
-package htcc.employee.service.entity.checkin;
+package htcc.common.entity.checkin;
 
 import htcc.common.util.DateTimeUtil;
 import io.swagger.annotations.ApiModel;
@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 @Data

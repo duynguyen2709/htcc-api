@@ -1,5 +1,6 @@
-package htcc.employee.service.entity.checkin;
+package htcc.common.entity.checkin;
 
+import htcc.common.component.LoggingConfiguration;
 import htcc.common.constant.CheckinTypeEnum;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
@@ -20,6 +21,9 @@ public class CheckinModel implements Serializable {
     private static final long serialVersionUID = 5926468583125150708L;
 
     @NotEmpty
+    private String requestId = LoggingConfiguration.getTraceId();
+
+    @NotEmpty
     public String companyId;
 
     @NotEmpty
@@ -31,6 +35,12 @@ public class CheckinModel implements Serializable {
 
     @Min(0)
     public long clientTime;
+
+    @Min(0)
+    public long serverTime;
+
+    @NotEmpty
+    public String validTime = "";
 
     @Min(0)
     public float latitude;
@@ -50,9 +60,6 @@ public class CheckinModel implements Serializable {
     public boolean usedWifi = false;
 
     public String ip = "";
-
-    @Min(0)
-    public long serverTime;
 
     @NotEmpty
     @Size(min = 8, max = 8)
@@ -82,6 +89,8 @@ public class CheckinModel implements Serializable {
 
 
     public CheckinModel(CheckinRequest request) {
+        this.requestId = LoggingConfiguration.getTraceId();
+
         this.companyId = request.companyId;
         this.username = request.username;
         this.type = request.type;

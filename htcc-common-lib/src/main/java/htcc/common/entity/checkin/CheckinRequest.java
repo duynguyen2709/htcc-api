@@ -1,4 +1,4 @@
-package htcc.employee.service.entity.checkin;
+package htcc.common.entity.checkin;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -50,24 +50,6 @@ public class CheckinRequest implements Serializable {
     @NotEmpty
     @Min(0)
     public float longitude;
-//
-//    @ApiModelProperty(notes = "Tọa độ cho phép điểm danh (lấy từ api GetCheckinInfo)",
-//                      example = "10.762462")
-//    @NotEmpty
-//    @Min(0)
-//    public float validLatitude;
-//
-//    @ApiModelProperty(notes = "Tọa độ cho phép điểm danh (lấy từ api GetCheckinInfo)",
-//                      example = "108.682762")
-//    @NotEmpty
-//    @Min(0)
-//    public float validLongitude;
-//
-//    @ApiModelProperty(notes = "Khoảng cách cho phép thực hiện điểm danh (lấy từ api GetCheckinInfo)",
-//                      example = "10")
-//    @NotEmpty
-//    @Min(0)
-//    public int maxAllowDistance = 10;
 
     @ApiModelProperty(notes = "Điểm danh bằng mạng 3G hoặc wifi",
                       example = "false")
