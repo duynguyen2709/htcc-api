@@ -31,8 +31,8 @@ redis:
 kafka:
   enableProducer: true
   enableConsumer: false
-  bootstrapAddress: 127.0.0.1:9092
+  bootstrapAddress: 127.0.0.1:9092,10.25.96.3:9092
   buz:
     apiLog:
-      topicName: REQUEST-LOG
-      groupId: REQUEST-LOG
+      topicName: API-LOG
+      groupId: API-LOG

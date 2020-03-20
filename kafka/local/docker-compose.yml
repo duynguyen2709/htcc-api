@@ -5,6 +5,7 @@ zookeeper1:
         - ZOOKEEPER_ID=1
         - ZOOKEEPER_SERVER_1=172.17.0.1
         - ZOOKEEPER_CLIENT_PORT=2181
+        - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
     ports:
         - 2181:2181
         - 2888:2888

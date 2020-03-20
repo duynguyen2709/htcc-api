@@ -30,8 +30,8 @@ spring:
 kafka:
   enableProducer: false
   enableConsumer: true
-  bootstrapAddress: 127.0.0.1:9092
+  bootstrapAddress: 127.0.0.1:9092,10.25.96.4:9092
   buz:
     apiLog:
-      topicName: REQUEST-LOG
-      groupId: REQUEST-LOG
+      topicName: API-LOG
+      groupId: API-LOG
