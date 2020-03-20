@@ -3,9 +3,11 @@ package htcc.common.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.InetAddresses;
 import com.google.gson.*;
+import org.checkerframework.checker.units.qual.C;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Map;
 
 public class StringUtil {
 
@@ -26,6 +28,11 @@ public class StringUtil {
 
     public static <T> T fromJsonString(String sJson, Class<T> t) {
         return gson.fromJson(sJson, t);
+    }
+
+    public static <T> T fromMapToObject(Map map, Class<T> t) {
+        JsonElement jsonElement = gson.toJsonTree(map);
+        return gson.fromJson(jsonElement, t);
     }
 
     public static boolean isJsonString(String str) {
