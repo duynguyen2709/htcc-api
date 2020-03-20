@@ -32,3 +32,12 @@ redis:
   useMaster: false
   masterAddress: 127.0.0.1:6379
   nodeAddresses: 127.0.0.1:6379
+
+kafka:
+  enableProducer: true
+  enableConsumer: false
+  bootstrapAddress: 127.0.0.1:9092
+  buz:
+    apiLog:
+      topicName: REQUEST-LOG
+      groupId: REQUEST-LOG

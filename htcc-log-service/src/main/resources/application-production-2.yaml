@@ -1,10 +1,10 @@
+server:
+  port: 8204
+
 security:
   user:
     name: htcc
     password: 6h5K8dapxfFdVKAS
-
-server:
-  port: 8761
 
 eureka:
   client:
@@ -13,24 +13,23 @@ eureka:
   instance:
     hostname: eureka2
 
-spring:
-  admin-datasource:
-    schemaName: HTCC_Admin
-    server: 10.25.96.3:3306
-  company-datasource:
-    schemaName: HTCC_Company
-    server: 10.25.96.3:3306
+service:
+  debugMode: false
+  hazelcast:
+    useHazelcast: false
+    enableRest: true
+    monitorLevel: "OFF"
+    address: 10.25.96.4
+    port: 5703
 
-redis:
-  useRedis: true
-  password: abc@123
-  useMaster: true
-  masterAddress: 10.25.96.3:6379
-  nodeAddresses: 127.0.0.1:6379
+spring:
+  datasource:
+    schemaName: HTCC_Log
+    server: 10.25.96.3:3306
 
 kafka:
-  enableProducer: true
-  enableConsumer: false
+  enableProducer: false
+  enableConsumer: true
   bootstrapAddress: 127.0.0.1:9092
   buz:
     apiLog:

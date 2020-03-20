@@ -80,6 +80,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
     private void setLogData(RequestWrapper request, HttpServletResponse responseToCache) {
         RequestLogEntity logEnt = new RequestLogEntity();
         try {
+            //logEnt.setRequestId(LoggingConfiguration.getTraceId());
             logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
             logEnt.setResponseTime(System.currentTimeMillis());
             logEnt.setMethod(request.getMethod());
