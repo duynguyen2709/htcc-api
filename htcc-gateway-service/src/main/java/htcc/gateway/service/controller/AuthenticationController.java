@@ -84,22 +84,27 @@ public class AuthenticationController {
     }
 
     private Object getUserInfo(LoginRequest request){
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
-        ClientSystemEnum e = ClientSystemEnum.fromInt(request.clientId);
-        switch (e) {
-            case ADMIN_WEB:
-                response = adminClient.getUserInfo(request.username);
-                break;
-            case MOBILE:
-            case MANAGER_WEB:
-                response = employeeClient.getUserInfo(request.companyId, request.username);
-                break;
-            default:
-                return null;
-        }
+        BaseResponse response = null;
+        try {
+            ClientSystemEnum e = ClientSystemEnum.fromInt(request.clientId);
+            switch (e) {
+                case ADMIN_WEB:
+                    response = adminClient.getUserInfo(request.username);
+                    break;
+                case MOBILE:
+                case MANAGER_WEB:
+                    response = employeeClient.getUserInfo(request.companyId, request.username);
+                    break;
+                default:
+                    return null;
+            }
 
-        if (response != null) {
-            return response.data;
+            if (response != null) {
+                return response.data;
+            }
+        } catch (Exception e) {
+            log.error("[getUserInfo] request {}, ex",
+                    StringUtil.toJsonString(request), e);
         }
 
         return redisUserInfo.getUserInfo(request.clientId + "",
