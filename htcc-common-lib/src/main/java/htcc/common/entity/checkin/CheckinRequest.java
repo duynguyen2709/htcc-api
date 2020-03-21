@@ -46,7 +46,7 @@ public class CheckinRequest implements Serializable {
     public float latitude;
 
     @ApiModelProperty(notes = "Tọa độ khi thực hiện điểm danh",
-                      example = "108.682762")
+                      example = "106.682752")
     @NotEmpty
     @Min(0)
     public float longitude;

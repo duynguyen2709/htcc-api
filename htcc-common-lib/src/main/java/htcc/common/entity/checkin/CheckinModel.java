@@ -2,6 +2,8 @@ package htcc.common.entity.checkin;
 
 import htcc.common.component.LoggingConfiguration;
 import htcc.common.constant.CheckinTypeEnum;
+import htcc.common.entity.log.CheckInLogEntity;
+import htcc.common.entity.log.CheckOutLogEntity;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import lombok.Data;
@@ -49,10 +51,10 @@ public class CheckinModel implements Serializable {
     public float longitude;
 
     @Min(0)
-    public float validLatitude = 0.0f;
+    public float validLatitude = 10.762462f;
 
     @Min(0)
-    public float validLongitude = 0.0f;
+    public float validLongitude = 106.682752f;
 
     @Min(0)
     public int maxAllowDistance = 10;
@@ -69,10 +71,6 @@ public class CheckinModel implements Serializable {
     public String isValid(){
         if (StringUtil.valueOf(date).isEmpty()) {
             return String.format("Thời gian gửi request {%s} không hợp lệ", this.clientTime);
-        }
-
-        if (Math.abs(serverTime - clientTime) > 3 * 60 * 1000) {
-            return "Thời gian gửi request quá 3 phút";
         }
 
         if (type != CheckinTypeEnum.CHECKIN.getValue() &&
@@ -104,6 +102,42 @@ public class CheckinModel implements Serializable {
         this.usedWifi = request.usedWifi;
         this.ip = request.ip;
         this.serverTime = System.currentTimeMillis();
+        this.date = DateTimeUtil.parseTimestampToString(this.clientTime,"yyyyMMdd");
+    }
+
+    public CheckinModel(CheckInLogEntity model) {
+        this.requestId = model.requestId;
+        this.companyId = model.companyId;
+        this.username = model.username;
+        this.type = CheckinTypeEnum.CHECKIN.getValue();
+        this.clientTime = model.clientTime;
+        this.latitude = model.latitude;
+        this.longitude = model.longitude;
+        this.validTime = model.validTime;
+        this.validLatitude = model.validLatitude;
+        this.validLongitude = model.validLongitude;
+        this.maxAllowDistance = model.maxAllowDistance;
+        this.usedWifi = model.usedWifi;
+        this.ip = model.ip;
+        this.serverTime = model.serverTime;
+        this.date = DateTimeUtil.parseTimestampToString(this.clientTime,"yyyyMMdd");
+    }
+
+    public CheckinModel(CheckOutLogEntity model) {
+        this.requestId = model.requestId;
+        this.companyId = model.companyId;
+        this.username = model.username;
+        this.type = CheckinTypeEnum.CHECKOUT.getValue();
+        this.clientTime = model.clientTime;
+        this.latitude = model.latitude;
+        this.longitude = model.longitude;
+        this.validTime = model.validTime;
+        this.validLatitude = model.validLatitude;
+        this.validLongitude = model.validLongitude;
+        this.maxAllowDistance = model.maxAllowDistance;
+        this.usedWifi = model.usedWifi;
+        this.ip = model.ip;
+        this.serverTime = model.serverTime;
         this.date = DateTimeUtil.parseTimestampToString(this.clientTime,"yyyyMMdd");
     }
 }

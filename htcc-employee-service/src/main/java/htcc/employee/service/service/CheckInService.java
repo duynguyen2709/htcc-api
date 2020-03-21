@@ -81,7 +81,9 @@ public class CheckInService {
                 return null;
             }
 
-            return (CheckinModel)res.data;
+            String data = StringUtil.toJsonString(res.data);
+
+            return StringUtil.fromJsonString(data, CheckinModel.class);
         } catch (Exception e){
             log.warn("parseResponse {} return null", StringUtil.toJsonString(res));
             return null;

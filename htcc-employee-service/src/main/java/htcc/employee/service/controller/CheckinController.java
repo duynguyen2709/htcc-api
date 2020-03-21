@@ -101,6 +101,7 @@ public class CheckinController {
                     return response;
                 }
 
+                // Điểm danh vào trước khi điểm danh ra
                 if (model.clientTime <= checkinData.clientTime) {
                     response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_TIME_NOT_VALID);
                     return response;

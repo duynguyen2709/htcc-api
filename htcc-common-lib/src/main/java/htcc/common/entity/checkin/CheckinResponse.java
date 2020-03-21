@@ -48,7 +48,7 @@ public class CheckinResponse implements Serializable {
     public float validLatitude = 10.762462f;
 
     @ApiModelProperty(notes = "Tọa độ cho phép thực hiện điểm danh",
-                      example = "108.682762")
+                      example = "106.682752")
     public float validLongitude = 106.682752f;
 
     @ApiModelProperty(notes = "Đã điểm danh vào hay chưa")
