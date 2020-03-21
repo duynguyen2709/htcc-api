@@ -76,14 +76,29 @@ ribbon:
   ReadTimeout: 30000
   ConnectTimeout: 30000
 
+htcc-employee-service:
+  ribbon:
+    MaxAutoRetries: 2
+    MaxAutoRetriesNextServer: 2
+    OkToRetryOnAllOperations: true
+    ReadTimeout: 30000
+    ConnectTimeout: 30000
+htcc-admin-service:
+  ribbon:
+    MaxAutoRetries: 2
+    MaxAutoRetriesNextServer: 2
+    OkToRetryOnAllOperations: true
+    ReadTimeout: 30000
+    ConnectTimeout: 30000
+
 feign:
   hystrix:
     enabled: true
   client:
     config:
       default:
-        connectTimeout: 15000
-        readTimeout: 15000
+        connectTimeout: 30000
+        readTimeout: 30000
 
 ################## Service Config ##################
 service:
