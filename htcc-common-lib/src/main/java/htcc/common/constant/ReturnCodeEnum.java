@@ -22,7 +22,8 @@ public enum ReturnCodeEnum {
     CHECKIN_ALREADY(-9, "Đã thực hiện điểm danh vào hôm nay"),
     CHECKOUT_ALREADY(-10, "Đã thực hiện điểm danh ra hôm nay"),
     NOT_CHECKIN(-11, "Chưa thực hiện điểm danh vào hôm nay"),
-    CHECKIN_TIME_NOT_VALID(-12, "Thời gian điểm danh không hợp lệ");
+    CHECKIN_TIME_NOT_VALID(-12, "Thời gian điểm danh không hợp lệ"),
+    LOG_NOT_FOUND(-13, "Không tìm thấy dữ liệu"),
     ;
 
     private final int value;

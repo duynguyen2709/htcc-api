@@ -3,9 +3,8 @@ zookeeper1:
     container_name: zookeeper1
     environment:
         - ZOOKEEPER_ID=1
-        - ZOOKEEPER_SERVER_1=172.17.0.1
+        - ZOOKEEPER_SERVER_1=127.0.0.1
         - ZOOKEEPER_CLIENT_PORT=2181
-        - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
     ports:
         - 2181:2181
         - 2888:2888
@@ -16,10 +15,10 @@ kafka1:
     container_name: kafka1
     environment:
         - KAFKA_ADVERTISED_PORT=9092
-        - KAFKA_ADVERTISED_HOST_NAME=172.17.0.1
+        - KAFKA_ADVERTISED_HOST_NAME=127.0.0.1
         - KAFKA_ZOOKEEPER_CONNECT=172.17.0.1:2181
         - KAFKA_LOG_RETENTION_BYTES=500000000
-        - KAFKA_HEAP_OPTS="-Xmx256M -Xms256M"
+        - KAFKA_HEAP_OPTS=-Xmx512M -Xms256M
         - KAFKA_LOG4J_ROOT_LOGLEVEL=WARN
     ports:
         - 9092:9092

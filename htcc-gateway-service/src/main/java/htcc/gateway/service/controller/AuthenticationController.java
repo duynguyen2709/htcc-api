@@ -9,6 +9,7 @@ import htcc.gateway.service.entity.response.LoginResponse;
 import htcc.gateway.service.feign.AdminServiceClient;
 import htcc.gateway.service.feign.EmployeeServiceClient;
 import htcc.gateway.service.service.authentication.JwtTokenService;
+import htcc.gateway.service.service.redis.RedisUserInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
@@ -47,6 +48,9 @@ public class AuthenticationController {
 
     @Autowired
     private EmployeeServiceClient employeeClient;
+
+    @Autowired
+    private RedisUserInfoService redisUserInfo;
     //</editor-fold>
 
     @ApiOperation(value = "Đăng nhập")
@@ -80,20 +84,32 @@ public class AuthenticationController {
     }
 
     private Object getUserInfo(LoginRequest request){
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
-        ClientSystemEnum e = ClientSystemEnum.fromInt(request.clientId);
-        switch (e) {
-            case ADMIN_WEB:
-                response = adminClient.getUserInfo(request.username);
-                break;
-            case MOBILE:
-            case MANAGER_WEB:
-                response = employeeClient.getUserInfo(request.companyId, request.username);
-                break;
-            default:
-                return null;
+        BaseResponse response = null;
+        try {
+            ClientSystemEnum e = ClientSystemEnum.fromInt(request.clientId);
+            switch (e) {
+                case ADMIN_WEB:
+                    response = adminClient.getUserInfo(request.username);
+                    break;
+                case MOBILE:
+                case MANAGER_WEB:
+                    response = employeeClient.getUserInfo(request.companyId, request.username);
+                    break;
+                default:
+                    return null;
+            }
+
+            if (response != null) {
+                return response.data;
+            }
+        } catch (Exception e) {
+            log.error("[getUserInfo] request {}, ex",
+                    StringUtil.toJsonString(request), e);
         }
-        return (response != null) ? response.data : null;
+
+        return redisUserInfo.getUserInfo(request.clientId + "",
+                StringUtil.valueOf(request.companyId),
+                request.username);
     }
 
 }

@@ -1,18 +1,18 @@
-package htcc.employee.service.entity.jpa;
+package htcc.common.entity.jpa;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import htcc.common.entity.jpa.BaseJPAEntity;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -27,6 +27,8 @@ import java.util.Objects;
 @ApiModel(description = "Thông tin nhân viên (các field * không cần gửi lại khi update)\n" +
           "(các field còn lại phải gửi lại kể cả khi không update)")
 public class EmployeeInfo extends BaseJPAEntity {
+
+    private static final long serialVersionUID = 5922818583125150708L;
 
     @Id
     @ApiModelProperty(notes = "(*) Mã công ty",

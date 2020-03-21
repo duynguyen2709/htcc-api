@@ -14,7 +14,7 @@ import java.util.Map;
 @Data
 @Log4j2
 @NoArgsConstructor
-public class RequestLogEntity extends BaseLogEntity implements Serializable {
+public class RequestLogEntity extends BaseLogEntity {
 
     private static final String TABLE_LOG_NAME = "ApiLog";
 
@@ -69,7 +69,7 @@ public class RequestLogEntity extends BaseLogEntity implements Serializable {
         parameters.put("method", this.getMethod());
         parameters.put("path", this.getPath());
         parameters.put("params", StringUtil.toJsonString(this.getParams()));
-        parameters.put("body", StringUtil.toJsonString(this.getBody()));
+        parameters.put("body", StringUtil.valueOf(this.getBody()).isEmpty() ? "" : StringUtil.toJsonString(this.getBody()));
         parameters.put("returnCode", this.getReturnCode());
         parameters.put("requestTime", this.getRequestTime());
         parameters.put("responseTime", this.getResponseTime());

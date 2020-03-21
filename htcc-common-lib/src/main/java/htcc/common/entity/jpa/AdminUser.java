@@ -1,4 +1,4 @@
-package htcc.admin.service.entity.jpa;
+package htcc.common.entity.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

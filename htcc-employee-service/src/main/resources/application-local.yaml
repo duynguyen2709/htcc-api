@@ -33,3 +33,15 @@ redis:
   password:
   useMaster: false
   nodeAddresses: 127.0.0.1:6379
+
+kafka:
+  enableProducer: true
+  enableConsumer: false
+  bootstrapAddress: 127.0.0.1:9092
+  buz:
+    checkInLog:
+      topicName: CHECKIN-LOG
+      groupId: CHECKIN-LOG
+    checkOutLog:
+      topicName: CHECKOUT-LOG
+      groupId: CHECKOUT-LOG

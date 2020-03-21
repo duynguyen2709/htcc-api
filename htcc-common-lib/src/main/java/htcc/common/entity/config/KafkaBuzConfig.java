@@ -6,6 +6,8 @@ import lombok.Data;
 public class KafkaBuzConfig {
 
     public KafkaTopicConfig apiLog;
+    public KafkaTopicConfig checkInLog;
+    public KafkaTopicConfig checkOutLog;
 
     @Data
     public static class KafkaTopicConfig {

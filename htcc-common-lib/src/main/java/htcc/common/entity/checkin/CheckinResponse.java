@@ -1,12 +1,12 @@
-package htcc.employee.service.entity.checkin;
+package htcc.common.entity.checkin;
 
+import htcc.common.util.DateTimeUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 @Data
@@ -48,7 +48,7 @@ public class CheckinResponse implements Serializable {
     public float validLatitude = 10.762462f;
 
     @ApiModelProperty(notes = "Tọa độ cho phép thực hiện điểm danh",
-                      example = "108.682762")
+                      example = "106.682752")
     public float validLongitude = 106.682752f;
 
     @ApiModelProperty(notes = "Đã điểm danh vào hay chưa")
@@ -67,4 +67,26 @@ public class CheckinResponse implements Serializable {
                       example = "17:35")
     public String checkoutTime = "";
 
+
+    public CheckinResponse(String yyyyMMdd){
+        this.date = yyyyMMdd;
+    }
+
+    public void setHasCheckedIn(CheckinModel model) {
+        if (model == null){
+            this.hasCheckedIn = false;
+        } else {
+            this.hasCheckedIn = true;
+            this.checkinTime = DateTimeUtil.parseTimestampToString(model.clientTime, "HH:mm");
+        }
+    }
+
+    public void setHasCheckedOut(CheckinModel model){
+        if (model == null){
+            this.hasCheckedOut = false;
+        } else {
+            this.hasCheckedOut = true;
+            this.checkoutTime = DateTimeUtil.parseTimestampToString(model.clientTime, "HH:mm");
+        }
+    }
 }

@@ -35,3 +35,9 @@ kafka:
     apiLog:
       topicName: API-LOG
       groupId: API-LOG
+    checkInLog:
+      topicName: CHECKIN-LOG
+      groupId: CHECKIN-LOG
+    checkOutLog:
+      topicName: CHECKOUT-LOG
+      groupId: CHECKOUT-LOG

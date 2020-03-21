@@ -8,6 +8,8 @@ spring:
     enabled: false
   jmx:
     enabled: false
+  main:
+    allow-bean-definition-overriding: true
   jpa:
     hibernate:
       naming:
@@ -34,6 +36,16 @@ eureka:
   instance:
     appname: ${spring.application.name}
     leaseExpirationDurationInSeconds: 45
+
+################## Feign Config ##################
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 10000
+        readTimeout: 10000
 
 ################## Logging Config ##################
 logging:
