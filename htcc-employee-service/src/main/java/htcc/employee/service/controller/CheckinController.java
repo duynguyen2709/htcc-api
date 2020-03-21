@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.CompletableFuture;
+
 @Api(tags = "API điểm danh",
      description = "API điểm danh của nhân viên")
 @RestController
@@ -52,12 +54,15 @@ public class CheckinController {
             CheckinResponse data = new CheckinResponse(yyyyMMdd);
 
             // get today checkin info
-            CheckinModel checkinModel = service.getCheckInLog(companyId, username, yyyyMMdd);
-            data.setHasCheckedIn(checkinModel);
-
+            CompletableFuture<CheckinModel> checkInFuture = service.getCheckInLog(companyId, username, yyyyMMdd);
             // get today checkout info
-            CheckinModel checkoutModel = service.getCheckOutLog(companyId, username, yyyyMMdd);
-            data.setHasCheckedOut(checkoutModel);
+            CompletableFuture<CheckinModel> checkOutFuture = service.getCheckOutLog(companyId, username, yyyyMMdd);
+
+            // finish all
+            CompletableFuture.allOf(checkInFuture,checkOutFuture).join();
+
+            data.setHasCheckedIn(checkInFuture.get());
+            data.setHasCheckedOut(checkOutFuture.get());
 
             response.data = data;
         } catch (Exception e){
@@ -90,12 +95,12 @@ public class CheckinController {
 
             // Verify time
             if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
-                if (service.getCheckInLog(model) != null) {
+                if (service.getCheckInLog(model.companyId, model.username, model.date).get() != null) {
                     response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_ALREADY);
                     return response;
                 }
             } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
-                CheckinModel checkinData = service.getCheckInLog(model);
+                CheckinModel checkinData = service.getCheckInLog(model.companyId, model.username, model.date).get();
                 if (checkinData == null) {
                     response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKIN);
                     return response;
@@ -107,7 +112,7 @@ public class CheckinController {
                     return response;
                 }
 
-                if (service.getCheckOutLog(model) != null) {
+                if (service.getCheckOutLog(model.companyId, model.username, model.date) != null) {
                     response = new BaseResponse<>(ReturnCodeEnum.CHECKOUT_ALREADY);
                     return response;
                 }
