@@ -106,3 +106,9 @@
     - [Log] Handle Kafka & LogDAO insert
     - [Gateway] Send Kafka
     - [Common] Add Base Kafka
+
+21-03-2020:
+ + Version 1.3.0:
+    - [Employee] Send Kafka CheckIn, CheckOut; Redis Async; Call Feign Client Log-Service
+    - [Gateway] Fix Feign
+    - [Log] Consume Kafka CheckIn, CheckOut; Internal API GetCheckInLog
