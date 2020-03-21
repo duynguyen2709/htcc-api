@@ -1,7 +1,7 @@
 package htcc.employee.service.service.jpa;
 
 import htcc.common.service.BaseJPAService;
-import htcc.employee.service.entity.jpa.EmployeeInfo;
+import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.employee.service.repository.jpa.EmployeeInfoRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

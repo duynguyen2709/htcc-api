@@ -9,6 +9,7 @@ import htcc.gateway.service.entity.response.LoginResponse;
 import htcc.gateway.service.feign.AdminServiceClient;
 import htcc.gateway.service.feign.EmployeeServiceClient;
 import htcc.gateway.service.service.authentication.JwtTokenService;
+import htcc.gateway.service.service.redis.RedisUserInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
@@ -47,6 +48,9 @@ public class AuthenticationController {
 
     @Autowired
     private EmployeeServiceClient employeeClient;
+
+    @Autowired
+    private RedisUserInfoService redisUserInfo;
     //</editor-fold>
 
     @ApiOperation(value = "Đăng nhập")
@@ -93,7 +97,14 @@ public class AuthenticationController {
             default:
                 return null;
         }
-        return (response != null) ? response.data : null;
+
+        if (response != null) {
+            return response.data;
+        }
+
+        return redisUserInfo.getUserInfo(request.clientId + "",
+                StringUtil.valueOf(request.companyId),
+                request.username);
     }
 
 }

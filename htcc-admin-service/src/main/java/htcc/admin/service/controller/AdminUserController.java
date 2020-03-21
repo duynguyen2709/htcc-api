@@ -1,8 +1,9 @@
 package htcc.admin.service.controller;
 
-import htcc.admin.service.entity.jpa.AdminUser;
+import htcc.common.entity.jpa.AdminUser;
 import htcc.admin.service.service.jpa.AdminUserInfoService;
 import htcc.admin.service.service.redis.RedisTokenService;
+import htcc.admin.service.service.redis.RedisUserInfoService;
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
@@ -33,6 +34,9 @@ public class AdminUserController {
 
     @Autowired
     private RedisTokenService redis;
+
+    @Autowired
+    private RedisUserInfoService redisUserInfo;
 
 
 
@@ -71,6 +75,10 @@ public class AdminUserController {
         } catch (Exception e){
             log.error("[findByUsername] ex", e);
             response = new BaseResponse<>(e);
+        } finally {
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()){
+                redisUserInfo.setUserInfo(response.data);
+            }
         }
         return response;
     }
@@ -139,6 +147,10 @@ public class AdminUserController {
         } catch (Exception e){
             log.error("[update] ex", e);
             response = new BaseResponse<>(e);
+        }  finally {
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()){
+                redisUserInfo.setUserInfo(response.data);
+            }
         }
         return response;
     }
@@ -183,6 +195,8 @@ public class AdminUserController {
                 } else if (newStatus == AccountStatusEnum.ACTIVE.getValue()) {
                     redis.deleteBlacklistToken(username);
                 }
+
+                redisUserInfo.setUserInfo(response.data);
             }
         }
         return response;
@@ -212,6 +226,7 @@ public class AdminUserController {
         } finally {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()){
                 redis.deleteBlacklistToken(username);
+                redisUserInfo.deleteUserInfo(username);
             }
         }
         return response;

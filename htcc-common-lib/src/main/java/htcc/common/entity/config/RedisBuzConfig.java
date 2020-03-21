@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedisBuzConfig {
     public String tokenFormat = "TOKEN-%s-%s-%s"; // clientId-companyId-username
+    public String userInfoFormat = "USER-INFO-%s-%s-%s"; // clientId-companyId-username
     public String blacklistTokenFormat = "BLACKLIST-TOKEN-%s-%s-%s"; // clientId-companyId-username
     public String checkinFormat = "CHECKIN-%s-%s-%s"; // companyId-username-date
     public String checkoutFormat = "CHECKOUT-%s-%s-%s"; // companyId-username-date

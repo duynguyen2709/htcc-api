@@ -1,6 +1,6 @@
 package htcc.admin.service.service.jpa;
 
-import htcc.admin.service.entity.jpa.AdminUser;
+import htcc.common.entity.jpa.AdminUser;
 import htcc.admin.service.jpa.AdminUserInfoRepository;
 import htcc.common.constant.Constant;
 import htcc.common.service.BaseJPAService;

@@ -3,8 +3,9 @@ package htcc.employee.service.controller;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.entity.jpa.EmployeeInfo;
+import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.redis.RedisUserInfoService;
 import io.swagger.annotations.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class EmployeeInfoController {
     @Autowired
     private EmployeeInfoService service;
 
+    @Autowired
+    private RedisUserInfoService redisUserInfo;
+
 
 
     @ApiOperation(value = "Lấy thông tin của nhân viên", response = EmployeeInfo.class)
@@ -38,8 +42,12 @@ public class EmployeeInfoController {
 
             response.data = user;
         } catch (Exception e){
-            log.error(String.format("getCheckinInfo [%s - %s] ex", companyId, username), e);
+            log.error(String.format("getUserInfo [%s - %s] ex", companyId, username), e);
             response = new BaseResponse<>(e);
+        } finally {
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
+                redisUserInfo.setUserInfo(response.data);
+            }
         }
         return response;
     }
@@ -87,6 +95,10 @@ public class EmployeeInfoController {
         } catch (Exception e){
             log.error(String.format("update [%s - %s] ex", companyId, username), e);
             response = new BaseResponse<>(e);
+        } finally {
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
+                redisUserInfo.setUserInfo(response.data);
+            }
         }
         return response;
     }
