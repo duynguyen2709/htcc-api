@@ -44,8 +44,29 @@ feign:
   client:
     config:
       default:
-        connectTimeout: 10000
-        readTimeout: 10000
+        connectTimeout: 30000
+        readTimeout: 30000
+
+ribbon:
+  eureka:
+    enabled: true
+  ReadTimeout: 30000
+  ConnectTimeout: 30000
+  ServerListRefreshInterval: 2000
+  eager-load:
+    enabled: true
+    clients: htcc-employee-service, htcc-admin-service
+
+htcc-log-service:
+  ribbon:
+    eureka:
+      enabled: true
+    MaxAutoRetries: 2
+    MaxAutoRetriesNextServer: 2
+    OkToRetryOnAllOperations: true
+    ReadTimeout: 30000
+    ConnectTimeout: 30000
+    ServerListRefreshInterval: 2000
 
 ################## Logging Config ##################
 logging:
