@@ -6,8 +6,6 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.entity.response.LoginResponse;
-import htcc.gateway.service.feign.AdminServiceClient;
-import htcc.gateway.service.feign.EmployeeServiceClient;
 import htcc.gateway.service.service.authentication.JwtTokenService;
 import htcc.gateway.service.service.redis.RedisUserInfoService;
 import io.swagger.annotations.Api;
@@ -43,12 +41,6 @@ public class AuthenticationController {
 
     @Autowired
     private UserDetailsService jwtUserDetailService;
-
-    @Autowired
-    private AdminServiceClient adminClient;
-
-    @Autowired
-    private EmployeeServiceClient employeeClient;
 
     @Autowired
     private RedisUserInfoService redisUserInfo;
@@ -95,12 +87,10 @@ public class AuthenticationController {
             switch (e) {
                 case ADMIN_WEB:
                     url = String.format("http://htcc-admin-service/users/%s", request.username);
-                    //response = adminClient.getUserInfo(request.username);
                     break;
                 case MOBILE:
                 case MANAGER_WEB:
                     url = String.format("http://htcc-employee-service/users/%s/%s", request.companyId, request.username);
-                    //response = employeeClient.getUserInfo(request.companyId, request.username);
                     break;
                 default:
                     return null;
