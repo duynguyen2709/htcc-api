@@ -101,6 +101,7 @@ public class CheckinController {
                 }
             } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
                 CheckinModel checkinData = service.getCheckInLog(model.companyId, model.username, model.date).get();
+
                 if (checkinData == null) {
                     response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKIN);
                     return response;
@@ -112,7 +113,9 @@ public class CheckinController {
                     return response;
                 }
 
-                if (service.getCheckOutLog(model.companyId, model.username, model.date) != null) {
+                //
+                CheckinModel checkOutData = service.getCheckOutLog(model.companyId, model.username, model.date).get();
+                if (checkOutData != null) {
                     response = new BaseResponse<>(ReturnCodeEnum.CHECKOUT_ALREADY);
                     return response;
                 }
