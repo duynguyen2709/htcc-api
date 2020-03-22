@@ -75,30 +75,33 @@ ribbon:
     enabled: true
   ReadTimeout: 30000
   ConnectTimeout: 30000
+  ServerListRefreshInterval: 2000
+  eager-load:
+    enabled: true
+    clients: htcc-employee-service, htcc-admin-service
 
 htcc-employee-service:
   ribbon:
+    eureka:
+      enabled: true
     MaxAutoRetries: 2
     MaxAutoRetriesNextServer: 2
     OkToRetryOnAllOperations: true
     ReadTimeout: 30000
     ConnectTimeout: 30000
+    ServerListRefreshInterval: 1000
+
 htcc-admin-service:
   ribbon:
+    eureka:
+      enabled: true
     MaxAutoRetries: 2
     MaxAutoRetriesNextServer: 2
     OkToRetryOnAllOperations: true
     ReadTimeout: 30000
     ConnectTimeout: 30000
+    ServerListRefreshInterval: 2000
 
-feign:
-  hystrix:
-    enabled: false
-  client:
-    config:
-      default:
-        connectTimeout: 30000
-        readTimeout: 30000
 
 ################## Service Config ##################
 service:

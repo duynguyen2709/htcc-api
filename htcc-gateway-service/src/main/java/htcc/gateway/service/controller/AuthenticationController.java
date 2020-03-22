@@ -6,8 +6,6 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.entity.response.LoginResponse;
-import htcc.gateway.service.feign.AdminServiceClient;
-import htcc.gateway.service.feign.EmployeeServiceClient;
 import htcc.gateway.service.service.authentication.JwtTokenService;
 import htcc.gateway.service.service.redis.RedisUserInfoService;
 import io.swagger.annotations.Api;
@@ -24,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 @Api(tags = "Login API (Không cần gửi token trong header)",
      value = "AuthenticationController",
@@ -44,13 +43,10 @@ public class AuthenticationController {
     private UserDetailsService jwtUserDetailService;
 
     @Autowired
-    private AdminServiceClient adminClient;
-
-    @Autowired
-    private EmployeeServiceClient employeeClient;
-
-    @Autowired
     private RedisUserInfoService redisUserInfo;
+
+    @Autowired
+    private RestTemplate restTemplate;
     //</editor-fold>
 
     @ApiOperation(value = "Đăng nhập")
@@ -85,19 +81,22 @@ public class AuthenticationController {
 
     private Object getUserInfo(LoginRequest request){
         BaseResponse response = null;
+        String url = "";
         try {
             ClientSystemEnum e = ClientSystemEnum.fromInt(request.clientId);
             switch (e) {
                 case ADMIN_WEB:
-                    response = adminClient.getUserInfo(request.username);
+                    url = String.format("http://htcc-admin-service/users/%s", request.username);
                     break;
                 case MOBILE:
                 case MANAGER_WEB:
-                    response = employeeClient.getUserInfo(request.companyId, request.username);
+                    url = String.format("http://htcc-employee-service/users/%s/%s", request.companyId, request.username);
                     break;
                 default:
                     return null;
             }
+
+            response = restTemplate.getForObject(url, BaseResponse.class);
 
             if (response != null) {
                 return response.data;
@@ -105,6 +104,9 @@ public class AuthenticationController {
         } catch (Exception e) {
             log.error("[getUserInfo] request {}, ex",
                     StringUtil.toJsonString(request), e);
+        } finally {
+            log.info("Call RestTemplate URL {} with request {} -> response {}",
+                    url, StringUtil.toJsonString(request), StringUtil.toJsonString(response));
         }
 
         return redisUserInfo.getUserInfo(request.clientId + "",
