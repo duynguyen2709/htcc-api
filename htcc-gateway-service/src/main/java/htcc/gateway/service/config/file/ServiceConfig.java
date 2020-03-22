@@ -10,5 +10,5 @@ import org.springframework.context.annotation.Configuration;
 public class ServiceConfig {
 
     public boolean debugMode;
-
+    public long maxFileSize = 10000000;
 }

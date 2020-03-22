@@ -3,15 +3,21 @@ package htcc.common.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.InetAddresses;
 import com.google.gson.*;
-import org.checkerframework.checker.units.qual.C;
+import htcc.common.entity.complaint.ComplaintRequest;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+@Log4j2
 public class StringUtil {
 
     public static final String EMPTY = "";
+
+    private static final List<String> MULTIPART_FIELDS = Arrays.asList("images", "avatarFile");
 
     private static final Gson gson;
 
@@ -19,7 +25,7 @@ public class StringUtil {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Double.class, new DoubleSerializer());
         gsonBuilder.setDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        gson = gsonBuilder.disableHtmlEscaping().create();
+        gson = gsonBuilder.disableHtmlEscaping().setLenient().create();
     }
 
     public static String toJsonString(Object obj) {

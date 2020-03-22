@@ -55,6 +55,7 @@ logging:
 service:
   debugMode: false
   allowDeleteCheckin: false
+  maxFileSize: 10000000
 
 ################## Redis Config ##################
 redis:

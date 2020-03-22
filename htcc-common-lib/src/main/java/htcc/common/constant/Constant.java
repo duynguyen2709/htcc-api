@@ -5,6 +5,7 @@ public class Constant {
     public static final String REQUEST_TIME = "requestTime";
 
     public static final String APPLICATION_JSON = "application/json";
+    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER        = "Bearer ";

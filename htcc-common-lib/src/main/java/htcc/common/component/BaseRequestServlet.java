@@ -72,15 +72,9 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
         return result;
     }
 
-    private boolean hasBody(String method) {
-        return (method.equalsIgnoreCase("POST") ||
-                method.equalsIgnoreCase("PUT"));
-    }
-
     private void setLogData(RequestWrapper request, HttpServletResponse responseToCache) {
         RequestLogEntity logEnt = new RequestLogEntity();
         try {
-            //logEnt.setRequestId(LoggingConfiguration.getTraceId());
             logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
             logEnt.setResponseTime(System.currentTimeMillis());
             logEnt.setMethod(request.getMethod());
@@ -89,7 +83,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
             logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
             logEnt.setServiceId(ServiceSystemEnum.getServiceFromUri(logEnt.path));
             logEnt.setIp(request);
-            logEnt.setBody((hasBody(logEnt.method)) ? StringUtil.valueOf(request.getBody()) : "");
+            logEnt.setBody(request);
             logEnt.setResponse(getResponsePayload(responseToCache));
         } catch (Exception e) {
             log.warn("setLogData ex {}", e.getMessage(), e);
