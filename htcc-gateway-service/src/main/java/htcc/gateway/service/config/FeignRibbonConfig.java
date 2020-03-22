@@ -1,7 +1,10 @@
 package htcc.gateway.service.config;
 
+import com.netflix.client.config.IClientConfig;
+import com.netflix.loadbalancer.*;
 import feign.Logger;
 import feign.Retryer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
