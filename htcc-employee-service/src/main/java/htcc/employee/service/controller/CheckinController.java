@@ -64,6 +64,10 @@ public class CheckinController {
             data.setHasCheckedIn(checkInFuture.get());
             data.setHasCheckedOut(checkOutFuture.get());
 
+            if (username.equalsIgnoreCase("duytv") && companyId.equalsIgnoreCase("HCMUS")) {
+                data.canCheckin = false;
+            }
+
             response.data = data;
         } catch (Exception e){
             log.error(String.format("getCheckinInfo [%s - %s - %s] ex", companyId, username, yyyyMMdd), e);
