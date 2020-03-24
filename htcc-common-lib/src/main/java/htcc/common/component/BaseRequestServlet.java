@@ -2,10 +2,9 @@ package htcc.common.component;
 
 import htcc.common.constant.Constant;
 import htcc.common.constant.ServiceSystemEnum;
-import htcc.common.entity.base.RequestLogEntity;
+import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.entity.base.RequestWrapper;
 import htcc.common.util.NumberUtil;
-import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.servlet.DispatcherServlet;

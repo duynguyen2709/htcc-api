@@ -45,3 +45,6 @@ kafka:
     checkOutLog:
       topicName: CHECKOUT-LOG
       groupId: CHECKOUT-LOG
+    complaintLog:
+      topicName: COMPLAINT-LOG
+      groupId: COMPLAINT-LOG

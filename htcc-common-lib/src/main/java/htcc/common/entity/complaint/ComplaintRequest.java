@@ -1,4 +1,4 @@
-package htcc.employee.service.entity.complaint;
+package htcc.common.entity.complaint;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
@@ -51,11 +51,6 @@ public class ComplaintRequest implements Serializable {
                       example = "Phản hồi về phiếu lương")
     @NotEmpty
     public String category;
-
-    @ApiModelProperty(notes = "Tiêu đề",
-                      example = "Gửi bộ phận HR...")
-    @NotEmpty
-    public String title;
 
     @ApiModelProperty(notes = "Nội dung phản hồi/ khiếu nại",
                       example = "abc")

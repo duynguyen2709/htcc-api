@@ -1,7 +1,7 @@
 package htcc.admin.service.component;
 
 import htcc.common.component.BaseRequestServlet;
-import htcc.common.entity.base.RequestLogEntity;
+import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 

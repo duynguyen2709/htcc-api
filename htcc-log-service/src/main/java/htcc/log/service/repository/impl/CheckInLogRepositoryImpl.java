@@ -2,6 +2,8 @@ package htcc.log.service.repository.impl;
 
 import htcc.common.entity.log.CheckInLogEntity;
 import htcc.common.entity.log.CheckOutLogEntity;
+import htcc.log.service.mapper.CheckInLogRowMapper;
+import htcc.log.service.mapper.CheckOutLogRowMapper;
 import htcc.log.service.repository.CheckInLogRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

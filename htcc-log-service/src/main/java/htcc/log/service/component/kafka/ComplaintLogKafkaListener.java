@@ -1,7 +1,10 @@
 package htcc.log.service.component.kafka;
 
 import htcc.common.entity.checkin.CheckinModel;
+import htcc.common.entity.complaint.ComplaintModel;
+import htcc.common.entity.complaint.ComplaintRequest;
 import htcc.common.entity.log.CheckInLogEntity;
+import htcc.common.entity.log.ComplaintLogEntity;
 import htcc.common.service.kafka.BaseKafkaConsumer;
 import htcc.common.util.StringUtil;
 import htcc.log.service.repository.BaseLogDAO;
@@ -12,17 +15,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Log4j2
-@KafkaListener(topics = "#{kafkaFileConfig.buz.checkInLog.topicName}",
-               groupId = "#{kafkaFileConfig.buz.checkInLog.groupId}")
-public class CheckInLogKafkaListener extends BaseKafkaConsumer<CheckinModel> {
+@KafkaListener(topics = "#{kafkaFileConfig.buz.complaintLog.topicName}",
+               groupId = "#{kafkaFileConfig.buz.complaintLog.groupId}")
+public class ComplaintLogKafkaListener extends BaseKafkaConsumer<ComplaintModel> {
 
     @Autowired
     private BaseLogDAO repo;
 
     @Override
-    public void process(CheckinModel model) {
+    public void process(ComplaintModel model) {
         try {
-            CheckInLogEntity logEnt = new CheckInLogEntity(model);
+            ComplaintLogEntity logEnt = new ComplaintLogEntity(model);
             repo.insertLog(logEnt);
         } catch (Exception e) {
             log.error("process {} ex", StringUtil.toJsonString(model), e);

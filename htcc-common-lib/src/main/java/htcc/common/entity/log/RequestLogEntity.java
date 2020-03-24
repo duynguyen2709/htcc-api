@@ -1,7 +1,10 @@
-package htcc.common.entity.base;
+package htcc.common.entity.log;
 
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.entity.base.BaseLogEntity;
+import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.base.RequestWrapper;
 import htcc.common.util.StringUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -20,4 +20,10 @@ public interface LogServiceClient {
     public BaseResponse getCheckOutLog(@RequestParam(name = "companyId") String companyId,
                                       @RequestParam(name = "username") String username,
                                       @RequestParam(name = "yyyyMMdd") String yyyyMMdd);
+
+    @GetMapping("/internal/logs/complaint")
+    public BaseResponse getComplaintLog(@RequestParam(name = "companyId") String companyId,
+                                       @RequestParam(name = "username") String username,
+                                       @RequestParam(name = "yyyyMM") String yyyyMM);
+
 }

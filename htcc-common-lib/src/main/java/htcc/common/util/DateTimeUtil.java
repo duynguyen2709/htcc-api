@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.*;
+import java.util.Calendar;
 import java.util.Date;
 
 @Log4j2
@@ -27,6 +28,30 @@ public class DateTimeUtil {
             log.warn("parseTimestampToString {} format {}", timestamp, format);
             return "";
         }
+    }
+
+    public static String parseTimestampToFullDateString(long timestamp){
+        try {
+            Calendar c = Calendar.getInstance();
+            c.setTime(new Date(timestamp));
+            int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+
+            String weekDay = getWeekDayString(dayOfWeek);
+            String date = parseTimestampToString(timestamp, "dd/MM/yyyy HH:mm");
+
+            return String.format("%s %s", weekDay, date);
+        } catch (Exception e){
+            log.warn("parseTimestampToFullDateString {} ex : {}", timestamp, e.getMessage());
+            return "T4 01/01/2020 00:00";
+        }
+    }
+
+    private static String getWeekDayString(int dayOfWeek) {
+        if (dayOfWeek == Calendar.SUNDAY) {
+            return "CN";
+        }
+
+        return String.format("T%s", dayOfWeek);
     }
 
     public static String parseDateToString(Date dt) {
@@ -84,6 +109,15 @@ public class DateTimeUtil {
             return dt.compareTo(dt2) >= 0;
         } catch (Exception e){
             log.warn("isAfter time: {} - validTime {} ex {}", time, validTime, e.getMessage());
+            return false;
+        }
+    }
+
+    public static boolean isRightFormat(String str, String format) {
+        try {
+            new SimpleDateFormat(format).parse(str);
+            return true;
+        } catch (Exception e){
             return false;
         }
     }

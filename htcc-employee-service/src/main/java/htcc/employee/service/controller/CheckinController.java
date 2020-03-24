@@ -79,10 +79,11 @@ public class CheckinController {
 
 
 
-    @ApiOperation(value = "Điểm danh vào", response = BaseResponse.class)
+    @ApiOperation(value = "Điểm danh", response = BaseResponse.class)
     @PostMapping("/checkin")
     public BaseResponse checkin(@ApiParam(value = "[Body] Thông tin điểm danh vào", required = true) @RequestBody CheckinRequest request) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        response.setReturnMessage("Điểm danh thành công");
         CheckinModel model = new CheckinModel(request);
 
         try {

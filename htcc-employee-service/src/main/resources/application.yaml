@@ -55,7 +55,7 @@ ribbon:
   ServerListRefreshInterval: 2000
   eager-load:
     enabled: true
-    clients: htcc-employee-service, htcc-admin-service
+    clients: htcc-log-service
 
 htcc-log-service:
   ribbon:

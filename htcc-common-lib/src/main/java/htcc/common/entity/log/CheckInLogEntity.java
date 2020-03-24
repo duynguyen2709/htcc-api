@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
-@Log4j2
 @NoArgsConstructor
 public class CheckInLogEntity extends BaseLogEntity {
 
@@ -39,7 +38,7 @@ public class CheckInLogEntity extends BaseLogEntity {
         this.serverTime = model.serverTime;
         this.validTime = "08:30";
         //this.validTime = model.validTime;
-        this.isOnTime = DateTimeUtil.isBefore(this.clientTime + 3 * 60 * 1000, this.validTime);
+        this.isOnTime = DateTimeUtil.isBefore(this.clientTime + 2 * 60 * 1000, this.validTime);
         this.validLatitude = model.validLatitude;
         this.validLongitude = model.validLongitude;
         this.latitude = model.latitude;

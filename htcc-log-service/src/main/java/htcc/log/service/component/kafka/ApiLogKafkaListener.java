@@ -1,8 +1,7 @@
 package htcc.log.service.component.kafka;
 
-import htcc.common.entity.base.RequestLogEntity;
+import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.service.kafka.BaseKafkaConsumer;
-import htcc.common.util.StringUtil;
 import htcc.log.service.repository.BaseLogDAO;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

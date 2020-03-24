@@ -16,4 +16,9 @@ public class LogServiceClientFallback implements LogServiceClient {
     public BaseResponse getCheckOutLog(String companyId, String username, String yyyyMMdd) {
         return null;
     }
+
+    @Override
+    public BaseResponse getComplaintLog(String companyId, String username, String yyyyMM) {
+        return null;
+    }
 }

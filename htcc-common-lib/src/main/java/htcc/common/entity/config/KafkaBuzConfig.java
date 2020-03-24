@@ -8,6 +8,7 @@ public class KafkaBuzConfig {
     public KafkaTopicConfig apiLog;
     public KafkaTopicConfig checkInLog;
     public KafkaTopicConfig checkOutLog;
+    public KafkaTopicConfig complaintLog;
 
     @Data
     public static class KafkaTopicConfig {

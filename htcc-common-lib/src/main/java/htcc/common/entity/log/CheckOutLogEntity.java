@@ -39,7 +39,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
         this.serverTime = model.serverTime;
 //        this.validTime = model.validTime;
         this.validTime = "17:30";
-        this.isOnTime = DateTimeUtil.isAfter(this.clientTime + 3 * 60 * 1000, this.validTime);
+        this.isOnTime = DateTimeUtil.isAfter(this.clientTime + 60 * 1000, this.validTime);
         this.validLatitude = model.validLatitude;
         this.validLongitude = model.validLongitude;
         this.latitude = model.latitude;

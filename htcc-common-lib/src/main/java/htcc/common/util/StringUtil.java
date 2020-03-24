@@ -3,6 +3,7 @@ package htcc.common.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.InetAddresses;
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -17,6 +18,8 @@ public class StringUtil {
     public static final String EMPTY = "";
 
     private static final List<String> MULTIPART_FIELDS = Arrays.asList("images", "avatarFile");
+
+    public static final Type LIST_STRING_TYPE = new TypeToken<List<String>>() {}.getType();
 
     private static final Gson gson;
 
