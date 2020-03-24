@@ -37,16 +37,7 @@ eureka:
     appname: ${spring.application.name}
     leaseExpirationDurationInSeconds: 45
 
-################## Feign Config ##################
-feign:
-  hystrix:
-    enabled: true
-  client:
-    config:
-      default:
-        connectTimeout: 30000
-        readTimeout: 30000
-
+################## Ribbon Config ##################
 ribbon:
   eureka:
     enabled: true

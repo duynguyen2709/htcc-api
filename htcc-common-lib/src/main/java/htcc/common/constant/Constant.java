@@ -24,4 +24,7 @@ public class Constant {
     public static final String USERNAME   = "username";
 
     public static final String USER_DEFAULT_AVATAR = "https://i.pinimg.com/originals/0d/36/e7/0d36e7a476b06333d9fe9960572b66b9.jpg";
+
+
+    public static final String HTCC_LOG_SERVICE = "htcc-log-service";
 }

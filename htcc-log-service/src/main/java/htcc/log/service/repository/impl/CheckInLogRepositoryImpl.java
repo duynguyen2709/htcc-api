@@ -29,13 +29,11 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
 
             return jdbcTemplate.queryForObject(query, new CheckInLogRowMapper());
 
-        } catch (IncorrectResultSizeDataAccessException e){
-            log.warn(String.format("[getCheckInLog] [%s-%s-%s] ex %s", companyId, username, ymd, e.getMessage()));
-            return null;
+        } catch (IncorrectResultSizeDataAccessException ignored){
         } catch (Exception e) {
             log.error(String.format("[getCheckInLog] [%s-%s-%s] ex ", companyId, username, ymd), e);
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -49,12 +47,10 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
 
             return jdbcTemplate.queryForObject(query, new CheckOutLogRowMapper());
 
-        }  catch (IncorrectResultSizeDataAccessException e){
-            log.warn(String.format("[getCheckOutLog] [%s-%s-%s] ex %s", companyId, username, ymd, e.getMessage()));
-            return null;
+        }  catch (IncorrectResultSizeDataAccessException ignored){
         } catch (Exception e) {
             log.error(String.format("[getCheckOutLog] [%s-%s-%s] ex ", companyId, username, ymd), e);
-            return null;
         }
+        return null;
     }
 }

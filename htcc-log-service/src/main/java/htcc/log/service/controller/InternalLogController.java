@@ -13,10 +13,7 @@ import htcc.log.service.repository.CheckInLogRepository;
 import htcc.log.service.repository.ComplaintLogRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +30,10 @@ public class InternalLogController {
     @Autowired
     private ComplaintLogRepository complaintRepo;
 
-    @GetMapping("/checkin")
-    public BaseResponse getCheckInLog(@RequestParam String companyId,
-                                      @RequestParam String username,
-                                      @RequestParam String yyyyMMdd){
+    @GetMapping("/checkin/{companyId}/{username}/{yyyyMMdd}")
+    public BaseResponse getCheckInLog(@PathVariable String companyId,
+                                      @PathVariable String username,
+                                      @PathVariable String yyyyMMdd){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         try {
             CheckInLogEntity data = repo.getCheckInLog(companyId, username, yyyyMMdd);
@@ -54,10 +51,10 @@ public class InternalLogController {
         return response;
     }
 
-    @GetMapping("/checkout")
-    public BaseResponse getCheckOutLog(@RequestParam String companyId,
-                                      @RequestParam String username,
-                                      @RequestParam String yyyyMMdd){
+    @GetMapping("/checkout/{companyId}/{username}/{yyyyMMdd}")
+    public BaseResponse getCheckOutLog(@PathVariable String companyId,
+                                      @PathVariable String username,
+                                      @PathVariable String yyyyMMdd){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         try {
             CheckOutLogEntity data = repo.getCheckOutLog(companyId, username, yyyyMMdd);
@@ -76,10 +73,10 @@ public class InternalLogController {
     }
 
 
-    @GetMapping("/complaint")
-    public BaseResponse getComplaintLog(@RequestParam String companyId,
-                                      @RequestParam String username,
-                                      @RequestParam String yyyyMM){
+    @GetMapping("/complaint/{companyId}/{username}/{yyyyMM}")
+    public BaseResponse getComplaintLog(@PathVariable String companyId,
+                                      @PathVariable String username,
+                                      @PathVariable String yyyyMM){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         try {
             List<ComplaintLogEntity> data = complaintRepo.getComplaintLog(companyId, username, yyyyMM);

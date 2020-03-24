@@ -6,7 +6,6 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintModel;
 import htcc.common.entity.complaint.ComplaintResponse;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.repository.feign.LogServiceClient;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,7 @@ import java.util.List;
 public class ComplaintService {
 
     @Autowired
-    private LogServiceClient logService;
+    private LogService logService;
 
     public List<ComplaintResponse> getComplaintLog(String companyId, String username, String yyyyMM) {
         List<ComplaintResponse> result = new ArrayList<>();
@@ -42,7 +41,9 @@ public class ComplaintService {
 
     private List<ComplaintModel> parseResponse(BaseResponse res) {
         try {
-            if (res == null || res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
+            if (res == null ||
+                    res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue() ||
+                    res.getData() == null) {
                 return null;
             }
 
