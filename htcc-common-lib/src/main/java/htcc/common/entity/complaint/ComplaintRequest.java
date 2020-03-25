@@ -10,7 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
+import java.io.File;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -57,7 +59,6 @@ public class ComplaintRequest implements Serializable {
     @NotEmpty
     public String content;
 
-    @JsonIgnore
     @ApiModelProperty(notes = "Hình ảnh mô tả (tối đa 3 ảnh)")
-    public MultipartFile[] images;
+    public List<MultipartFile> images;
 }

@@ -29,6 +29,12 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
             return;
         }
 
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.startsWith(Constant.MULTIPART_FORM_DATA)) {
+            super.doDispatch(request, response);
+            return;
+        }
+
         if (request.getAttribute(Constant.REQUEST_TIME) == null){
             request.setAttribute(Constant.REQUEST_TIME, System.currentTimeMillis());
         }

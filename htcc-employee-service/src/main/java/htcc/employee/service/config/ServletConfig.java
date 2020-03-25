@@ -3,13 +3,17 @@ package htcc.employee.service.config;
 import htcc.employee.service.component.RequestLoggingServlet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.DispatcherServlet;
+
+import javax.servlet.MultipartConfigElement;
 
 @Configuration
 public class ServletConfig {
@@ -32,6 +36,7 @@ public class ServletConfig {
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
         resolver.setDefaultEncoding("utf-8");
         resolver.setMaxUploadSize(maxFileSize);
+        resolver.setMaxInMemorySize(Integer.MAX_VALUE);
         return resolver;
     }
 

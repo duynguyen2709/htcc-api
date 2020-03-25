@@ -37,6 +37,13 @@ public class ComplaintModel implements Serializable {
         this.isAnonymous = request.isAnonymous;
         this.companyId = request.companyId;
         this.username = request.username;
+        if (this.isAnonymous == 1) {
+            if (this.receiverType == 1) {
+                // send anonymous to admin system
+                this.companyId = StringUtil.EMPTY;
+            }
+            this.username = StringUtil.EMPTY;
+        }
         this.clientTime = request.clientTime;
         this.category = request.category;
         this.content = request.content;

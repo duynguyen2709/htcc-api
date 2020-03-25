@@ -9,6 +9,7 @@ import htcc.common.entity.complaint.ComplaintResponse;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.ComplaintService;
+import htcc.employee.service.service.GoogleDriveService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,16 +19,18 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Api(tags = "API phản hồi/ khiếu nại",
      description = "API để phản hồi/ khiếu nại của nhân viên")
 @RestController
 @Log4j2
 public class ComplaintController {
-
-    @Autowired
-    private KafkaProducerService kafka;
 
     @Autowired
     private ComplaintService service;
@@ -50,33 +53,36 @@ public class ComplaintController {
                                     @RequestParam String category,
                                  @ApiParam(value = "Nội dung phản hồi/ khiếu nại", required = true, example = "Abc")
                                     @RequestParam String content,
-                                 @ApiParam(value = "Hình ảnh mô tả (tối đa 3 ảnh)", required = false)
-                                    @RequestParam(required = false) MultipartFile[] images) {
+                                 @ApiParam(value = "Hình ảnh mô tả (tối đa 3 ảnh)",name = "images", required = false)
+                                    @RequestParam(name = "images", required = false) List<MultipartFile> images) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Gửi phản hồi thành công");
         ComplaintRequest request = null;
         ComplaintModel model = null;
         try {
-            if (images.length > 3) {
+            if (images.size() > 3) {
                 response = new BaseResponse(ReturnCodeEnum.MAXIMUM_FILES_EXCEED);
                 return response;
             }
 
             request = new ComplaintRequest(receiverType, isAnonymous, companyId, username, clientTime, category, content, images);
-
             model = new ComplaintModel(request);
-            log.info(StringUtil.toJsonString(model));
 
         } catch (Exception e){
             log.error(String.format("complain [%s] ex", StringUtil.toJsonString(request)), e);
             response = new BaseResponse<>(e);
         } finally {
             if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
-                kafka.sendMessage(kafka.getBuzConfig().complaintLog.topicName, model);
+                service.handleUploadImage(images, model);
+            }
+
+            if (model != null) {
+                log.info(StringUtil.toJsonString(model));
             }
         }
         return response;
     }
+
 
 
 

@@ -35,7 +35,7 @@ redis:
   nodeAddresses: 127.0.0.1:6379
 
 kafka:
-  enableProducer: true
+  enableProducer: false
   enableConsumer: false
   bootstrapAddress: 127.0.0.1:9092
   buz:
