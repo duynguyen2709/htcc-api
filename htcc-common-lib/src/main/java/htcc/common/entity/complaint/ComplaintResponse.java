@@ -86,13 +86,6 @@ public class ComplaintResponse implements Serializable {
         String fullDateTime = DateTimeUtil.parseTimestampToFullDateString(model.clientTime);
         this.date = fullDateTime.substring(0, 13);
         this.time = fullDateTime.substring(14);
-
-        // current hardcode random images
-        // TODO : Remove this
-        this.images = new ArrayList<>();
-        int rand = new Random().nextInt(4);
-        for (int i = 0; i < rand; i++) {
-            this.images.add("https://picsum.photos/200");
-        }
+        this.images = model.images;
     }
 }
