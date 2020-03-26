@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -102,6 +100,10 @@ public class ComplaintController {
             }
 
             List<ComplaintResponse> list = service.getComplaintLog(companyId, username, yyyyMM);
+            if (list != null && !list.isEmpty()) {
+                Collections.reverse(list);
+            }
+
             response.data = list;
 
         } catch (Exception e) {

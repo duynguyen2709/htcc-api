@@ -1,5 +1,6 @@
 package htcc.employee.service.controller;
 
+import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintResponse;
@@ -52,13 +53,23 @@ public class UpdateComplaintController {
 
 
 
+
     @ApiOperation(value = "Cập nhật trạng thái khiếu nại", response = BaseResponse.class)
     @PutMapping("/complaint/status")
     public BaseResponse updateComplaintStatus(@ApiParam(value = "[Body] Trạng thái mới cần update", required = true)
                                                   @RequestBody UpdateComplaintStatusModel request) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
+            if (request.getStatus() != ComplaintStatusEnum.DONE.getValue() &&
+                    request.getStatus() != ComplaintStatusEnum.REJECTED.getValue()) {
+                return new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID, String.format("Trạng thái %s không hợp lệ", request.getStatus()));
+            }
 
+            if (DateTimeUtil.isRightFormat(request.getYyyyMM(), "yyyyMM") == false) {
+                return new BaseResponse(ReturnCodeEnum.DATE_WRONG_FORMAT, String.format("Tháng %s không phù hợp định dạng yyyyMM", request.getYyyyMM()));
+            }
+
+            response = complaintService.updateComplaintStatus(request);
         } catch (Exception e) {
             log.error(String.format("updateComplaintStatus [%s] ex", StringUtil.toJsonString(request)), e);
             response = new BaseResponse<>(e);
