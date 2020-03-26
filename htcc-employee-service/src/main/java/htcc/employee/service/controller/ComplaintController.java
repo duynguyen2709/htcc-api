@@ -53,19 +53,19 @@ public class ComplaintController {
                                     @RequestParam String category,
                                  @ApiParam(value = "Nội dung phản hồi/ khiếu nại", required = true, example = "Abc")
                                     @RequestParam String content,
-                                 @ApiParam(value = "Hình ảnh mô tả (tối đa 3 ảnh)",name = "images", required = false)
-                                    @RequestParam(name = "images", required = false) List<MultipartFile> images) {
+                                 @ApiParam(value = "Hình ảnh mô tả (tối đa 3 ảnh)",name = "images[]", required = false)
+                                    @RequestParam(name = "images[]", required = false) MultipartFile images[]) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Gửi phản hồi thành công");
         ComplaintRequest request = null;
         ComplaintModel model = null;
         try {
-            if (images.size() > 3) {
+            if (images.length > 3) {
                 response = new BaseResponse(ReturnCodeEnum.MAXIMUM_FILES_EXCEED);
                 return response;
             }
 
-            request = new ComplaintRequest(receiverType, isAnonymous, companyId, username, clientTime, category, content, images);
+            request = new ComplaintRequest(receiverType, isAnonymous, companyId, username, clientTime, category, content, Arrays.asList(images));
             model = new ComplaintModel(request);
 
         } catch (Exception e){
@@ -73,7 +73,7 @@ public class ComplaintController {
             response = new BaseResponse<>(e);
         } finally {
             if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
-                service.handleUploadImage(images, model);
+                service.handleUploadImage(Arrays.asList(images), model);
             }
 
             if (model != null) {
