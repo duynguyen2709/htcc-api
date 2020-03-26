@@ -24,6 +24,8 @@ public enum ReturnCodeEnum {
     NOT_CHECKIN(-11, "Chưa thực hiện điểm danh vào hôm nay"),
     CHECKIN_TIME_NOT_VALID(-12, "Thời gian điểm danh không hợp lệ"),
     LOG_NOT_FOUND(-13, "Không tìm thấy dữ liệu"),
+    DATE_WRONG_FORMAT(-14, "Định dạng ngày tháng không hợp lệ"),
+    MAXIMUM_FILES_EXCEED(-15, "Chỉ cho upload tối đa 3 ảnh"),
     ;
 
     private final int value;

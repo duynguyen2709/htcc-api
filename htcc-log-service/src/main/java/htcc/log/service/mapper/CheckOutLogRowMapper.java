@@ -1,16 +1,16 @@
-package htcc.log.service.repository.impl;
+package htcc.log.service.mapper;
 
-import htcc.common.entity.log.CheckInLogEntity;
+import htcc.common.entity.log.CheckOutLogEntity;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CheckInLogRowMapper implements RowMapper<CheckInLogEntity> {
+public class CheckOutLogRowMapper implements RowMapper<CheckOutLogEntity> {
 
     @Override
-    public CheckInLogEntity mapRow(ResultSet rs, int i) throws SQLException {
-        CheckInLogEntity entity = new CheckInLogEntity();
+    public CheckOutLogEntity mapRow(ResultSet rs, int i) throws SQLException {
+        CheckOutLogEntity entity = new CheckOutLogEntity();
         entity.requestId = rs.getString("requestId");
         entity.companyId = rs.getString("companyId");
         entity.username = rs.getString("username");

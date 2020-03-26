@@ -106,6 +106,7 @@ htcc-admin-service:
 ################## Service Config ##################
 service:
   debugMode: false
+  maxFileSize: 10000000
 
 security:
   bypassJWT: false

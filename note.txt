@@ -119,3 +119,15 @@
 22-03-2020:
  + Version 1.3.3:
     - [Gateway] Change Feign -> Ribbon RestTemplate
+
+24-03-2020:
+ + Version 1.3.4:
+    - [Employee & Log] Add Complaint Feature (not handled upload image yet)
+
+25-03-2020:
+ + Version 1.4.0:
+    - [Employee] Upload Complaint Image
+
+26-03-2020:
+ + Version 1.4.1:
+    - [Employee & Admin] Update Complaint Status

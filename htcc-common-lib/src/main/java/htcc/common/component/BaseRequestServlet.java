@@ -2,10 +2,9 @@ package htcc.common.component;
 
 import htcc.common.constant.Constant;
 import htcc.common.constant.ServiceSystemEnum;
-import htcc.common.entity.base.RequestLogEntity;
+import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.entity.base.RequestWrapper;
 import htcc.common.util.NumberUtil;
-import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -26,6 +25,12 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
         String uri = request.getRequestURI();
 
         if (shouldNotProcessLog(uri) || uri.endsWith(Constant.SWAGGER_DOCS_PATH)) {
+            super.doDispatch(request, response);
+            return;
+        }
+
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.startsWith(Constant.MULTIPART_FORM_DATA)) {
             super.doDispatch(request, response);
             return;
         }
@@ -72,15 +77,9 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
         return result;
     }
 
-    private boolean hasBody(String method) {
-        return (method.equalsIgnoreCase("POST") ||
-                method.equalsIgnoreCase("PUT"));
-    }
-
     private void setLogData(RequestWrapper request, HttpServletResponse responseToCache) {
         RequestLogEntity logEnt = new RequestLogEntity();
         try {
-            //logEnt.setRequestId(LoggingConfiguration.getTraceId());
             logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
             logEnt.setResponseTime(System.currentTimeMillis());
             logEnt.setMethod(request.getMethod());
@@ -89,7 +88,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
             logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
             logEnt.setServiceId(ServiceSystemEnum.getServiceFromUri(logEnt.path));
             logEnt.setIp(request);
-            logEnt.setBody((hasBody(logEnt.method)) ? StringUtil.valueOf(request.getBody()) : "");
+            logEnt.setBody(request);
             logEnt.setResponse(getResponsePayload(responseToCache));
         } catch (Exception e) {
             log.warn("setLogData ex {}", e.getMessage(), e);

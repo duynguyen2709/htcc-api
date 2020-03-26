@@ -5,6 +5,7 @@ public class Constant {
     public static final String REQUEST_TIME = "requestTime";
 
     public static final String APPLICATION_JSON = "application/json";
+    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER        = "Bearer ";
@@ -23,4 +24,7 @@ public class Constant {
     public static final String USERNAME   = "username";
 
     public static final String USER_DEFAULT_AVATAR = "https://i.pinimg.com/originals/0d/36/e7/0d36e7a476b06333d9fe9960572b66b9.jpg";
+    public static final String GOOGLE_DRIVE_IMAGE_FORMAT = "https://drive.google.com/uc?export=view&id=%s";
+
+    public static final String HTCC_LOG_SERVICE = "htcc-log-service";
 }

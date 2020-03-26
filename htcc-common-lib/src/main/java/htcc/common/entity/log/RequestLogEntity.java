@@ -1,6 +1,10 @@
-package htcc.common.entity.base;
+package htcc.common.entity.log;
 
+import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.entity.base.BaseLogEntity;
+import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.base.RequestWrapper;
 import htcc.common.util.StringUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,12 +45,22 @@ public class RequestLogEntity extends BaseLogEntity {
         }
     }
 
-    public void setBody(String str) {
+    public void setBody(RequestWrapper request) {
         try {
-            Object obj = StringUtil.fromJsonString(str, Object.class);
-            this.body = (obj != null) ? obj : "";
+            if (!hasBody(this.method)) {
+                this.body = "";
+                return;
+            }
+
+            String contentType = request.getContentType();
+            if (contentType != null && contentType.startsWith(Constant.MULTIPART_FORM_DATA)) {
+                this.body = "";
+            } else {
+                Object obj = StringUtil.fromJsonString(request.getBody(), Object.class);
+                this.body = (obj != null) ? obj : "";
+            }
         } catch (Exception e) {
-            this.body = str;
+            this.body = request.getBody();
         }
     }
 
@@ -58,6 +72,11 @@ public class RequestLogEntity extends BaseLogEntity {
         else if (this.ip.contains(",")) {
             this.ip = this.ip.split(",")[0];
         }
+    }
+
+    private boolean hasBody(String method) {
+        return (method.equalsIgnoreCase("POST") ||
+                method.equalsIgnoreCase("PUT"));
     }
 
     @Override

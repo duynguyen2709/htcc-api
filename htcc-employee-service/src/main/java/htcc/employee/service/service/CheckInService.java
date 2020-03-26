@@ -1,11 +1,11 @@
 package htcc.employee.service.service;
 
 import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.common.entity.checkin.CheckinModel;
-import htcc.employee.service.repository.feign.LogServiceClient;
 import htcc.employee.service.service.redis.RedisCheckinService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 public class CheckInService {
 
     @Autowired
-    private LogServiceClient logService;
+    private LogService logService;
 
     @Autowired
     private RedisCheckinService redisService;
@@ -79,7 +79,8 @@ public class CheckInService {
 
     private CheckinModel parseResponse(BaseResponse res) {
         try {
-            if (res == null) {
+            if (res == null || res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue() ||
+            res.getData() == null) {
                 return null;
             }
 

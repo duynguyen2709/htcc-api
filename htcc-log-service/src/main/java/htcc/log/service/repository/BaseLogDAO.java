@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
 import java.util.Map;
 
 @Repository
@@ -28,6 +29,7 @@ public class BaseLogDAO {
 
             Map<String, Object> parameters = logEntity.getParamsMap();
             parameters.put("ymd", yyyyMMdd);
+            parameters.put("updDate", new Timestamp(System.currentTimeMillis()));
             return jdbc.execute(parameters);
         } catch (Exception e) {
             log.error("insertLog {} ex", StringUtil.toJsonString(logEntity), e);

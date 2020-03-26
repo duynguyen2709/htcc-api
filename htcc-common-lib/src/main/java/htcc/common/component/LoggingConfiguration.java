@@ -5,6 +5,8 @@ import brave.sampler.Sampler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 @Configuration
@@ -13,7 +15,7 @@ public class LoggingConfiguration {
     private static Tracer _tracer;
 
     @Autowired
-    public void setTracer(Tracer tracer) {
+    public void setTracer(@Lazy Tracer tracer) {
         _tracer = tracer;
     }
 

@@ -3,6 +3,8 @@ package htcc.employee.service;
 import htcc.common.component.redis.RedisClient;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.LoggingUtil;
+import htcc.common.util.StringUtil;
+import htcc.employee.service.config.GoogleDriveBuzConfig;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,13 +30,13 @@ public class ApplicationReady {
     @Autowired
     private ConfigurableEnvironment configurableEnvironment;
 
+
     @Autowired
     private RedisClient redis;
 
     @EventListener({ApplicationReadyEvent.class})
     public void readyProcess() throws Exception {
         LoggingUtil.printConfig(configurableEnvironment);
-
     }
 
     @PreDestroy
