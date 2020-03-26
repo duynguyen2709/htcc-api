@@ -49,6 +49,10 @@ public class ComplaintResponse implements Serializable {
     @Max(1)
     public int isAnonymous = 0;
 
+    @ApiModelProperty(notes = "Người gửi",
+                      example = "ẨN DANH")
+    public String sender = "";
+
     @ApiModelProperty(notes = "Loại phản hồi/ khiếu nại",
                       example = "Phản hồi về phiếu lương")
     @NotEmpty
@@ -87,5 +91,11 @@ public class ComplaintResponse implements Serializable {
         this.date = fullDateTime.substring(0, 13);
         this.time = fullDateTime.substring(14);
         this.images = model.images;
+
+        if (this.isAnonymous == 1) {
+            this.sender = "ẨN DANH";
+        } else {
+            this.sender = String.format("%s - %s", model.companyId, model.username);
+        }
     }
 }

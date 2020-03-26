@@ -22,13 +22,10 @@ import java.util.stream.Collectors;
 @RestController
 @Log4j2
 @RequestMapping("/internal/logs")
-public class InternalLogController {
+public class CheckInLogController {
 
     @Autowired
     private CheckInLogRepository repo;
-
-    @Autowired
-    private ComplaintLogRepository complaintRepo;
 
     @GetMapping("/checkin/{companyId}/{username}/{yyyyMMdd}")
     public BaseResponse getCheckInLog(@PathVariable String companyId,
@@ -72,26 +69,4 @@ public class InternalLogController {
         return response;
     }
 
-
-    @GetMapping("/complaint/{companyId}/{username}/{yyyyMM}")
-    public BaseResponse getComplaintLog(@PathVariable String companyId,
-                                      @PathVariable String username,
-                                      @PathVariable String yyyyMM){
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
-        try {
-            List<ComplaintLogEntity> data = complaintRepo.getComplaintLog(companyId, username, yyyyMM);
-            if (data == null) {
-                return new BaseResponse(ReturnCodeEnum.LOG_NOT_FOUND);
-            }
-
-            List<ComplaintModel> listResponse = data.stream().map(ComplaintModel::new).collect(Collectors.toList());
-
-            response.data = listResponse;
-
-        } catch (Exception e) {
-            log.error(String.format("[getComplaintLog] [%s-%s-%s] ex", companyId, username, yyyyMM), e);
-            return new BaseResponse(e);
-        }
-        return response;
-    }
 }

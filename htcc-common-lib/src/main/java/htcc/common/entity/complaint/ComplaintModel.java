@@ -50,8 +50,9 @@ public class ComplaintModel implements Serializable {
         this.complaintId = String.format("#%s-%s", this.companyId, this.requestId);
         this.response = StringUtil.EMPTY;
         this.status = ComplaintStatusEnum.PROCESSING.getValue();
+
+        // upload image async and then update this.images value
         this.images = new ArrayList<>();
-        // TODO : handle image upload
     }
 
     public ComplaintModel(ComplaintLogEntity logEntity) {

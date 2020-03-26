@@ -6,6 +6,7 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintModel;
 import htcc.common.entity.complaint.ComplaintResponse;
+import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,30 @@ public class ComplaintService {
         }
 
         return result;
+    }
+
+
+    public List<ComplaintResponse> getListComplaintLogByCompany(String companyId, String yyyyMM) {
+        List<ComplaintResponse> result = new ArrayList<>();
+        try {
+            BaseResponse response = logService.getListComplaintLogByCompany(companyId, yyyyMM);
+            List<ComplaintModel> models = parseResponse(response);
+            if (models == null) {
+                throw new Exception(String.format("parseResponse %s return null", response));
+            }
+
+            models.forEach(c -> result.add(new ComplaintResponse(c)));
+
+        } catch (Exception e) {
+            log.error(String.format("[getListComplaintLogByCompany] : [%s-%s] ex", companyId, yyyyMM), e);
+        }
+
+        return result;
+    }
+
+
+    public BaseResponse updateComplaintStatus(UpdateComplaintStatusModel model) {
+        return logService.updateComplaintStatus(model);
     }
 
 
