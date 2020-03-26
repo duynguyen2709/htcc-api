@@ -76,10 +76,14 @@ public class ComplaintService {
 
     private List<ComplaintModel> parseResponse(BaseResponse res) {
         try {
-            if (res == null ||
-                    res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue() ||
-                    res.getData() == null) {
+            if (res == null) {
                 return null;
+            }
+
+            if (res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue() ||
+                    res.getData() == null) {
+                log.warn("parseResponse Failed {}", StringUtil.toJsonString(res));
+                return new ArrayList<>();
             }
 
             String data = StringUtil.toJsonString(res.data);
