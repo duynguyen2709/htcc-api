@@ -35,6 +35,28 @@ eureka:
     appname: ${spring.application.name}
     leaseExpirationDurationInSeconds: 45
 
+################## Ribbon Config ##################
+ribbon:
+  eureka:
+    enabled: true
+  ReadTimeout: 30000
+  ConnectTimeout: 30000
+  ServerListRefreshInterval: 2000
+  eager-load:
+    enabled: true
+    clients: htcc-log-service
+
+htcc-log-service:
+  ribbon:
+    eureka:
+      enabled: true
+    MaxAutoRetries: 2
+    MaxAutoRetriesNextServer: 2
+    OkToRetryOnAllOperations: true
+    ReadTimeout: 30000
+    ConnectTimeout: 30000
+    ServerListRefreshInterval: 2000
+
 ################## Logging Config ##################
 logging:
   config: classpath:log4j2.properties

@@ -127,3 +127,7 @@
 25-03-2020:
  + Version 1.4.0:
     - [Employee] Upload Complaint Image
+
+26-03-2020:
+ + Version 1.4.1:
+    - [Employee & Admin] Update Complaint Status
