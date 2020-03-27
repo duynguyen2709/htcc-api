@@ -2,6 +2,7 @@ package htcc.admin.service.controller;
 
 import htcc.admin.service.service.GoogleDriveService;
 import htcc.admin.service.service.jpa.AdminUserInfoService;
+import htcc.admin.service.service.redis.RedisUserInfoService;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
@@ -30,6 +31,9 @@ public class PersonalInfoController {
 
     @Autowired
     private GoogleDriveService driveService;
+
+    @Autowired
+    private RedisUserInfoService redisUserInfo;
 
 
     @ApiOperation(value = "Lấy thông tin cá nhân", response = AdminUser.class)
@@ -74,19 +78,30 @@ public class PersonalInfoController {
                 throw new Exception("driveService.uploadAvatar return null");
             }
 
+            // save old avatar to delete
             oldAvatar = admin.getAvatar();
-            admin.setAvatar(newAvatar);
-            response.setData(userInfoService.update(admin));
 
+            // set new avatar
+            admin.setAvatar(newAvatar);
+
+            // update to db
+            admin = userInfoService.update(admin);
+
+            // set response
+            response.setData(admin);
         } catch (Exception e) {
             log.error("[updateAvatar] {} ex", username, e);
             response = new BaseResponse<>(e);
         } finally {
             if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
+                // delete old file on gg drive
                 String fileId = StringUtil.getFileIdFromImage(oldAvatar);
                 if (!fileId.isEmpty()) {
                     driveService.deleteFile(fileId);
                 }
+
+                // reset cache
+                redisUserInfo.setUserInfo(response.data);
             }
         }
 

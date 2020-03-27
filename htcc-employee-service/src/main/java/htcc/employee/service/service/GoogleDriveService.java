@@ -66,4 +66,50 @@ public class GoogleDriveService {
         // error case
         return CompletableFuture.completedFuture(buzConfig.buz.errorImage);
     }
+
+    public String uploadAvatar(MultipartFile multipartFile, String fileName) {
+        java.io.File tempFile = null;
+        try {
+            tempFile = java.io.File.createTempFile("temp", null);
+            tempFile.deleteOnExit();
+
+            multipartFile.transferTo(tempFile);
+
+            File newGGDriveFile = new File()
+                    .setParents(Collections.singletonList(buzConfig.buz.avatarImageFolder))
+                    .setName(fileName);
+
+            FileContent mediaContent = new FileContent(multipartFile.getContentType(), tempFile);
+
+            File uploadedFile = googleDrive.files()
+                    .create(newGGDriveFile, mediaContent)
+                    .setFields("id")
+                    .execute();
+
+            log.info(String.format("[uploadAvatar] Uploaded Filename [%s] - Content Type [%s] - Id [%s] Succeed",
+                    fileName,
+                    multipartFile.getContentType(),
+                    uploadedFile.getId()));
+
+            return Constant.GOOGLE_DRIVE_IMAGE_FORMAT + uploadedFile.getId();
+        } catch (Exception e) {
+            log.error("uploadAvatar ex", e);
+        } finally {
+            if (tempFile != null) {
+                tempFile.delete();
+            }
+        }
+        // error case
+        return null;
+    }
+
+
+    @Async("asyncExecutor")
+    public void deleteFile(String fileId) {
+        try {
+            googleDrive.files().delete(fileId).execute();
+        } catch (Exception e) {
+            log.error("[deleteFile] {} ex", fileId, e);
+        }
+    }
 }

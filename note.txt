@@ -134,4 +134,4 @@
 
 27-03-2020:
  + Version 1.4.2:
-    - [Admin] Change Avatar
+    - [Employee & Admin] Change Avatar
