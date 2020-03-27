@@ -30,7 +30,6 @@ public class ApplicationReady {
     @Autowired
     private ConfigurableEnvironment configurableEnvironment;
 
-
     @Autowired
     private RedisClient redis;
 

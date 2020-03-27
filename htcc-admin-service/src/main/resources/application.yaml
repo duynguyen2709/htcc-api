@@ -64,3 +64,12 @@ logging:
 ################## Service Config ##################
 service:
   debugMode: false
+  maxFileSize: 10000000
+
+################## Google Drive Config ##################
+drive:
+  serviceAccountId: "htcc-57@htcc-272106.iam.gserviceaccount.com"
+  p12File: "htcc.p12"
+  buz:
+    defaultAvatarImage: "https://i.pinimg.com/originals/0d/36/e7/0d36e7a476b06333d9fe9960572b66b9.jpg"
+    avatarImageFolder: "1AqmRTHtklSTPMN1nyvF5nDaCzLYgmidi"

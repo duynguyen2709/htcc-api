@@ -1,5 +1,5 @@
 security:
-  bypassJWT: true
+  bypassJWT: false
   user:
     name: admin
     password: admin

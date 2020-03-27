@@ -131,3 +131,7 @@
 26-03-2020:
  + Version 1.4.1:
     - [Employee & Admin] Update Complaint Status
+
+27-03-2020:
+ + Version 1.4.2:
+    - [Admin] Change Avatar

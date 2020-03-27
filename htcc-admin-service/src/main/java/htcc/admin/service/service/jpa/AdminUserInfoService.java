@@ -4,6 +4,7 @@ import htcc.common.entity.jpa.AdminUser;
 import htcc.admin.service.jpa.AdminUserInfoRepository;
 import htcc.common.constant.Constant;
 import htcc.common.service.BaseJPAService;
+import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,9 @@ public class AdminUserInfoService extends BaseJPAService<AdminUser, String> {
 
     @Override
     public AdminUser update(AdminUser adminUser) {
-        adminUser.avatar = Constant.USER_DEFAULT_AVATAR;
+        if (StringUtil.valueOf(adminUser.avatar).isEmpty()) {
+            adminUser.avatar = Constant.USER_DEFAULT_AVATAR;
+        }
         return repo.save(adminUser);
     }
 

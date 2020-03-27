@@ -9,7 +9,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableEurekaClient
-@EnableFeignClients
 @EnableSwagger2
 @EnableSwaggerDocs(basePackage = "htcc.employee.service.controller",
                    baseUrl = "https://1612145.online/api/employee/")

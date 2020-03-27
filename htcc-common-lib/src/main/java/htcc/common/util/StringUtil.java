@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.InetAddresses;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import htcc.common.constant.Constant;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
@@ -73,6 +74,20 @@ public class StringUtil {
 
     public static boolean isIPAddress(String str) {
         return InetAddresses.isInetAddress(str);
+    }
+
+    public static String getFileIdFromImage(String imageUrl) {
+        String fileId = "";
+        try {
+            if (!imageUrl.startsWith(Constant.GOOGLE_DRIVE_IMAGE_FORMAT)) {
+                throw new Exception("Image not start with GOOGLE_DRIVE_IMAGE_FORMAT");
+            }
+            return imageUrl.substring(Constant.GOOGLE_DRIVE_IMAGE_FORMAT.length());
+
+        } catch (Exception e) {
+            log.warn(String.format("[getFileIdFromImage] Url [%s] ex %s", imageUrl, e.getMessage()));
+        }
+        return fileId;
     }
 
 }
