@@ -65,6 +65,10 @@ public class StringUtil {
         return String.valueOf(obj);
     }
 
+    public static boolean isEmpty(Object obj) {
+        return valueOf(obj).isEmpty();
+    }
+
     private static class DoubleSerializer implements JsonSerializer<Double> {
         @Override
         public JsonElement serialize(Double src, Type typeOfSrc, JsonSerializationContext context) {
@@ -74,6 +78,13 @@ public class StringUtil {
 
     public static boolean isIPAddress(String str) {
         return InetAddresses.isInetAddress(str);
+    }
+
+    public static boolean isEmail(String email ) {
+        String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+        java.util.regex.Matcher m = p.matcher(valueOf(email));
+        return m.matches();
     }
 
     public static String getFileIdFromImage(String imageUrl) {

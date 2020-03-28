@@ -2,6 +2,7 @@ package htcc.common.entity.jpa;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import htcc.common.util.DateTimeUtil;
+import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -106,16 +107,39 @@ public class EmployeeInfo extends BaseJPAEntity {
 
     @Column
     @ApiModelProperty(notes = "(*) URL Ảnh đại diện (Default - không cần set)")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String avatar = "";
 
     @Override
-    public boolean isValid() {
-        return (!StringUtil.valueOf(username).isEmpty() &&
-                !StringUtil.valueOf(address).isEmpty() &&
-                StringUtil.valueOf(phoneNumber).length() >= 10 &&
-                StringUtil.valueOf(identityCardNo).length() >= 9 &&
-                this.birthDate != null);
+    public String isValid() {
+        String error = "";
+
+        if (StringUtil.isEmpty(fullName)) {
+            return "Họ tên không được rỗng";
+        }
+
+        if (StringUtil.isEmpty(address)) {
+            return "Địa chỉ không được rỗng";
+        }
+
+        if (birthDate == null) {
+            return "Ngày sinh sai định dạng yyyy-MM-dd";
+        }
+
+        if (!StringUtil.isEmail(email)) {
+            return String.format("Email %s không phù hợp định dạng email", email);
+        }
+
+        if (StringUtil.valueOf(identityCardNo).length() < 9 ||
+                NumberUtil.getLongValue(identityCardNo) == 0L) {
+            return String.format("Số chứng minh nhân dân %s không phù hợp định dạng", identityCardNo);
+        }
+
+        if (StringUtil.valueOf(phoneNumber).length() < 10 ||
+                NumberUtil.getLongValue(phoneNumber) == 0L) {
+            return String.format("Số điện thoại %s không phù hợp định dạng", phoneNumber);
+        }
+
+        return StringUtil.EMPTY;
     }
 
     public void refillImmutableValue(EmployeeInfo other){

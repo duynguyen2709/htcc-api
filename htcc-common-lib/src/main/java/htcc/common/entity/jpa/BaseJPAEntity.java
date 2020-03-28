@@ -6,5 +6,5 @@ import java.io.Serializable;
 public abstract class BaseJPAEntity implements Serializable {
 
     @Transient
-    public abstract boolean isValid();
+    public abstract String isValid();
 }
