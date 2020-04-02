@@ -1,3 +1,4 @@
+################## Spring Config ##################
 spring:
   application:
     name: htcc-log-service
@@ -25,6 +26,7 @@ spring:
     timeBetweenEvictionRunsMillis: 60000
     validationQuery: SELECT 1
 
+################## Eureka Config ##################
 eureka:
   client:
     register-with-eureka: true
@@ -32,8 +34,26 @@ eureka:
   instance:
     appname: ${spring.application.name}
 
+################## Logging Config ##################
 logging:
   config: classpath:log4j2.properties
 
+################## Service Config ##################
 service:
   debugMode: false
+
+################## Redis Config ##################
+redis:
+  delimiterAddress: ;
+  scanInterval: 5000
+  slaveConnectionMinimumIdleSize: 10
+  slaveConnectionPoolSize: 100
+  masterConnectionMinimumIdleSize: 10
+  masterConnectionPoolSize: 100
+  idleConnectionTimeout: 10000
+  connectTimeout: 10000
+  responseTimeout: 10000
+  retryAttempts: 3
+  retryInterval: 1000
+  readMode: SLAVE
+  masterAddress:

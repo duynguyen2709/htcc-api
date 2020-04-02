@@ -33,6 +33,10 @@ public abstract class RedisClient {
 
     protected RedissonClient instance = null;
 
+    public RedissonClient getInstance() {
+        return this.instance;
+    }
+
     @Bean
     @ConditionalOnProperty(name="redis.useRedis", havingValue="true")
     private RedissonClient redisClient() {
@@ -100,6 +104,10 @@ public abstract class RedisClient {
     }
 
     protected boolean lock(String key) {
+        if (instance == null) {
+            return false;
+        }
+
         try{
             RLock lock = instance.getLock(key);
             if (lock.isLocked())
@@ -115,6 +123,10 @@ public abstract class RedisClient {
     }
 
     protected void unlock(String key){
+        if (instance == null) {
+            return;
+        }
+
         try{
             RLock lock = instance.getLock(key);
             if (lock.isLocked())
