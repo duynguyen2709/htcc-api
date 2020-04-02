@@ -92,9 +92,11 @@ public class AdminUserController {
                                     @RequestBody AdminUser user) {
         BaseResponse<AdminUser> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
-            if (!user.isValid()) {
-                throw new ConstraintViolationException(
-                        "Thông tin user không hợp lệ: " + StringUtil.toJsonString(user), null);
+            String error = user.isValid();
+            if (!error.isEmpty()) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(error);
+                return response;
             }
 
             user.password = new BCryptPasswordEncoder().encode(user.password);
@@ -124,9 +126,11 @@ public class AdminUserController {
                                @RequestBody AdminUser user) {
         BaseResponse<AdminUser> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
-            if (!user.isValid()) {
-                throw new ConstraintViolationException(
-                        "Thông tin user không hợp lệ: " + StringUtil.toJsonString(user), null);
+            String error = user.isValid();
+            if (!error.isEmpty()) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(error);
+                return response;
             }
 
             AdminUser oldUser = service.findById(username);

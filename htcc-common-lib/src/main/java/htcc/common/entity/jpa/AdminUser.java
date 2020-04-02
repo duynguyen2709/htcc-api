@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.entity.jpa.BaseJPAEntity;
+import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -32,14 +33,12 @@ public class AdminUser extends BaseJPAEntity {
                       example = "admin")
     public String username = "";
 
-
     @Column
     @NotEmpty
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ApiModelProperty(notes = "Mật khẩu (chỉ gửi khi tạo user mới)",
                       example = "abc")
     public String password = "";
-
 
     @Column
     @NotEmpty
@@ -75,8 +74,24 @@ public class AdminUser extends BaseJPAEntity {
     public int status = 1;
 
     @Override
-    public boolean isValid() {
-        return (StringUtil.valueOf(phoneNumber).length() >= 10) &&
-                (AccountStatusEnum.fromInt(status) != null);
+    public String isValid() {
+        if (StringUtil.valueOf(phoneNumber).length() < 10 ||
+                NumberUtil.getLongValue(phoneNumber) == 0L) {
+            return String.format("Số điện thoại %s không phù hợp định dạng", phoneNumber);
+        }
+
+        if (StringUtil.isEmpty(fullName)) {
+            return "Họ tên không được rỗng";
+        }
+
+        if (!StringUtil.isEmail(email)) {
+            return String.format("Email %s không phù hợp định dạng email", email);
+        }
+
+        if (AccountStatusEnum.fromInt(status) == null) {
+            return String.format("Trạng thái %s không hợp lệ", status);
+        }
+
+        return StringUtil.EMPTY;
     }
 }

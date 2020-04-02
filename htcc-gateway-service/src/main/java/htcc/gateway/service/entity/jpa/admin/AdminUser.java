@@ -2,6 +2,7 @@ package htcc.gateway.service.entity.jpa.admin;
 
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.entity.jpa.BaseJPAEntity;
+import htcc.common.util.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,11 @@ public class AdminUser extends BaseJPAEntity {
     public int status = 1;
 
     @Override
-    public boolean isValid() {
-        return (AccountStatusEnum.fromInt(status) != null);
+    public String isValid() {
+        if (AccountStatusEnum.fromInt(status) == null) {
+            return String.format("Trạng thái %s không hợp lệ", status);
+        }
+
+        return StringUtil.EMPTY;
     }
 }

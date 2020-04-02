@@ -60,103 +60,94 @@ public class EmployeeInfoController {
 
 
 
-
-    @ApiOperation(value = "Cập nhật thông tin của nhân viên (các field * không cần gửi lại khi update) -" +
-            "(các field còn lại phải gửi lại kể cả khi không update)",
-                  response = EmployeeInfo.class)
-    @ApiImplicitParams({
-                               @ApiImplicitParam(name = "companyId", dataType = "String", paramType = "path",
-                                                 value = "[Path] Mã công ty", defaultValue = "VNG", required = true),
-                               @ApiImplicitParam(name = "username", dataType = "String", paramType = "path",
-                                                 value = "[Path] Tên đăng nhập", defaultValue = "admin", required = true),
-                               @ApiImplicitParam(name = "request", dataType = "EmployeeInfo", paramType = "body",
-                                                 value = "[Body] Thông tin mới cần update", required = true)
-                       })
-    @PutMapping("/users/{companyId}/{username}")
-    public BaseResponse update(@PathVariable(required = true) String companyId,
-                               @PathVariable(required = true) String username,
-                               @RequestBody EmployeeInfo request) {
-        BaseResponse<EmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
-        try {
-            if (!request.isValid()) {
-                throw new ConstraintViolationException(
-                        "Param Invalid " + StringUtil.toJsonString(request), null);
-            }
-
-            EmployeeInfo oldUser = service.findById(new EmployeeInfo.Key(companyId, username));
-            if (oldUser == null) {
-                return new BaseResponse<>(ReturnCodeEnum.USER_NOT_FOUND);
-            }
-
-            // set old value to update
-            request.refillImmutableValue(oldUser);
-
-            oldUser = service.update(request);
-
-            response.data = oldUser;
-        } catch (ConstraintViolationException| TransactionSystemException e) {
-            log.warn("[update] ConstraintViolationException: ", e);
-            response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, e.getMessage());
-        } catch (Exception e){
-            log.error(String.format("update [%s - %s] ex", companyId, username), e);
-            response = new BaseResponse<>(e);
-        } finally {
-            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
-                redisUserInfo.setUserInfo(response.data);
-            }
-        }
-        return response;
-    }
-
-
-
-
-    @ApiOperation(value = "Cập nhật avatar", response = EmployeeInfo.class)
-    @PostMapping("/users/avatar/{companyId}/{username}")
-    public BaseResponse changeAvatar(@ApiParam(name = "companyId", value = "[Path] Mã công ty", defaultValue = "VNG", required = true)
+    @ApiOperation(value = "Cập nhật thông tin của nhân viên", response = EmployeeInfo.class)
+    @PostMapping("/users/{companyId}/{username}")
+    public BaseResponse updateUserInfo(@ApiParam(name = "companyId", value = "[Path] Mã công ty", defaultValue = "VNG", required = true)
                                          @PathVariable(required = true) String companyId,
-                                     @ApiParam(name = "username", value = "Tên đăng nhập", defaultValue = "admin", required = true)
+                                     @ApiParam(name = "username", value = "[Path] Tên đăng nhập", defaultValue = "admin", required = true)
                                      @PathVariable(required = true) String username,
+                                     @ApiParam(name = "employeeId", value = "(*) Mã nhân viên", defaultValue = "VNG-00001", required = false)
+                                     @RequestParam(name = "employeeId", required = false) String employeeId,
+                                     @ApiParam(name = "officeId", value = "(*) Mã chi nhánh", defaultValue = "CAMPUS", required = false)
+                                     @RequestParam(name = "officeId", required = false) String officeId,
+                                     @ApiParam(name = "department", value = "(*) Phòng ban/ bộ phận làm việc", defaultValue = "PMA", required = false)
+                                     @RequestParam(name = "department", required = false) String department,
+                                     @ApiParam(name = "title", value = "(*) Chức danh/ Cấp độ nhân viên", defaultValue = "Junior Developer", required = false)
+                                     @RequestParam(name = "title", required = false) String title,
+                                     @ApiParam(name = "fullName", value = "Họ tên", defaultValue = "NGUYỄN ANH DUY", required = true)
+                                     @RequestParam(name = "fullName", required = true) String fullName,
+                                     @ApiParam(name = "birthDate", value = "Ngày sinh (yyyy-MM-dd)", defaultValue = "1998-09-27", required = true)
+                                     @RequestParam(name = "birthDate", required = true) String birthDate,
+                                     @ApiParam(name = "email", value = "Email", defaultValue = "naduy.hcmus@gmail.com", required = true)
+                                     @RequestParam(name = "email", required = true) String email,
+                                     @ApiParam(name = "identityCardNo", value = "CMND", defaultValue = "272683901", required = true)
+                                     @RequestParam(name = "identityCardNo", required = true) String identityCardNo,
+                                     @ApiParam(name = "phoneNumber", value = "SDT", defaultValue = "0948202709", required = true)
+                                     @RequestParam(name = "phoneNumber", required = true) String phoneNumber,
+                                     @ApiParam(name = "address", value = "Địa chỉ nơi ở", defaultValue = "TPHCM", required = true)
+                                     @RequestParam(name = "address", required = true) String address,
                                      @ApiParam(value = "[Multipart/form-data] Avatar mới cần update", required = true)
-                                         @RequestParam(name = "avatar") MultipartFile avatar) {
+                                         @RequestParam(name = "avatar", required = false) MultipartFile avatar) {
         BaseResponse<EmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        response.setReturnMessage("Cập nhật thông tin thành công");
         String oldAvatar = "";
         try {
-            EmployeeInfo user = service.findById(new EmployeeInfo.Key(companyId, username));
-            if (user == null) {
+            EmployeeInfo model = new EmployeeInfo(companyId, username, employeeId, officeId, department, title, fullName,
+                    null, email, identityCardNo, phoneNumber, address, StringUtil.EMPTY);
+            model.setBirthDate(birthDate);
+
+            log.info("[UpdateUserInfo] EmployeeInfo: " + StringUtil.toJsonString(model));
+
+            // validate model
+            String errorMessage = model.isValid();
+            if (!errorMessage.isEmpty()) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(errorMessage);
+                return response;
+            }
+
+            // find current user in db
+            EmployeeInfo oldUser = service.findById(new EmployeeInfo.Key(companyId, username));
+            if (oldUser == null) {
                 response = new BaseResponse<>(ReturnCodeEnum.USER_NOT_FOUND);
                 response.setReturnMessage(String.format("Không tìm thấy người dùng [%s-%s]",
                         StringUtil.valueOf(companyId), StringUtil.valueOf(username)));
                 return response;
             }
 
-            String fileName = String.format("%s_%s", companyId, username);
-            String newAvatar = driveService.uploadAvatar(avatar, fileName);
+            model.refillImmutableValue(oldUser);
 
-            if (newAvatar == null) {
-                throw new Exception("driveService.uploadAvatar return null");
+            if (avatar != null) {
+                String fileName  = String.format("%s_%s", companyId, username);
+                String newAvatar = driveService.uploadAvatar(avatar, fileName);
+
+                if (newAvatar == null) {
+                    throw new Exception("driveService.uploadAvatar return null");
+                }
+
+                // save old avatar to delete
+                oldAvatar = oldUser.getAvatar();
+
+                // set new avatar
+                model.setAvatar(newAvatar);
             }
 
-            // save old avatar to delete
-            oldAvatar = user.getAvatar();
-
-            // set new avatar
-            user.setAvatar(newAvatar);
-
             // update to db
-            user = service.update(user);
+            model = service.update(model);
 
             // set response
-            response.data = user;
+            response.data = model;
         } catch (Exception e){
-            log.error(String.format("[changeAvatar] [%s - %s] ex", companyId, username), e);
+            log.error(String.format("[updateUserInfo] [%s - %s] ex", companyId, username), e);
             response = new BaseResponse<>(e);
         } finally {
-            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
                 // delete old file on gg drive
-                String fileId = StringUtil.getFileIdFromImage(oldAvatar);
-                if (!fileId.isEmpty()) {
-                    driveService.deleteFile(fileId);
+                if (avatar != null) {
+                    String fileId = StringUtil.getFileIdFromImage(oldAvatar);
+                    if (!fileId.isEmpty()) {
+                        driveService.deleteFile(fileId);
+                    }
                 }
                 // reset cache
                 redisUserInfo.setUserInfo(response.data);

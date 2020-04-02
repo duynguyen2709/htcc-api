@@ -135,3 +135,7 @@
 27-03-2020:
  + Version 1.4.2:
     - [Employee & Admin] Change Avatar
+
+28-03-2020:
+ + Version 1.4.3:
+    - [Employee] Merge Change Avatar & UpdateUserInfo

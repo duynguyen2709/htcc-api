@@ -33,6 +33,7 @@ public class GoogleDriveService {
     @Async("asyncExecutor")
     public CompletableFuture<String> uploadComplaintImage(MultipartFile multipartFile, String fileName) {
         java.io.File tempFile = null;
+        long start = System.currentTimeMillis();
         try {
             tempFile = java.io.File.createTempFile("temp", null);
             tempFile.deleteOnExit();
@@ -50,9 +51,12 @@ public class GoogleDriveService {
                     .setFields("id")
                     .execute();
 
-            log.info(String.format("[uploadComplaintImage] Uploaded Filename [%s] - Content Type [%s] - Id [%s] Succeed",
+            log.info(String.format("[uploadComplaintImage] Uploaded Filename [%s] - Content Type [%s]" +
+                            "- File Size [%s] - Total Time [%sms] - Id [%s] Succeed",
                     fileName,
                     multipartFile.getContentType(),
+                    multipartFile.getSize(),
+                    (System.currentTimeMillis() - start),
                     uploadedFile.getId()));
 
             return CompletableFuture.completedFuture(Constant.GOOGLE_DRIVE_IMAGE_FORMAT + uploadedFile.getId());
@@ -69,6 +73,7 @@ public class GoogleDriveService {
 
     public String uploadAvatar(MultipartFile multipartFile, String fileName) {
         java.io.File tempFile = null;
+        long start = System.currentTimeMillis();
         try {
             tempFile = java.io.File.createTempFile("temp", null);
             tempFile.deleteOnExit();
@@ -86,9 +91,12 @@ public class GoogleDriveService {
                     .setFields("id")
                     .execute();
 
-            log.info(String.format("[uploadAvatar] Uploaded Filename [%s] - Content Type [%s] - Id [%s] Succeed",
+            log.info(String.format("[uploadAvatar] Uploaded Filename [%s] - Content Type [%s]" +
+                            " - File Size [%s] - Total Time [%sms] -  Id [%s] Succeed",
                     fileName,
                     multipartFile.getContentType(),
+                    multipartFile.getSize(),
+                    (System.currentTimeMillis() - start),
                     uploadedFile.getId()));
 
             return Constant.GOOGLE_DRIVE_IMAGE_FORMAT + uploadedFile.getId();
