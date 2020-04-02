@@ -1,4 +1,4 @@
-package htcc.admin.service.service;
+package htcc.admin.service.service.rest;
 
 import htcc.common.constant.Constant;
 import htcc.common.entity.base.BaseResponse;
@@ -17,7 +17,6 @@ public class LogService {
     private RestTemplate restTemplate;
 
     private static final String baseURL = String.format("http://%s/internal/logs", Constant.HTCC_LOG_SERVICE);
-
 
     public BaseResponse getListComplaintLogByMonth(String yyyyMM) {
         int receiverType = 1;

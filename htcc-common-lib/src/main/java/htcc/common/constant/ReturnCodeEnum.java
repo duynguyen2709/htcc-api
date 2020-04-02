@@ -27,6 +27,8 @@ public enum ReturnCodeEnum {
     DATE_WRONG_FORMAT(-14, "Định dạng ngày tháng không hợp lệ"),
     MAXIMUM_FILES_EXCEED(-15, "Chỉ cho upload tối đa 3 ảnh"),
     MAXIMUM_FILE_SIZE_EXCEED(-16, "Chỉ cho upload tối đa ảnh tối đa 10MB"),
+    DATA_NOT_FOUND(-17, "Không tìm thấy dữ liệu"),
+    DATA_ALREADY_EXISTED(-18, "Dữ liệu đã tồn tại"),
     ;
 
     private final int value;

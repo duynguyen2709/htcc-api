@@ -144,3 +144,6 @@
  + Version 1.4.4:
     - [Employee] Redis Lock on Post new Complaint => GetListComplaint wait for unlock
     - [Gateway] Exception Handler for Maximum File Size Upload
+
+ + Version 1.4.5:
+     - [Employee & Admin] REST Api For Company CRUD

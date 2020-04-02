@@ -1,6 +1,7 @@
 package htcc.admin.service.service;
 
 import com.google.gson.reflect.TypeToken;
+import htcc.admin.service.service.rest.LogService;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintModel;

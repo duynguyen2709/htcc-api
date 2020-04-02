@@ -31,9 +31,6 @@ public class CompanyUser extends BaseJPAEntity {
     public String password = "";
 
     @Column
-    public String email = "";
-
-    @Column
     public int role = 0;
 
     @Column
