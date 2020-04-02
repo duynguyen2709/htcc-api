@@ -32,6 +32,9 @@ public class StringUtil {
     }
 
     public static String toJsonString(Object obj) {
+        if (obj == null) {
+            return EMPTY;
+        }
         return gson.toJson(obj);
     }
 
@@ -101,4 +104,17 @@ public class StringUtil {
         return fileId;
     }
 
+    public static String genEmployeeId(String companyId, int id){
+        if (id < 10) {
+            return String.format("%s-0000%s", companyId, id);
+        } else if (id < 100) {
+            return String.format("%s-000%s", companyId, id);
+        } else if (id < 1000) {
+            return String.format("%s-00%s", companyId, id);
+        } else if (id < 10000) {
+            return String.format("%s-0%s", companyId, id);
+        } else {
+            return String.format("%s-%s", companyId, id);
+        }
+    }
 }

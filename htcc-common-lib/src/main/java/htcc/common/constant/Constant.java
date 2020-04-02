@@ -28,4 +28,5 @@ public class Constant {
 
     public static final String HTCC_LOG_SERVICE      = "htcc-log-service";
     public static final String HTCC_EMPLOYEE_SERVICE = "htcc-employee-service";
+    public static final String HTCC_GATEWAY_SERVICE = "htcc-gateway-service";
 }

@@ -1,8 +1,11 @@
 package htcc.gateway.service.entity.jpa.company;
 
-import htcc.common.constant.AccountStatusEnum;
+import htcc.common.entity.companyuser.CompanyUserModel;
 import htcc.common.entity.jpa.BaseJPAEntity;
+import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +14,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -21,14 +27,48 @@ import java.util.Objects;
 @AllArgsConstructor
 public class CompanyUser extends BaseJPAEntity {
 
+    public CompanyUser(CompanyUserModel model) {
+        this.companyId = model.companyId;
+        this.username = model.username;
+        this.password = model.password;
+        this.email = model.email;
+        this.phoneNumber = model.phoneNumber;
+        this.status = model.status;
+    }
+
+    public CompanyUserModel fromEntity() {
+        CompanyUserModel model = new CompanyUserModel();
+        model.companyId = this.companyId;
+        model.username = this.username;
+        model.email = this.email;
+        model.phoneNumber = this.phoneNumber;
+        model.status = this.status;
+        model.password = null;
+        return model;
+    }
+
     @Id
+    @NotEmpty
     public String companyId = "";
 
     @Id
+    @NotEmpty
     public String username = "";
 
     @Column
+    @NotEmpty
+    @Size(min = 6, message = "Mật khẩu ít nhất 6 kí tự")
     public String password = "";
+
+    @Column
+    @NotEmpty
+    @Email(message = "Không đúng định dạng email")
+    public String email = "";
+
+    @Column
+    @NotEmpty
+    @Size(min = 10, max = 20, message = "Số điện thoại, ít nhất 10 chữ số")
+    public String phoneNumber = "";
 
     @Column
     public int role = 0;
@@ -38,8 +78,14 @@ public class CompanyUser extends BaseJPAEntity {
 
     @Override
     public String isValid() {
-        if (AccountStatusEnum.fromInt(status) == null) {
-            return String.format("Trạng thái %s không hợp lệ", status);
+
+        if (StringUtil.valueOf(phoneNumber).length() < 10 ||
+                NumberUtil.getLongValue(phoneNumber) == 0L) {
+            return String.format("Số điện thoại %s không phù hợp định dạng", phoneNumber);
+        }
+
+        if (!StringUtil.isEmail(email)) {
+            return String.format("Email %s không phù hợp định dạng email", email);
         }
 
         return StringUtil.EMPTY;

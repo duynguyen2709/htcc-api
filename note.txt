@@ -146,4 +146,5 @@
     - [Gateway] Exception Handler for Maximum File Size Upload
 
  + Version 1.4.5:
-     - [Employee & Admin] REST Api For Company CRUD
+     - [Employee & Admin & Gateway] REST Api For Company & CompanyUser CRUD;
+            Kafka for synchronize email & phoneNumber of CompanyUser

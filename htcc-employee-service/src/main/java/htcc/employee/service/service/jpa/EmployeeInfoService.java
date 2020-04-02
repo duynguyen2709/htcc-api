@@ -22,6 +22,10 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
         return repo.findAll();
     }
 
+    public List<EmployeeInfo> findByCompanyId(String companyId) {
+        return repo.findByCompanyId(companyId);
+    }
+
     @Override
     public EmployeeInfo findById(EmployeeInfo.Key key) {
         Optional<EmployeeInfo> user = repo.findById(key);

@@ -34,10 +34,16 @@ redis:
   nodeAddresses: 127.0.0.1:6379
 
 kafka:
-  enableProducer: false
-  enableConsumer: false
+  enableProducer: true
+  enableConsumer: true
   bootstrapAddress: 127.0.0.1:9092
   buz:
     apiLog:
       topicName: API-LOG
       groupId: API-LOG
+    eventUpdateCompanyUser:
+      topicName: EVENT-UPDATE-COMPANY-USER
+      groupId: EVENT-UPDATE-COMPANY-USER
+    eventUpdateEmployeeInfo:
+      topicName: EVENT-UPDATE-EMPLOYEE-INFO
+      groupId: EVENT-UPDATE-EMPLOYEE-INFO

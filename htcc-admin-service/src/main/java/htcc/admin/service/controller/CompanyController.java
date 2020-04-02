@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
 
-@Api(tags = "Company REST APIs",
+@Api(tags = "API quản lý Công Ty",
      description = "API quản lý danh sách công ty")
 @RestController
 @Log4j2

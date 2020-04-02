@@ -8,6 +8,7 @@ import htcc.employee.service.service.jpa.CompanyService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @Log4j2
 @RequestMapping("/internal")
+@ApiIgnore
 public class InternalCompanyController {
 
     @Autowired
