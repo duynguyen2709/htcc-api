@@ -27,6 +27,12 @@ spring:
     schemaName: HTCC_Log
     server: 127.0.0.1:3306
 
+redis:
+  useRedis: true
+  password:
+  useMaster: false
+  nodeAddresses: 127.0.0.1:6379
+
 kafka:
   enableProducer: false
   enableConsumer: true

@@ -1,6 +1,5 @@
 package htcc.employee.service.controller;
 
-import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintModel;
@@ -9,7 +8,6 @@ import htcc.common.entity.complaint.ComplaintResponse;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.ComplaintService;
-import htcc.employee.service.service.GoogleDriveService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -19,10 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Api(tags = "API phản hồi/ khiếu nại",
      description = "API để phản hồi/ khiếu nại của nhân viên")
@@ -32,6 +27,7 @@ public class ComplaintController {
 
     @Autowired
     private ComplaintService service;
+
 
 
     @ApiOperation(value = "Gửi khiếu nại", response = BaseResponse.class)
