@@ -148,3 +148,7 @@
  + Version 1.4.5:
      - [Employee & Admin & Gateway] REST Api For Company & CompanyUser CRUD;
             Kafka for synchronize email & phoneNumber of CompanyUser
+
+04-04-2020:
+ + Version 1.4.6:
+    - [Employee] API GetListContact
