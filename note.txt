@@ -152,3 +152,4 @@
 04-04-2020:
  + Version 1.4.6:
     - [Employee] API GetListContact
+    - Change CountPendingComplaint to LogCounter
