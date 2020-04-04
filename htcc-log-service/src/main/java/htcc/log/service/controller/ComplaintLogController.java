@@ -7,7 +7,9 @@ import htcc.common.entity.complaint.ComplaintModel;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.entity.log.ComplaintLogEntity;
 import htcc.common.util.StringUtil;
+import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.repository.ComplaintLogRepository;
+import htcc.log.service.repository.LogCounterRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,8 @@ public class ComplaintLogController {
     @Autowired
     private ComplaintLogRepository complaintRepo;
 
+    @Autowired
+    private LogCounterRepository logCounterRepo;
 
     @GetMapping("/complaint/{companyId}/{username}/{yyyyMM}")
     public BaseResponse getComplaintLog(@PathVariable String companyId,
@@ -48,6 +52,7 @@ public class ComplaintLogController {
 
 
 
+    // get complaint log by receiverType, call by web to handle complaint
     @GetMapping("/complaint/{receiverType}/{yyyyMM}")
     public BaseResponse getComplaintLogByReceiverType(@PathVariable int receiverType,
                                                     @PathVariable String yyyyMM,
@@ -79,7 +84,38 @@ public class ComplaintLogController {
 
 
 
+    @GetMapping("/complaint/count/{receiverType}")
+    public BaseResponse countPendingComplaintLogByReceiverType(@PathVariable int receiverType,
+                                                      @RequestParam(required = false) String companyId){
+        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        int count = 0;
+        try {
+            final String logType = "ComplaintLog";
+            String params = "1";
 
+            if (receiverType == 2) {
+                params = "2-" + StringUtil.valueOf(companyId);
+            }
+
+            List<LogCounter> list = logCounterRepo.findByLogTypeAndParams(logType, params);
+            if (!list.isEmpty()) {
+                for (LogCounter counter : list) {
+                    count += counter.count;
+                }
+            }
+
+            response.data = count;
+        } catch (Exception e) {
+            log.error(String.format("[countPendingComplaintLogByReceiverType] [%s-%s] ex", receiverType, StringUtil.valueOf(companyId)), e);
+            return new BaseResponse(e);
+        }
+        return response;
+    }
+
+
+
+
+    // update complaint status, call by web
     @PostMapping("/complaint/status")
     public BaseResponse updateComplaintStatus(@RequestBody UpdateComplaintStatusModel request){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);

@@ -14,4 +14,6 @@ public interface ComplaintLogRepository {
     void updateComplaintLogStatus(UpdateComplaintStatusModel model);
 
     ComplaintLogEntity getComplaint(UpdateComplaintStatusModel model);
+
+    void increaseComplaintLogCounter(UpdateComplaintStatusModel model);
 }

@@ -32,18 +32,20 @@ public class RedisComplaintService {
         }
     }
 
-    public void unlockWriteLock(String companyId, String username, String yyyyMM, ICallback cb) {
+    public Object unlockWriteLock(String companyId, String username, String yyyyMM, ICallback cb) {
         String key1 = String.format(COMPLAINT_EMPLOYEE_COUNTDOWN_LACK, StringUtil.valueOf(companyId),StringUtil.valueOf(username), yyyyMM);
 
         RCountDownLatch latch1 = redis.getInstance().getCountDownLatch(key1);
 
         try {
-            cb.callback();
+            return cb.callback();
         } catch (Exception e) {
             log.error("[unlockWriteLock] ex", e);
         } finally {
             latch1.countDown();
         }
+
+        return null;
     }
 
     public Object readLockForEmployee(String companyId, String username, String yyyyMM, ICallback cb) {
