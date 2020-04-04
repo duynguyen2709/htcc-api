@@ -40,6 +40,9 @@ public class ComplaintService {
         return result;
     }
 
+    public BaseResponse countPendingComplaint() {
+        return logService.countPendingComplaintLog();
+    }
 
     public BaseResponse updateComplaintStatus(UpdateComplaintStatusModel model) {
         return logService.updateComplaintStatus(model);
