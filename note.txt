@@ -153,3 +153,7 @@
  + Version 1.4.6:
     - [Employee] API GetListContact
     - Change CountPendingComplaint to LogCounter
+
+05-04-2020:
+ + Version 1.4.7:
+    - [Employee] add FullTextSearch fullName in API GetListContact

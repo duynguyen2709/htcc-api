@@ -37,6 +37,8 @@ public class ContactController {
                                        @RequestParam(required = false) String officeId,
                                        @ApiParam(name = "department", value = "[QueryString] Mã phòng ban", defaultValue = "PMA", required = false)
                                        @RequestParam(required = false) String department,
+                                       @ApiParam(name = "search", value = "[QueryString] Search theo mã nhân viên/ họ tên", required = false)
+                                       @RequestParam(required = false) String search,
                                        @ApiParam(name = "index", value = "[QueryString] Phân trang (0,1,2...)", defaultValue = "0", required = false)
                                        @RequestParam(required = false, defaultValue = "0") Integer index,
                                        @ApiParam(name = "size", value = "[QueryString] Số record mỗi trang (0 = lấy toàn bộ), nếu khác 0 cần gửi thêm index để lấy trang tiếp theo",
@@ -44,7 +46,15 @@ public class ContactController {
                                        @RequestParam(required = false, defaultValue = "0") Integer size) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         try {
-            List<EmployeeInfo> listEmployee = employeeService.findByCompanyId(companyId);
+            List<EmployeeInfo> listEmployee = new ArrayList<>();
+
+            if (StringUtil.isEmpty(search)) {
+                listEmployee = employeeService.findByCompanyId(companyId);
+            } else {
+                listEmployee = employeeService.findByFullTextSearch(search)
+                        .stream().filter(e -> e.getCompanyId().equals(companyId))
+                        .collect(Collectors.toList());
+            }
 
             if (!StringUtil.isEmpty(officeId)) {
                 // filter by office
