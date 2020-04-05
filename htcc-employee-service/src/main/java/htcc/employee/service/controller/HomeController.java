@@ -53,15 +53,13 @@ public class HomeController {
 
     private void countPendingComplaint(HomeResponse data, String companyId){
         int count = 0;
-        String yyyyMM = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMM");
-        List<ComplaintResponse> list = complaintService.getListComplaintLogByCompany(companyId, yyyyMM);
-
-        if (list != null && !list.isEmpty()) {
-            for (ComplaintResponse complaintResponse : list) {
-                if (complaintResponse.getStatus() == ComplaintStatusEnum.PROCESSING.getValue()) {
-                    count++;
-                }
+        try {
+            BaseResponse response = complaintService.countPendingComplaint(companyId);
+            if (response != null && response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+                count = (int) response.getData();
             }
+        } catch (Exception e) {
+            log.error("[countPendingComplaint] {} ex", companyId, e);
         }
         data.setPendingComplaint(count);
     }

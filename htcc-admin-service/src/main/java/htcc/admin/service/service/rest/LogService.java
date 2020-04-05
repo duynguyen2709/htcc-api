@@ -1,4 +1,4 @@
-package htcc.admin.service.service;
+package htcc.admin.service.service.rest;
 
 import htcc.common.constant.Constant;
 import htcc.common.entity.base.BaseResponse;
@@ -18,10 +18,15 @@ public class LogService {
 
     private static final String baseURL = String.format("http://%s/internal/logs", Constant.HTCC_LOG_SERVICE);
 
-
     public BaseResponse getListComplaintLogByMonth(String yyyyMM) {
         int receiverType = 1;
         String method = String.format("/complaint/%s/%s",receiverType, yyyyMM);
+        return callGet(method);
+    }
+
+    public BaseResponse countPendingComplaintLog() {
+        int receiverType = 1;
+        String method = String.format("/complaint/count/%s",receiverType);
         return callGet(method);
     }
 

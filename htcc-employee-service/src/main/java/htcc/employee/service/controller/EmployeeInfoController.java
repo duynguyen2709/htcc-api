@@ -1,5 +1,6 @@
 package htcc.employee.service.controller;
 
+import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.util.StringUtil;
@@ -31,6 +32,9 @@ public class EmployeeInfoController {
 
     @Autowired
     private GoogleDriveService driveService;
+
+    @Autowired
+    private KafkaProducerService kafka;
 
 
 
@@ -86,13 +90,15 @@ public class EmployeeInfoController {
                                      @RequestParam(name = "phoneNumber", required = true) String phoneNumber,
                                      @ApiParam(name = "address", value = "Địa chỉ nơi ở", defaultValue = "TPHCM", required = true)
                                      @RequestParam(name = "address", required = true) String address,
-                                     @ApiParam(value = "[Multipart/form-data] Avatar mới cần update", required = true)
+                                     @ApiParam(value = "[Multipart/form-data] Avatar mới cần update", required = false)
                                          @RequestParam(name = "avatar", required = false) MultipartFile avatar) {
         BaseResponse<EmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Cập nhật thông tin thành công");
         String oldAvatar = "";
+        boolean needUpdate = false;
+        EmployeeInfo model = null;
         try {
-            EmployeeInfo model = new EmployeeInfo(companyId, username, employeeId, officeId, department, title, fullName,
+            model = new EmployeeInfo(companyId, username, employeeId, officeId, department, title, fullName,
                     null, email, identityCardNo, phoneNumber, address, StringUtil.EMPTY);
             model.setBirthDate(birthDate);
 
@@ -113,6 +119,12 @@ public class EmployeeInfoController {
                 response.setReturnMessage(String.format("Không tìm thấy người dùng [%s-%s]",
                         StringUtil.valueOf(companyId), StringUtil.valueOf(username)));
                 return response;
+            }
+
+            // check need send kafka
+            if (!oldUser.getEmail().equals(model.getEmail()) ||
+                    !oldUser.getPhoneNumber().equals(model.getPhoneNumber())) {
+                needUpdate = true;
             }
 
             model.refillImmutableValue(oldUser);
@@ -137,6 +149,7 @@ public class EmployeeInfoController {
 
             // set response
             response.data = model;
+
         } catch (Exception e){
             log.error(String.format("[updateUserInfo] [%s - %s] ex", companyId, username), e);
             response = new BaseResponse<>(e);
@@ -151,6 +164,11 @@ public class EmployeeInfoController {
                 }
                 // reset cache
                 redisUserInfo.setUserInfo(response.data);
+
+                // send kafka
+                if (needUpdate) {
+                    kafka.sendMessage(kafka.getBuzConfig().eventUpdateEmployeeInfo.topicName, model);
+                }
             }
         }
         return response;

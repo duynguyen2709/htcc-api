@@ -1,23 +1,20 @@
 package htcc.log.service.repository.impl;
 
+import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
-import htcc.common.entity.log.CheckInLogEntity;
 import htcc.common.entity.log.ComplaintLogEntity;
-import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.log.service.mapper.CheckInLogRowMapper;
+import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.mapper.ComplaintLogRowMapper;
 import htcc.log.service.repository.ComplaintLogRepository;
+import htcc.log.service.service.jpa.LogCounterService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -26,6 +23,9 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private LogCounterService logCounterService;
 
     @Override
     public List<ComplaintLogEntity> getComplaintLog(String companyId, String username, String yyyyMM) {
@@ -62,6 +62,7 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
 
 
     @Override
+    @Transactional
     public void updateComplaintLogStatus(UpdateComplaintStatusModel model) {
         try {
             String tableName = "ComplaintLog" + model.getYyyyMM();
@@ -69,12 +70,82 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
             String query = String.format("UPDATE %s SET status = ?, response = ? WHERE complaintId='%s'",
                     tableName, model.getComplaintId());
 
-            jdbcTemplate.update(query, model.getStatus(), model.getResponse());
+            int rowAffected = jdbcTemplate.update(query, model.getStatus(), model.getResponse());
+            if (rowAffected == 1) {
+                decreaseComplaintLogCounter(model);
+            }
 
         } catch (Exception e) {
             log.error(String.format("[updateComplaintLogStatus] [%s] ex ", StringUtil.toJsonString(model)), e);
         }
     }
+
+    private void decreaseComplaintLogCounter(UpdateComplaintStatusModel model){
+        final String logType = "ComplaintLog";
+
+        ComplaintLogEntity entity = getComplaint(model);
+        String params = "";
+        if (entity.getReceiverType() == 1) {
+            params = "1";
+        } else {
+            params = entity.getReceiverType() + "-" + entity.getCompanyId();
+        }
+
+        LogCounter logCounter = logCounterService.findById(new LogCounter.Key(logType, model.yyyyMM, params));
+
+        // new log insert
+        if (logCounter == null) {
+            List<ComplaintLogEntity> list = getComplaintLogByReceiverType(entity.getReceiverType(), model.yyyyMM);
+            int pendingCount = (int) list.stream()
+                    .filter(c -> c.getStatus() == ComplaintStatusEnum.PROCESSING.getValue())
+                    .count();
+
+            int newCount = 0;
+            if (pendingCount > 0){
+                newCount = pendingCount -1 ;
+            }
+
+            logCounter = new LogCounter(logType, model.yyyyMM, params, newCount);
+        } else {
+            // update current counter
+            int newCount = 0;
+            if (logCounter.getCount() > 0) {
+                newCount = logCounter.getCount() - 1;
+            }
+
+            logCounter.setCount(newCount);
+        }
+
+        logCounterService.update(logCounter);
+    }
+
+    @Override
+    public void increaseComplaintLogCounter(UpdateComplaintStatusModel model){
+        final String logType = "ComplaintLog";
+
+        ComplaintLogEntity entity = getComplaint(model);
+        String params = "";
+        if (entity.getReceiverType() == 1) {
+            params = "1";
+        } else {
+            params = entity.getReceiverType() + "-" + entity.getCompanyId();
+        }
+
+        LogCounter logCounter = logCounterService.findById(new LogCounter.Key(logType, model.yyyyMM, params));
+
+        // new log insert
+        if (logCounter == null) {
+            int newCount = 1;
+            logCounter = new LogCounter(logType, model.yyyyMM, params, newCount);
+        } else {
+            // update current counter
+            int newCount = logCounter.getCount() + 1;
+            logCounter.setCount(newCount);
+        }
+
+        logCounterService.update(logCounter);
+    }
+
 
     @Override
     public ComplaintLogEntity getComplaint(UpdateComplaintStatusModel model) {

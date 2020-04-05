@@ -77,7 +77,9 @@ public class ComplaintService {
         };
     }
 
-
+    public BaseResponse countPendingComplaint(String companyId) {
+        return logService.countPendingComplaintLogByCompany(companyId);
+    }
 
 
     /*

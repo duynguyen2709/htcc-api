@@ -31,6 +31,12 @@ public class LogService {
         return callGet(method);
     }
 
+    public BaseResponse countPendingComplaintLogByCompany(String companyId) {
+        int receiverType = 2;
+        String method = String.format("/complaint/count/%s?companyId=%s",receiverType, companyId);
+        return callGet(method);
+    }
+
 
     public BaseResponse updateComplaintStatus(UpdateComplaintStatusModel model) {
         HttpEntity<UpdateComplaintStatusModel> request = new HttpEntity<>(model);

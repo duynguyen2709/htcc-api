@@ -44,9 +44,31 @@ ribbon:
   ServerListRefreshInterval: 2000
   eager-load:
     enabled: true
-    clients: htcc-log-service
+    clients: htcc-log-service, htcc-employee-service, htcc-gateway-service
 
 htcc-log-service:
+  ribbon:
+    eureka:
+      enabled: true
+    MaxAutoRetries: 2
+    MaxAutoRetriesNextServer: 2
+    OkToRetryOnAllOperations: true
+    ReadTimeout: 30000
+    ConnectTimeout: 30000
+    ServerListRefreshInterval: 2000
+
+htcc-employee-service:
+  ribbon:
+    eureka:
+      enabled: true
+    MaxAutoRetries: 2
+    MaxAutoRetriesNextServer: 2
+    OkToRetryOnAllOperations: true
+    ReadTimeout: 30000
+    ConnectTimeout: 30000
+    ServerListRefreshInterval: 2000
+
+htcc-gateway-service:
   ribbon:
     eureka:
       enabled: true

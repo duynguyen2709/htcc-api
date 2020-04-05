@@ -37,7 +37,7 @@ redis:
 
 kafka:
   enableProducer: true
-  enableConsumer: false
+  enableConsumer: true
   bootstrapAddress: 127.0.0.1:9092,10.25.96.4:9092
   buz:
     checkinLog:
@@ -49,3 +49,9 @@ kafka:
     complaintLog:
       topicName: COMPLAINT-LOG
       groupId: COMPLAINT-LOG
+    eventUpdateCompanyUser:
+      topicName: EVENT-UPDATE-COMPANY-USER
+      groupId: EVENT-UPDATE-COMPANY-USER
+    eventUpdateEmployeeInfo:
+      topicName: EVENT-UPDATE-EMPLOYEE-INFO
+      groupId: EVENT-UPDATE-EMPLOYEE-INFO

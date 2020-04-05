@@ -42,35 +42,30 @@ public class EmployeeInfo extends BaseJPAEntity {
     public String username = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "(*) Mã nhân viên",
                       example = "VNG-00001")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String employeeId = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "(*) Mã chi nhánh",
                       example = "CAMPUS")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String officeId = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "(*) Phòng ban/ bộ phận làm việc",
                       example = "PMA")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String department = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "(*) Chức danh/ Cấp độ nhân viên",
                       example = "Junior Developer")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String title = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "Họ tên",
                       example = "NGUYỄN ANH DUY")
     public String fullName = "";
@@ -81,26 +76,21 @@ public class EmployeeInfo extends BaseJPAEntity {
     public Date birthDate;
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "Email",
                       example = "naduy.hcmus@gmail.com")
     public String email = "";
 
     @Column
-    @Size(min = 9, max = 12, message = "CMND, ít nhất 9 chữ số")
     @ApiModelProperty(notes = "Số CMND",
                       example = "012345678")
     public String identityCardNo = "";
 
     @Column
-    @NotEmpty
-    @Size(min = 10, max = 20, message = "Số điện thoại, ít nhất 10 chữ số")
     @ApiModelProperty(notes = "Sđt, ít nhất 10 chữ số",
                       example = "0948202709")
     public String phoneNumber = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "Địa chỉ nơi ở",
                       example = "Quận 7, TPHCM")
     public String address = "";

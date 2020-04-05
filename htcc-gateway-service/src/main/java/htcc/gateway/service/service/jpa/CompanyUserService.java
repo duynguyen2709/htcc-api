@@ -22,6 +22,10 @@ public class CompanyUserService extends BaseJPAService<CompanyUser, CompanyUser.
         return repo.findAll();
     }
 
+    public List<CompanyUser> findByCompanyId(String companyId) {
+        return repo.findByCompanyId(companyId);
+    }
+
     @Override
     public CompanyUser findById(CompanyUser.Key key) {
         Optional<CompanyUser> companyUser = repo.findById(key);
@@ -42,4 +46,5 @@ public class CompanyUserService extends BaseJPAService<CompanyUser, CompanyUser.
     public void delete(CompanyUser.Key key) {
         repo.deleteById(key);
     }
+
 }
