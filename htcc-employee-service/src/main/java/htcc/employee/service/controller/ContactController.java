@@ -6,7 +6,7 @@ import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.entity.ContactFilterEntity;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
-import htcc.employee.service.util.EmployeeIdComparator;
+import htcc.common.comparator.EmployeeIdComparator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

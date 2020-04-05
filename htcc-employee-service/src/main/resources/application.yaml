@@ -68,6 +68,13 @@ service:
   debugMode: false
   allowDeleteCheckin: false
   maxFileSize: 10000000
+  leavingRequestCategoryList:
+    - "Nghỉ phép năm"
+    - "Nghỉ bệnh"
+    - "Nghỉ thai sản"
+    - "Nghỉ phép không hưởng lương"
+    - "Nghỉ bù do làm thêm giờ"
+
 
 ################## Redis Config ##################
 redis:
@@ -93,3 +100,25 @@ drive:
     errorImage: "https://drive.google.com/uc?export=view&id=1FegKvZI8zJC29v8o1G3ybCozFcae0F9l"
     complaintImageFolder: "1F1kuTmYLs2Ch_dPkUOK_nKkveC3n1l-t"
     avatarImageFolder: "1dPURbxh3Xbv0AHwRufGrbKy1W_DNzRtw"
+
+################## Kafka Config ##################
+kafka:
+  buz:
+    checkInLog:
+      topicName: CHECKIN-LOG
+      groupId: CHECKIN-LOG
+    checkOutLog:
+      topicName: CHECKOUT-LOG
+      groupId: CHECKOUT-LOG
+    complaintLog:
+      topicName: COMPLAINT-LOG
+      groupId: COMPLAINT-LOG
+    leavingRequestLog:
+      topicName: LEAVING-REQUEST-LOG
+      groupId: LEAVING-REQUEST-LOG
+    eventUpdateCompanyUser:
+      topicName: EVENT-UPDATE-COMPANY-USER
+      groupId: EVENT-UPDATE-COMPANY-USER
+    eventUpdateEmployeeInfo:
+      topicName: EVENT-UPDATE-EMPLOYEE-INFO
+      groupId: EVENT-UPDATE-EMPLOYEE-INFO

@@ -9,6 +9,7 @@ public class KafkaBuzConfig {
     public KafkaTopicConfig checkInLog;
     public KafkaTopicConfig checkOutLog;
     public KafkaTopicConfig complaintLog;
+    public KafkaTopicConfig leavingRequestLog;
     public KafkaTopicConfig eventUpdateCompanyUser;
     public KafkaTopicConfig eventUpdateEmployeeInfo;
 

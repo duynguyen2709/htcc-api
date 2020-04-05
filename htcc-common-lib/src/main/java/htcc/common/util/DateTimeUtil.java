@@ -15,6 +15,17 @@ public class DateTimeUtil {
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final String HHMM_FORMAT = "HH:mm";
 
+    public static String convertToOtherFormat(String raw, String sourceFormat, String targetFormat){
+        try {
+            Date d = parseStringToDate(raw, sourceFormat);
+            String newDate = parseDateToString(d, targetFormat);
+            return newDate;
+        } catch (Exception e){
+            log.warn("convertToOtherFormat {}, source format {}, target format {} , ex {}",
+                    raw, sourceFormat, targetFormat, e.getMessage());
+            return "";
+        }
+    }
 
     public static String parseTimestampToDateString(long timestamp){
         return parseTimestampToString(timestamp, DATETIME_FORMAT);
@@ -54,13 +65,17 @@ public class DateTimeUtil {
         return String.format("T%s", dayOfWeek);
     }
 
-    public static String parseDateToString(Date dt) {
+    public static String parseDateToString(Date dt, String format) {
         try {
-            return new SimpleDateFormat(DATE_FORMAT).format(dt);
+            return new SimpleDateFormat(format).format(dt);
         } catch (Exception e){
-            log.warn("parseDateToString {}", dt);
+            log.warn("parseDateToString {}, format {}, ex {}", dt, format, e.getMessage());
             return "";
         }
+    }
+
+    public static String parseDateToString(Date dt) {
+        return parseDateToString(dt, DATE_FORMAT);
     }
 
     public static Date parseStringToDate(String str, String format) {

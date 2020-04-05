@@ -101,7 +101,6 @@ public class EmployeeInfo extends BaseJPAEntity {
 
     @Override
     public String isValid() {
-        String error = "";
 
         if (StringUtil.isEmpty(fullName)) {
             return "Họ tên không được rỗng";

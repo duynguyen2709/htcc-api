@@ -51,6 +51,7 @@ public class CheckinController {
                 yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
             }
 
+            // TODO : GET REAL LOCATION FROM DB CONFIG MAP OF COMPANY
             CheckinResponse data = new CheckinResponse(yyyyMMdd);
 
             // get today checkin info

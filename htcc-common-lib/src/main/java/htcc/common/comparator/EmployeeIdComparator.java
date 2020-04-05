@@ -1,4 +1,4 @@
-package htcc.employee.service.util;
+package htcc.common.comparator;
 
 import htcc.common.entity.jpa.EmployeeInfo;
 
