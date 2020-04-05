@@ -137,4 +137,15 @@ public class DateTimeUtil {
         }
     }
 
+
+    public static boolean isBeforeToday(String date) {
+        try {
+            String today = parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+            Long todayNum = Long.parseLong(today);
+            Long dateNum = Long.parseLong(date);
+            return dateNum < todayNum;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

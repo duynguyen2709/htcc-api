@@ -1,5 +1,6 @@
 package htcc.common.entity.leavingrequest;
 
+import htcc.common.comparator.DateComparator;
 import htcc.common.constant.LeavingRequestSessionEnum;
 import htcc.common.entity.jpa.BaseJPAEntity;
 import htcc.common.util.DateTimeUtil;
@@ -76,6 +77,10 @@ public class LeavingRequest extends BaseJPAEntity {
         for (LeavingDayDetail d : detail) {
             if (DateTimeUtil.isRightFormat(d.date, "yyyyMMdd") == false) {
                 return String.format("Ngày %s không phù hợp định dạng yyyyMMdd", d.date);
+            }
+
+            if (DateTimeUtil.isBeforeToday(d.date)){
+                return "Không được đăng ký ngày trước hôm nay";
             }
 
             if (LeavingRequestSessionEnum.fromInt(d.session) == null) {

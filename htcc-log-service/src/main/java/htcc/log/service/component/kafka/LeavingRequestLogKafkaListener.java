@@ -1,7 +1,9 @@
 package htcc.log.service.component.kafka;
 
 import htcc.common.entity.checkin.CheckinModel;
+import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.log.CheckInLogEntity;
+import htcc.common.entity.log.LeavingRequestLogEntity;
 import htcc.common.service.kafka.BaseKafkaConsumer;
 import htcc.common.util.StringUtil;
 import htcc.log.service.repository.BaseLogDAO;
@@ -14,17 +16,17 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 @ConditionalOnProperty(value = "kafka.enableConsumer", havingValue = "true")
-@KafkaListener(topics = "#{kafkaFileConfig.buz.checkInLog.topicName}",
-               groupId = "#{kafkaFileConfig.buz.checkInLog.groupId}")
-public class CheckInLogKafkaListener extends BaseKafkaConsumer<CheckinModel> {
+@KafkaListener(topics = "#{kafkaFileConfig.buz.leavingRequestLog.topicName}",
+               groupId = "#{kafkaFileConfig.buz.leavingRequestLog.groupId}")
+public class LeavingRequestLogKafkaListener extends BaseKafkaConsumer<LeavingRequestModel> {
 
     @Autowired
     private BaseLogDAO repo;
 
     @Override
-    public void process(CheckinModel model) {
+    public void process(LeavingRequestModel model) {
         try {
-            CheckInLogEntity logEnt = new CheckInLogEntity(model);
+            LeavingRequestLogEntity logEnt = new LeavingRequestLogEntity(model);
             repo.insertLog(logEnt);
         } catch (Exception e) {
             log.error("process {} ex", StringUtil.toJsonString(model), e);

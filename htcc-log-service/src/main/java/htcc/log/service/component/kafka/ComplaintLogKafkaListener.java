@@ -15,11 +15,13 @@ import htcc.log.service.repository.BaseLogDAO;
 import htcc.log.service.repository.ComplaintLogRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @Log4j2
+@ConditionalOnProperty(value = "kafka.enableConsumer", havingValue = "true")
 @KafkaListener(topics = "#{kafkaFileConfig.buz.complaintLog.topicName}",
                groupId = "#{kafkaFileConfig.buz.complaintLog.groupId}")
 public class ComplaintLogKafkaListener extends BaseKafkaConsumer<ComplaintModel> {
