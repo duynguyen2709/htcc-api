@@ -36,8 +36,8 @@ public class InternalCompanyUserController {
         try {
             CompanyUser oldUser = service.findById(new CompanyUser.Key(model.companyId, model.username));
             if (oldUser != null) {
-                response = new BaseResponse<>(ReturnCodeEnum.DATA_ALREADY_EXISTED,
-                        String.format("User %s đã tồn tại", model.getUsername()));
+                response = new BaseResponse<>(ReturnCodeEnum.DATA_ALREADY_EXISTED);
+                response.setReturnMessage(String.format("User %s đã tồn tại", model.getUsername()));
                 return response;
             }
 

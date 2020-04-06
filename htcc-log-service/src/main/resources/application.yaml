@@ -25,6 +25,20 @@ spring:
     testOnBorrow: true
     timeBetweenEvictionRunsMillis: 60000
     validationQuery: SELECT 1
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "htcc.system@gmail.com"
+    password: "6h5K8dapxfFdVKAS"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+          starttls:
+            enable: true
 
 ################## Eureka Config ##################
 eureka:
@@ -76,3 +90,12 @@ kafka:
     leavingRequestLog:
       topicName: LEAVING-REQUEST-LOG
       groupId: LEAVING-REQUEST-LOG
+    eventCreateUser:
+      topicName: EVENT-CREATE-USER
+      groupId: EVENT-CREATE-USER
+
+################## Mail Buz Config ##################
+mail:
+  buz:
+    subject:
+      createNewUserMail: "Thông tin tài khoản mới trên hệ thống HTCC"

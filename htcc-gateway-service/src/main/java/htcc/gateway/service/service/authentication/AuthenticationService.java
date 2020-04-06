@@ -4,7 +4,7 @@ import htcc.common.constant.ClientSystemEnum;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.admin.AdminUser;
-import htcc.gateway.service.entity.jpa.BaseUser;
+import htcc.common.entity.base.BaseUser;
 import htcc.gateway.service.entity.jpa.company.CompanyUser;
 import htcc.gateway.service.entity.request.ChangePasswordRequest;
 import htcc.gateway.service.entity.request.LoginRequest;
@@ -42,13 +42,19 @@ public class AuthenticationService {
             switch (system) {
                 case EUREKA_DASHBOARD:
                     String password = passwordEncoder.encode(securityConfig.user.password);
-                    user = new BaseUser(securityConfig.user.name, password, 1);
+                    user = new BaseUser();
+                    user.setUsername(securityConfig.user.name);
+                    user.setPassword(password);
+                    user.setStatus(1);
                     break;
 
                 case ADMIN_WEB:
                     AdminUser admin = adminUserService.findById(req.username);
                     if (admin != null) {
-                        user = new BaseUser(admin.username, admin.password, admin.status);
+                        user = new BaseUser();
+                        user.setUsername(admin.username);
+                        user.setPassword(admin.password);
+                        user.setStatus(admin.status);
                     }
                     break;
 
@@ -57,7 +63,10 @@ public class AuthenticationService {
                     CompanyUser.Key key = new CompanyUser.Key(req.companyId, req.username);
                     CompanyUser companyUser = companyUserService.findById(key);
                     if (companyUser != null) {
-                        user = new BaseUser(companyUser.username, companyUser.password, companyUser.status);
+                        user = new BaseUser();
+                        user.setUsername(companyUser.username);
+                        user.setPassword(companyUser.password);
+                        user.setStatus(companyUser.status);
                     }
                     break;
             }

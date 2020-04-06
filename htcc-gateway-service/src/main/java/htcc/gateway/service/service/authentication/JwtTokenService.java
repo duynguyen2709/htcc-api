@@ -9,7 +9,7 @@ import htcc.common.util.DateTimeUtil;
 import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.config.file.SecurityConfig;
-import htcc.gateway.service.entity.jpa.BaseUser;
+import htcc.common.entity.base.BaseUser;
 import htcc.gateway.service.entity.request.LoginRequest;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
