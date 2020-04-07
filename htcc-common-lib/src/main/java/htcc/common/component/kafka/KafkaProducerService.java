@@ -58,7 +58,6 @@ public class KafkaProducerService {
         } else {
             msg = StringUtil.toJsonString(message);
         }
-        log.info("Send Kafka Message = {}", msg);
         kafkaTemplate.send(topic, msg);
     }
 
