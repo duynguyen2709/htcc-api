@@ -1,4 +1,4 @@
-package htcc.employee.service.controller;
+package htcc.employee.service.controller.employee;
 
 import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ReturnCodeEnum;

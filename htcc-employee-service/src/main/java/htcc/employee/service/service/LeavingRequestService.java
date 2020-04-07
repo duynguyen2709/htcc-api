@@ -5,6 +5,7 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.leavingrequest.LeavingRequestResponse;
+import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.ServiceConfig;
 import lombok.extern.log4j.Log4j2;
@@ -28,6 +29,7 @@ public class LeavingRequestService {
         return serviceConfig.leavingRequestCategoryList;
     }
 
+    // for employee
     public List<LeavingRequestResponse> getLeavingRequestLog(String companyId, String username, String year){
         List<LeavingRequestResponse> result = new ArrayList<>();
         try {
@@ -45,6 +47,32 @@ public class LeavingRequestService {
         }
     }
 
+    // for manager
+    public BaseResponse countPendingLeavingRequest(String companyId) {
+        return logService.countPendingLeavingRequest(companyId);
+    }
+
+    public List<LeavingRequestResponse> getLeavingRequestLogByCompanyId(String companyId, String yyyyMM){
+        List<LeavingRequestResponse> result = new ArrayList<>();
+        try {
+            BaseResponse response = logService.getListLeavingRequestLogByCompany(companyId, yyyyMM);
+            List<LeavingRequestModel> list = parseResponse(response);
+            if (list == null){
+                throw new Exception("parseResponse return null");
+            }
+
+            list.forEach(c -> result.add(new LeavingRequestResponse(c)));
+            return result;
+        } catch (Exception e){
+            log.error("[getLeavingRequestLog] [{} - {}]", companyId, yyyyMM, e);
+            return null;
+        }
+    }
+
+    public BaseResponse updateLeavingRequestStatus(UpdateLeavingRequestStatusModel model) {
+        return logService.updateLeavingRequestStatus(model);
+    }
+
     private List<LeavingRequestModel> parseResponse(BaseResponse res) {
         try {
             if (res == null || res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue() ||
@@ -57,7 +85,7 @@ public class LeavingRequestService {
             return StringUtil.json2Collection(data, new TypeToken<List<LeavingRequestModel>>(){}.getType());
         } catch (Exception e){
             log.warn("parseResponse {} return null, ex {}", StringUtil.toJsonString(res), e.getMessage());
-            return null;
+            return new ArrayList<>();
         }
     }
 }

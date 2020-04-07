@@ -64,19 +64,14 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
     @Override
     @Transactional
     public void updateComplaintLogStatus(UpdateComplaintStatusModel model) {
-        try {
-            String tableName = "ComplaintLog" + model.getYyyyMM();
+        String tableName = "ComplaintLog" + model.getYyyyMM();
 
-            String query = String.format("UPDATE %s SET status = ?, response = ? WHERE complaintId='%s'",
-                    tableName, model.getComplaintId());
+        String query = String.format("UPDATE %s SET status = ?, response = ? WHERE complaintId='%s'",
+                tableName, model.getComplaintId());
 
-            int rowAffected = jdbcTemplate.update(query, model.getStatus(), model.getResponse());
-            if (rowAffected == 1) {
-                decreaseComplaintLogCounter(model);
-            }
-
-        } catch (Exception e) {
-            log.error(String.format("[updateComplaintLogStatus] [%s] ex ", StringUtil.toJsonString(model)), e);
+        int rowAffected = jdbcTemplate.update(query, model.getStatus(), model.getResponse());
+        if (rowAffected == 1) {
+            decreaseComplaintLogCounter(model);
         }
     }
 
@@ -120,7 +115,7 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
     }
 
     @Override
-    public void increaseComplaintLogCounter(UpdateComplaintStatusModel model){
+    public void increasePendingComplaintCounter(UpdateComplaintStatusModel model){
         final String logType = "ComplaintLog";
 
         ComplaintLogEntity entity = getComplaint(model);
