@@ -40,7 +40,7 @@ public class InternalCompanyController {
             response.setData(newCompany);
 
         } catch (Exception e) {
-            log.error("[createCompany] {} ex", StringUtil.toJsonString(company), e);
+            log.error("[createOffice] {} ex", StringUtil.toJsonString(company), e);
             response = new BaseResponse<>(e);
         }
 
