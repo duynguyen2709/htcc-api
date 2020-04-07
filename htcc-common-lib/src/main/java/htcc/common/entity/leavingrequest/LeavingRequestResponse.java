@@ -22,6 +22,9 @@ public class LeavingRequestResponse implements Serializable {
     @ApiModelProperty(notes = "Mã đơn nghỉ phép", example = "#TICKET-001")
     public String leavingRequestId = "";
 
+    @ApiModelProperty(notes = "Người gửi", example = "duyna")
+    public String sender = "";
+
     @ApiModelProperty(notes = "Ngày bắt đầu nghỉ (yyyy-MM-dd)", example = "2020-04-05")
     public String dateFrom = "";
 
@@ -49,6 +52,7 @@ public class LeavingRequestResponse implements Serializable {
 
     public LeavingRequestResponse(LeavingRequestModel model) {
         this.leavingRequestId = model.leavingRequestId;
+        this.sender = model.username;
         this.category = model.category;
         this.reason = model.reason;
         this.detail = model.detail;

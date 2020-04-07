@@ -1,4 +1,4 @@
-package htcc.employee.service.controller;
+package htcc.employee.service.controller.complaint;
 
 import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;

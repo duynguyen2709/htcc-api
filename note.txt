@@ -162,3 +162,7 @@
 06-04-2020:
  + Version 1.4.8:
     - [Log] fix bug leak Connection on Datasource; add feature Send Email on creating new User
+
+07-04-2020:
+ + Version 1.4.9:
+    - [Employee] Update Leaving Request Status

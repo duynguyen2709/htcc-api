@@ -26,5 +26,9 @@ public class HomeResponse implements Serializable {
                       example = "10")
     public int pendingComplaint = 0;
 
+    @ApiModelProperty(notes = "Số lượng đơn nghỉ phép chưa xử lý (để hiển thị ở sidebar)",
+                      example = "10")
+    public int pendingLeavingRequest = 0;
+
 }
 

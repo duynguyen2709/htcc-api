@@ -1,11 +1,8 @@
 package htcc.log.service.component.kafka;
 
 import htcc.common.component.redis.RedisComplaintService;
-import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.complaint.ComplaintModel;
-import htcc.common.entity.complaint.ComplaintRequest;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
-import htcc.common.entity.log.CheckInLogEntity;
 import htcc.common.entity.log.ComplaintLogEntity;
 import htcc.common.service.ICallback;
 import htcc.common.service.kafka.BaseKafkaConsumer;
@@ -54,7 +51,7 @@ public class ComplaintLogKafkaListener extends BaseKafkaConsumer<ComplaintModel>
                 UpdateComplaintStatusModel counter = new UpdateComplaintStatusModel();
                 counter.setYyyyMM(DateTimeUtil.parseTimestampToString(model.clientTime, "yyyyMM"));
                 counter.setComplaintId(model.getComplaintId());
-                complaintLogRepo.increaseComplaintLogCounter(counter);
+                complaintLogRepo.increasePendingComplaintCounter(counter);
             }
 
         } catch (Exception e) {

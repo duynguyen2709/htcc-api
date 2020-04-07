@@ -1,4 +1,4 @@
-package htcc.employee.service.controller;
+package htcc.employee.service.controller.home;
 
 import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
@@ -8,6 +8,7 @@ import htcc.common.entity.home.HomeResponse;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.ComplaintService;
+import htcc.employee.service.service.LeavingRequestService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,6 +29,8 @@ public class HomeController {
     @Autowired
     private ComplaintService complaintService;
 
+    @Autowired
+    private LeavingRequestService leavingRequestService;
 
 
     @ApiOperation(value = "API Home", response = HomeResponse.class)
@@ -40,6 +43,7 @@ public class HomeController {
 
             HomeResponse data = new HomeResponse();
             countPendingComplaint(data, companyId);
+            countPendingLeavingRequest(data, companyId);
             response.data = data;
 
         } catch (Exception e) {
@@ -62,5 +66,20 @@ public class HomeController {
             log.error("[countPendingComplaint] {} ex", companyId, e);
         }
         data.setPendingComplaint(count);
+    }
+
+
+
+    private void countPendingLeavingRequest(HomeResponse data, String companyId){
+        int count = 0;
+        try {
+            BaseResponse response = leavingRequestService.countPendingLeavingRequest(companyId);
+            if (response != null && response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+                count = (int) response.getData();
+            }
+        } catch (Exception e) {
+            log.error("[countPendingLeavingRequest] {} ex", companyId, e);
+        }
+        data.setPendingLeavingRequest(count);
     }
 }

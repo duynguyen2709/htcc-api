@@ -136,7 +136,7 @@ public class ComplaintLogController {
 
             complaintRepo.updateComplaintLogStatus(request);
         } catch (Exception e){
-            log.error(String.format("[updateComplaintStatus] [%s] ex", StringUtil.toJsonString(request)), e);
+            log.error(String.format("[updateLeavingRequestStatus] [%s] ex", StringUtil.toJsonString(request)), e);
             return new BaseResponse(e);
         }
 
