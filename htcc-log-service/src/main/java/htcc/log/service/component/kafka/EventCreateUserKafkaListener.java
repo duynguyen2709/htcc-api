@@ -34,7 +34,7 @@ public class EventCreateUserKafkaListener extends BaseKafkaConsumer<BaseUser> {
 
             String companyIdValue = "";
             if (!StringUtil.isEmpty(user.companyId)){
-                companyIdValue = String.format("Company ID: <b>%s</b><br></br>", user.companyId);
+                companyIdValue = String.format("<br></br>Company ID: <b>%s</b><br></br>", user.companyId);
             }
 
             String content = template.replaceAll(username, user.username)
