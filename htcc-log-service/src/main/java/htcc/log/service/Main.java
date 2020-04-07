@@ -28,5 +28,4 @@ public class Main {
 	public void readyProcess() throws Exception {
 		LoggingUtil.printConfig(configurableEnvironment);
 	}
-
 }

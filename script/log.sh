@@ -1,6 +1,6 @@
 #!/bin/bash
 docker container rm -f htcc-log-service
-sleep 20
+sleep 10
 docker pull duyna5/htcc-log-service:latest
 docker run -p 8204:8204 -d \
         -v "$(pwd)/resources":/conf:ro \

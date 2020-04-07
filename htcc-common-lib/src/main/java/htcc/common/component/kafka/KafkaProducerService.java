@@ -51,11 +51,14 @@ public class KafkaProducerService {
             return;
         }
 
+        String msg = "";
+
         if (message instanceof String) {
-            kafkaTemplate.send(topic, (String)message);
+            msg = (String)message;
         } else {
-            kafkaTemplate.send(topic, StringUtil.toJsonString(message));
+            msg = StringUtil.toJsonString(message);
         }
+        kafkaTemplate.send(topic, msg);
     }
 
     public KafkaBuzConfig getBuzConfig(){

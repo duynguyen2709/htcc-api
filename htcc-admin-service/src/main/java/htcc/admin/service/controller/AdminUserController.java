@@ -1,5 +1,7 @@
 package htcc.admin.service.controller;
 
+import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.entity.base.BaseUser;
 import htcc.common.entity.jpa.AdminUser;
 import htcc.admin.service.service.jpa.AdminUserInfoService;
 import htcc.admin.service.service.redis.RedisTokenService;
@@ -38,6 +40,8 @@ public class AdminUserController {
     @Autowired
     private RedisUserInfoService redisUserInfo;
 
+    @Autowired
+    private KafkaProducerService kafka;
 
 
     @ApiOperation(value = "Lấy thông tin của các user", response = AdminUser.class)
@@ -91,6 +95,7 @@ public class AdminUserController {
     public BaseResponse createUser(@ApiParam(value = "[Body] Thông tin user mới", required = true)
                                     @RequestBody AdminUser user) {
         BaseResponse<AdminUser> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        String rawPassword = user.getPassword();
         try {
             String error = user.isValid();
             if (!error.isEmpty()) {
@@ -111,6 +116,13 @@ public class AdminUserController {
         } catch (Exception e){
             log.error("[createUser] ex", e);
             response = new BaseResponse<>(e);
+        } finally {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+                BaseUser model = new BaseUser(user);
+                model.setPassword(rawPassword);
+
+                kafka.sendMessage(kafka.getBuzConfig().eventCreateUser.topicName, model);
+            }
         }
         return response;
     }

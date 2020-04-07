@@ -58,7 +58,6 @@ public class CheckInService {
     public void setCheckInLog(CheckinModel model){
         redisService.setCheckInLog(model);
 
-        log.info("Send Kafka Checkin Log: " + StringUtil.toJsonString(model));
         kafka.sendMessage(kafka.getBuzConfig().checkInLog.topicName, model);
     }
 
@@ -66,7 +65,6 @@ public class CheckInService {
     public void setCheckOutLog(CheckinModel model){
         redisService.setCheckOutLog(model);
 
-        log.info("Send Kafka Checkout Log: " + StringUtil.toJsonString(model));
         kafka.sendMessage(kafka.getBuzConfig().checkOutLog.topicName, model);
     }
 

@@ -38,16 +38,3 @@ kafka:
   enableProducer: false
   enableConsumer: true
   bootstrapAddress: 127.0.0.1:9092,10.25.96.4:9092
-  buz:
-    apiLog:
-      topicName: API-LOG
-      groupId: API-LOG
-    checkInLog:
-      topicName: CHECKIN-LOG
-      groupId: CHECKIN-LOG
-    checkOutLog:
-      topicName: CHECKOUT-LOG
-      groupId: CHECKOUT-LOG
-    complaintLog:
-      topicName: COMPLAINT-LOG
-      groupId: COMPLAINT-LOG

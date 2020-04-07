@@ -19,6 +19,11 @@ public class LogService {
 
     private static final String baseURL = String.format("http://%s/internal/logs", Constant.HTCC_LOG_SERVICE);
 
+    public BaseResponse getListLeavingRequestLog(String companyId, String username, String year) {
+        String method = String.format("/leaving/%s/%s/%s", companyId, username, year);
+        return callGet(method);
+    }
+
     public BaseResponse getComplaintLog(String companyId, String username, String yyyyMM) {
         String method = String.format("/complaint/%s/%s/%s", companyId, username, yyyyMM);
         return callGet(method);

@@ -7,7 +7,7 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.config.file.SecurityConfig;
-import htcc.gateway.service.entity.jpa.BaseUser;
+import htcc.common.entity.base.BaseUser;
 import htcc.gateway.service.entity.request.ChangePasswordRequest;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.service.authentication.AuthenticationService;
@@ -70,6 +70,8 @@ public class PrivateController {
                 long ttl = 0;
                 if (loginInfo.clientId != ClientSystemEnum.MOBILE.getValue()) {
                     ttl = securityConfig.jwt.expireSecond;
+                } else {
+                    ttl = securityConfig.jwt.expireSecond * 7;
                 }
 
                 redis.set(token, ttl, redis.buzConfig.blacklistTokenFormat,

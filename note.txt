@@ -156,4 +156,9 @@
 
 05-04-2020:
  + Version 1.4.7:
-    - [Employee] add FullTextSearch fullName in API GetListContact
+    - [Employee] add FullTextSearch fullName in API GetListContact;
+    API SubmitLeavingRequest, GetLeavingRequestInfo
+
+06-04-2020:
+ + Version 1.4.8:
+    - [Log] fix bug leak Connection on Datasource; add feature Send Email on creating new User

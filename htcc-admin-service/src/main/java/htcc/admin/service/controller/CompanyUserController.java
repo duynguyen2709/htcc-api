@@ -2,9 +2,11 @@ package htcc.admin.service.controller;
 
 import htcc.admin.service.service.rest.EmployeeInfoService;
 import htcc.admin.service.service.rest.GatewayCompanyUserService;
+import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.base.BaseUser;
 import htcc.common.entity.companyuser.CompanyUserModel;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.Api;
@@ -26,6 +28,12 @@ public class CompanyUserController {
     @Autowired
     private EmployeeInfoService employeeInfoService;
 
+    @Autowired
+    private KafkaProducerService kafka;
+
+
+
+
     @ApiOperation(value = "Lấy danh sách admin của công ty", response = CompanyUserModel.class)
     @GetMapping("/companyusers/{companyId}")
     public BaseResponse getListCompanyUser(@ApiParam(value = "[Path] Mã công ty", required = true, defaultValue = "VNG")
@@ -41,6 +49,8 @@ public class CompanyUserController {
     public BaseResponse createCompanyUser(@ApiParam(value = "[Body] Thông tin admin mới", required = true)
                                    @RequestBody CompanyUserModel user) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        response.setReturnMessage("Tạo người dùng thành công");
+        String rawPassword = user.getPassword();
         try {
             String error = user.isValid();
             if (!error.isEmpty()) {
@@ -58,12 +68,20 @@ public class CompanyUserController {
                     log.warn("Rollback on creating new employee {}, response {}",
                             StringUtil.toJsonString(user), StringUtil.toJsonString(response1));
                     service.deleteCompanyUser(user);
-                    return response1;
+                    response = response1;
+                    return response;
                 }
             }
         } catch (Exception e) {
             log.error("[createCompanyUser] {} ex", StringUtil.toJsonString(user), e);
-            return new BaseResponse(e);
+            response = new BaseResponse(e);
+        } finally {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+                BaseUser model = new BaseUser(user);
+                model.setPassword(rawPassword);
+
+                kafka.sendMessage(kafka.getBuzConfig().getEventCreateUser().topicName, model);
+            }
         }
         return response;
     }

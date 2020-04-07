@@ -1,6 +1,6 @@
 #!/bin/bash
 docker container rm -f htcc-gateway-service
-sleep 2
+sleep 10
 docker pull duyna5/htcc-gateway-service:latest
 docker run -p 8761:8761 -d \
         -v "$(pwd)/resources":/conf:ro \
