@@ -25,6 +25,9 @@ public class LeavingRequestResponse implements Serializable {
     @ApiModelProperty(notes = "Người gửi", example = "duyna")
     public String sender = "";
 
+    @ApiModelProperty(notes = "Ngày submit đơn (yyyy-MM-dd)", example = "2020-04-05")
+    public String dateSubmit = "";
+
     @ApiModelProperty(notes = "Ngày bắt đầu nghỉ (yyyy-MM-dd)", example = "2020-04-05")
     public String dateFrom = "";
 
@@ -34,7 +37,7 @@ public class LeavingRequestResponse implements Serializable {
     @ApiModelProperty(notes = "Loại nghỉ phép", example = "Nghỉ phép năm")
     public String category = "";
 
-    @ApiModelProperty(notes = "lý do nghỉ", example = "Nghỉ bệnh")
+    @ApiModelProperty(notes = "Lý do nghỉ", example = "Nghỉ bệnh")
     public String reason = "";
 
     @ApiModelProperty(notes = "Chi tiết ngày nghỉ (buổi nào)")
@@ -59,6 +62,7 @@ public class LeavingRequestResponse implements Serializable {
         this.status = model.status;
         this.response = model.response;
         this.approver = model.approver;
+        this.dateSubmit = DateTimeUtil.parseTimestampToString(model.clientTime, "yyyy-MM-dd");
 
         if (this.detail.size() > 0) {
             this.detail.sort(new DateComparator());

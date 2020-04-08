@@ -17,12 +17,10 @@ public class CompanyUserModel {
 
     private static final long serialVersionUID = 1327000583005150807L;
 
-    @NotEmpty
     @ApiModelProperty(notes = "Mã công ty",
                       example = "VNG")
     public String companyId = "";
 
-    @NotEmpty
     @ApiModelProperty(notes = "Tên đăng nhập",
                       example = "admin")
     public String username = "";
@@ -31,14 +29,10 @@ public class CompanyUserModel {
                       example = "123")
     public String password = "";
 
-    @NotEmpty
-    @Email(message = "Không đúng định dạng email")
     @ApiModelProperty(notes = "email",
                       example = "naduy.hcmus@gmail.com")
     public String email = "";
 
-    @NotEmpty
-    @Size(min = 10, max = 20, message = "Số điện thoại, ít nhất 10 chữ số")
     @ApiModelProperty(notes = "Sđt, ít nhất 10 chữ số",
                       example = "0948202709")
     public String phoneNumber = "";
@@ -50,6 +44,18 @@ public class CompanyUserModel {
 
     @Transient
     public String isValid(){
+        if (StringUtil.isEmpty(companyId)) {
+            return "Mã công ty không được rỗng";
+        }
+
+        if (StringUtil.isEmpty(username)) {
+            return "Tên đăng nhập không được rỗng";
+        }
+
+        if (StringUtil.isEmpty(password)) {
+            return "Mật khẩu không được rỗng";
+        }
+
         if (StringUtil.valueOf(phoneNumber).length() < 10 ||
                 NumberUtil.getLongValue(phoneNumber) == 0L) {
             return String.format("Số điện thoại %s không phù hợp định dạng", phoneNumber);

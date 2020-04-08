@@ -82,6 +82,7 @@ public class InternalCompanyUserController {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         try {
             List<CompanyUserModel> list = service.findByCompanyId(companyId).stream()
+                              .filter(c -> c.getRole() == 0)
                               .map(CompanyUser::fromEntity)
                               .collect(Collectors.toList());
 
