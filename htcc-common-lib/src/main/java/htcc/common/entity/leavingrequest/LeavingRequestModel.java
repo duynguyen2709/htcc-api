@@ -23,6 +23,7 @@ public class LeavingRequestModel implements Serializable {
     public String companyId        = "";
     public String username         = "";
     public long   clientTime       = 0L;
+    public boolean useDayOff       = true;
     public String category         = "";
     public String reason           = "";
     public String response         = "";
@@ -52,6 +53,7 @@ public class LeavingRequestModel implements Serializable {
         this.companyId = logEntity.companyId;
         this.username = logEntity.username;
         this.clientTime = logEntity.clientTime;
+        this.useDayOff = (logEntity.useDayOff == 1);
         this.category = logEntity.category;
         this.reason = logEntity.reason;
         this.response = logEntity.response;

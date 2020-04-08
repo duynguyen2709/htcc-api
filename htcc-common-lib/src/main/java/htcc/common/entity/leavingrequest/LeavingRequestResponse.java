@@ -34,6 +34,9 @@ public class LeavingRequestResponse implements Serializable {
     @ApiModelProperty(notes = "Ngày kết thúc nghỉ (yyyy-MM-dd)", example = "2020-04-07")
     public String dateTo = "";
 
+    @ApiModelProperty(notes = "Có sử dụng ngày phép hay nghỉ không phép", example = "true")
+    public boolean useDayOff = true;
+
     @ApiModelProperty(notes = "Loại nghỉ phép", example = "Nghỉ phép năm")
     public String category = "";
 
@@ -56,6 +59,7 @@ public class LeavingRequestResponse implements Serializable {
     public LeavingRequestResponse(LeavingRequestModel model) {
         this.leavingRequestId = model.leavingRequestId;
         this.sender = model.username;
+        this.useDayOff = model.useDayOff;
         this.category = model.category;
         this.reason = model.reason;
         this.detail = model.detail;

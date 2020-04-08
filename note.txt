@@ -168,3 +168,7 @@
     - [Employee] Update Leaving Request Status
  + Version 1.5.0:
     - [Employee] RestAPI For Company & Office Info
+
+08-04-2020:
+ + Version 1.5.1:
+    - [Employee] API CancelLeavingRequest, add field useDayOff in case using external day off

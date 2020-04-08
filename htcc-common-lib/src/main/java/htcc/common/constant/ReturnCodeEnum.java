@@ -29,6 +29,7 @@ public enum ReturnCodeEnum {
     MAXIMUM_FILE_SIZE_EXCEED(-16, "Chỉ cho upload tối đa ảnh tối đa 10MB"),
     DATA_NOT_FOUND(-17, "Không tìm thấy dữ liệu"),
     DATA_ALREADY_EXISTED(-18, "Dữ liệu đã tồn tại"),
+    TIME_LIMIT_EXCEED(-19, "Quá thời gian cho phép hủy đơn nghỉ phép"),
     ;
 
     private final int value;

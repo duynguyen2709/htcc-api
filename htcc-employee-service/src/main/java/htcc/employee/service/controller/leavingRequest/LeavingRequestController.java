@@ -1,16 +1,16 @@
 package htcc.employee.service.controller.leavingRequest;
 
+import htcc.common.comparator.DateComparator;
+import htcc.common.comparator.LeavingRequestResponseComparator;
 import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.LeavingRequestSessionEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.leavingrequest.LeavingRequest;
-import htcc.common.entity.leavingrequest.LeavingRequestInfo;
-import htcc.common.entity.leavingrequest.LeavingRequestModel;
-import htcc.common.entity.leavingrequest.LeavingRequestResponse;
+import htcc.common.entity.leavingrequest.*;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
+import htcc.employee.service.config.ServiceConfig;
 import htcc.employee.service.service.LeavingRequestService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,10 +19,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Api(tags = "API Xin Nghỉ Phép",
@@ -36,6 +34,9 @@ public class LeavingRequestController {
 
     @Autowired
     private KafkaProducerService kafka;
+
+    @Autowired
+    private ServiceConfig serviceConfig;
 
     @ApiOperation(value = "Lấy thông tin phép còn lại & đơn đã submit", response = LeavingRequestInfo.class)
     @GetMapping("/leaving/{companyId}/{username}/{yyyy}")
@@ -55,12 +56,14 @@ public class LeavingRequestController {
             if (detail == null) {
                 throw new Exception("service.getLeavingRequestLog return null");
             }
+            detail.sort(new LeavingRequestResponseComparator());
 
             LeavingRequestInfo data = new LeavingRequestInfo();
             data.setCategories(service.getCategories());
             data.setListRequest(detail);
+            // TODO : Remove hard code day off
             data.setTotalDays(20.0f);
-            data.setUsedDays(countUsedDay(detail));
+            countDayOff(data, detail);
 
             if (DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyy").equals(yyyy)) {
                 data.setLeftDays(data.getTotalDays() - data.getUsedDays());
@@ -77,8 +80,10 @@ public class LeavingRequestController {
         return response;
     }
 
-    private float countUsedDay(List<LeavingRequestResponse> detail) {
-        float count = 0.0f;
+    private void countDayOff(LeavingRequestInfo data, List<LeavingRequestResponse> detail){
+        float normalOffDay = 0.0f;
+        float externalOffDay = 0.0f;
+
         for (LeavingRequestResponse entity : detail) {
             if (entity.getStatus() == ComplaintStatusEnum.REJECTED.getValue()) {
                 // skip rejected forms
@@ -86,16 +91,27 @@ public class LeavingRequestController {
             }
 
             for (LeavingRequest.LeavingDayDetail d : entity.detail) {
-                if (d.session == LeavingRequestSessionEnum.FULL_DAY.getValue()){
-                    count += 1;
+                if (entity.useDayOff) {
+                    if (d.session == LeavingRequestSessionEnum.FULL_DAY.getValue()) {
+                        normalOffDay += 1;
+                    }
+                    else {
+                        normalOffDay += 0.5f;
+                    }
                 } else {
-                    count += 0.5f;
+                    if (d.session == LeavingRequestSessionEnum.FULL_DAY.getValue()) {
+                        externalOffDay += 1;
+                    }
+                    else {
+                        externalOffDay += 0.5f;
+                    }
                 }
             }
         }
-
-        return Float.valueOf(String.format("%.1f", count));
+        data.setUsedDays(Float.valueOf(String.format("%.1f", normalOffDay)));
+        data.setExternalDaysOff(Float.valueOf(String.format("%.1f", externalOffDay)));
     }
+
 
     @ApiOperation(value = "Nộp đơn xin nghỉ phép", response = BaseResponse.class)
     @PostMapping("/leaving")
@@ -112,6 +128,8 @@ public class LeavingRequestController {
             }
 
             model = new LeavingRequestModel(request);
+            // TODO : GET CONFIG FROM DB OF COMPANY
+            model.setUseDayOff(serviceConfig.getLeavingRequestCategoryList().getOrDefault(request.getCategory(), true));
 
             // validate list detail dates
             // check collision
@@ -121,7 +139,6 @@ public class LeavingRequestController {
                 response.setReturnMessage(error);
                 return response;
             }
-            //
 
         } catch (Exception e) {
             log.error("[submitLeavingRequest] [{}] ex", StringUtil.toJsonString(request), e);
@@ -169,5 +186,71 @@ public class LeavingRequestController {
         }
 
         return StringUtil.EMPTY;
+    }
+
+
+    @ApiOperation(value = "Hủy đơn xin nghỉ phép", response = BaseResponse.class)
+    @PostMapping("/leaving/cancel/{leavingRequestId}/{dateSubmit}")
+    public BaseResponse cancelLeavingRequest(@ApiParam(name = "leavingRequestId", value = "[Path] Mã đơn nghỉ phép", defaultValue = "#VNG-LR-00001", required = true)
+                                                 @PathVariable String leavingRequestId,
+                                             @ApiParam(name = "dateSubmit", value = "[Path] Ngày submit đơn gốc (yyyyMMdd)", defaultValue = "20200408", required = true)
+                                             @PathVariable String dateSubmit){
+        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        response.setReturnMessage("Đơn nghỉ phép của bạn đã hủy thành công");
+        try {
+            if (DateTimeUtil.isRightFormat(dateSubmit, "yyyyMMdd") == false) {
+                response = new BaseResponse(ReturnCodeEnum.DATE_WRONG_FORMAT,
+                        String.format("Ngày %s không phù hợp định dạng yyyyMMdd", dateSubmit));
+                return response;
+            }
+
+            String yyyyMM = DateTimeUtil.convertToOtherFormat(dateSubmit, "yyyyMMdd", "yyyyMM");
+
+            LeavingRequestModel model = service.getOneLeavingRequest(leavingRequestId.substring(1), yyyyMM);
+
+            if (model == null){
+                response = new BaseResponse(ReturnCodeEnum.LOG_NOT_FOUND);
+                response.setReturnMessage(String.format("Không tìm thấy đơn nghỉ phép %s", leavingRequestId));
+                return response;
+            }
+
+            if (checkNotAllowDayCancel(model)){
+                response = new BaseResponse(ReturnCodeEnum.TIME_LIMIT_EXCEED);
+                return response;
+            }
+
+            UpdateLeavingRequestStatusModel updateModel = new UpdateLeavingRequestStatusModel();
+            updateModel.setYyyyMM(yyyyMM);
+            updateModel.setLeavingRequestId(leavingRequestId);
+            updateModel.setStatus(ComplaintStatusEnum.REJECTED.getValue());
+            updateModel.setResponse("Nhân viên tự hủy đơn");
+            updateModel.setApprover(StringUtil.EMPTY);
+
+            BaseResponse response1 = service.updateLeavingRequestStatus(updateModel);
+            if (response1 != null && response1.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+                return response;
+            } else {
+                return response1;
+            }
+
+        } catch (Exception e) {
+            log.error("[cancelLeavingRequest] [{} - {}] ex", leavingRequestId, dateSubmit, e);
+            response = new BaseResponse(e);
+        }
+        return response;
+    }
+
+    private boolean checkNotAllowDayCancel(LeavingRequestModel model){
+        model.getDetail().sort(new DateComparator());
+
+        Date now = new Date(System.currentTimeMillis());
+        String nowStr = DateTimeUtil.parseDateToString(now, "yyyyMMdd");
+        Date today = DateTimeUtil.parseStringToDate(nowStr, "yyyyMMdd");
+        Date firstDay = DateTimeUtil.parseStringToDate(model.detail.get(0).date, "yyyyMMdd");
+
+        long diffInMillies = Math.abs(today.getTime() - firstDay.getTime());
+        long dayDiff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+        return dayDiff <= 1;
     }
 }

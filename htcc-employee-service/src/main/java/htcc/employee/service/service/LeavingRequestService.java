@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -26,7 +27,7 @@ public class LeavingRequestService {
     private LogService logService;
 
     public List<String> getCategories(){
-        return serviceConfig.leavingRequestCategoryList;
+        return new ArrayList<>(serviceConfig.getLeavingRequestCategoryList().keySet());
     }
 
     // for employee
@@ -43,6 +44,21 @@ public class LeavingRequestService {
             return result;
         } catch (Exception e){
             log.error("[getLeavingRequestLog] [{} - {} - {}]", companyId, username, year, e);
+            return null;
+        }
+    }
+
+    public LeavingRequestModel getOneLeavingRequest(String leavingRequestId, String yyyyMM){
+        try {
+            BaseResponse res = logService.getOneLeavingRequestLog(leavingRequestId, yyyyMM);
+            if (res == null || res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue() ||
+                    res.getData() == null) {
+                throw new Exception("LogService.getOneLeavingRequestLog API Failed");
+            }
+            String data = StringUtil.toJsonString(res.data);
+            return StringUtil.fromJsonString(data, LeavingRequestModel.class);
+        } catch (Exception e){
+            log.error("[getOneLeavingRequest] [{} - {}] ex", leavingRequestId, yyyyMM, e);
             return null;
         }
     }

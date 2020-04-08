@@ -23,6 +23,9 @@ public class LeavingRequestInfo implements Serializable {
     @ApiModelProperty(notes = "Số ngày nghỉ còn lại", example = "10.5")
     public float leftDays = 0.0f;
 
+    @ApiModelProperty(notes = "Số ngày nghỉ không dùng phép", example = "4")
+    public float externalDaysOff = 0.0f;
+
     @ApiModelProperty(notes = "Danh sách loại nghỉ phép được chọn", example = "[\"Nghỉ phép năm\",\"Nghỉ bệnh\",\"Nghỉ thai sản\"]")
     public List<String> categories = new ArrayList<>();
 

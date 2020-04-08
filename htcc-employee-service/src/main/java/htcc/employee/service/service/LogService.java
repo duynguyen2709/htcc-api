@@ -53,6 +53,11 @@ public class LogService {
      */
 
     // for employee
+    public BaseResponse getOneLeavingRequestLog(String leavingRequestId, String yyyyMM) {
+        String method = String.format("/leaving?leavingRequestId=%s&yyyyMM=%s", leavingRequestId, yyyyMM);
+        return callGet(method);
+    }
+
     public BaseResponse getListLeavingRequestLog(String companyId, String username, String year) {
         String method = String.format("/leaving/%s/%s/%s", companyId, username, year);
         return callGet(method);

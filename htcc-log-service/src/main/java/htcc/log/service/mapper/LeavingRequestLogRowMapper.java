@@ -17,6 +17,7 @@ public class LeavingRequestLogRowMapper implements RowMapper<LeavingRequestLogEn
         entity.companyId = rs.getString("companyId");
         entity.username = rs.getString("username");
         entity.clientTime = rs.getLong("clientTime");
+        entity.useDayOff = rs.getInt("useDayOff");
         entity.category = rs.getString("category");
         entity.reason = rs.getString("reason");
         entity.detail = rs.getString("detail");

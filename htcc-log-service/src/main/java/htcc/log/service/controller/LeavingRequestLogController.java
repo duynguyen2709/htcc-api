@@ -28,6 +28,30 @@ public class LeavingRequestLogController {
     @Autowired
     private LogCounterRepository logCounterRepo;
 
+    @GetMapping("/leaving")
+    public BaseResponse getOneLeavingRequestLog(@RequestParam String leavingRequestId,
+                                                @RequestParam String yyyyMM) {
+        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        try {
+            UpdateLeavingRequestStatusModel model = new UpdateLeavingRequestStatusModel();
+            model.setYyyyMM(yyyyMM);
+            model.setLeavingRequestId("#" + leavingRequestId);
+
+            LeavingRequestLogEntity oldEnt = repo.getOneLeavingRequest(model);
+            if (oldEnt == null) {
+                log.warn("[repo.getOneLeavingRequest] {} return null", StringUtil.toJsonString(model));
+                response = new BaseResponse<>(ReturnCodeEnum.LOG_NOT_FOUND);
+                return response;
+            }
+
+            response.setData(new LeavingRequestModel(oldEnt));
+        } catch (Exception e) {
+            log.error(String.format("[getOneLeavingRequestLog] [#%s-%s] ex", leavingRequestId, yyyyMM), e);
+            return new BaseResponse(e);
+        }
+        return response;
+    }
+
     @GetMapping("/leaving/{companyId}/{username}/{yyyy}")
     public BaseResponse getLeavingRequestLog(@PathVariable String companyId,
                                       @PathVariable String username,
