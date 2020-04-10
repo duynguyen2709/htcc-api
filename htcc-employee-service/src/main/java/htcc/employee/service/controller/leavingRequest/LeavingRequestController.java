@@ -29,6 +29,12 @@ import java.util.stream.Collectors;
 @Log4j2
 public class LeavingRequestController {
 
+    // TODO : Remove hard code day off
+    private static final float HARD_CODE_DAY_OFF = 20.0f;
+
+    // TODO : remove hard code num of day allow cancel, change to get from config
+    private static final int HARD_CODE_DAY_ALLOW_CANCEL = 1;
+
     @Autowired
     private LeavingRequestService service;
 
@@ -46,7 +52,7 @@ public class LeavingRequestController {
                                               @PathVariable String username,
                                               @ApiParam(name = "yyyy", value = "[Path] Năm", defaultValue = "2020", required = true)
                                               @PathVariable String yyyy){
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        BaseResponse<LeavingRequestInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             if (!DateTimeUtil.isRightFormat(yyyy, "yyyy")) {
                 return new BaseResponse(ReturnCodeEnum.DATE_WRONG_FORMAT, String.format("Năm %s không phù hợp định dạng yyyy", yyyy));
@@ -61,8 +67,8 @@ public class LeavingRequestController {
             LeavingRequestInfo data = new LeavingRequestInfo();
             data.setCategories(service.getCategories());
             data.setListRequest(detail);
-            // TODO : Remove hard code day off
-            data.setTotalDays(20.0f);
+
+            data.setTotalDays(HARD_CODE_DAY_OFF);
             countDayOff(data, detail);
 
             if (DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyy").equals(yyyy)) {
@@ -75,7 +81,7 @@ public class LeavingRequestController {
 
         } catch (Exception e) {
             log.error("[getLeavingRequestInfo] [{} - {} - {}] ex", companyId, username, yyyy, e);
-            return new BaseResponse(e);
+            response = new BaseResponse<>(e);
         }
         return response;
     }
@@ -128,8 +134,19 @@ public class LeavingRequestController {
             }
 
             model = new LeavingRequestModel(request);
+
             // TODO : GET CONFIG FROM DB OF COMPANY
             model.setUseDayOff(serviceConfig.getLeavingRequestCategoryList().getOrDefault(request.getCategory(), true));
+
+            // check if days off left is enough to register
+            if (model.useDayOff) {
+                error = validateNumOfDayOffLeft(model);
+                if (!error.isEmpty()) {
+                    response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
+                    response.setReturnMessage(error);
+                    return response;
+                }
+            }
 
             // validate list detail dates
             // check collision
@@ -149,6 +166,53 @@ public class LeavingRequestController {
             }
         }
         return response;
+    }
+
+    private String validateNumOfDayOffLeft(LeavingRequestModel model) throws Exception {
+        BaseResponse response = getLeavingRequestInfo(model.getCompanyId(), model.getUsername(),
+                DateTimeUtil.parseTimestampToString(model.getClientTime(), "yyyy"));
+
+        if (response == null || response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()){
+            throw new Exception("[getLeavingRequestInfo] return null");
+        }
+
+        LeavingRequestInfo info = (LeavingRequestInfo) response.getData();
+
+        // count days used
+        float daysOff = 0.0f;
+        for (LeavingRequestResponse entity : info.listRequest) {
+            if (entity.getStatus() == ComplaintStatusEnum.REJECTED.getValue()) {
+                // skip rejected forms
+                continue;
+            }
+
+            for (LeavingRequest.LeavingDayDetail d : entity.detail) {
+                if (entity.useDayOff) {
+                    if (d.session == LeavingRequestSessionEnum.FULL_DAY.getValue()) {
+                        daysOff += 1;
+                    } else {
+                        daysOff += 0.5f;
+                    }
+                }
+            }
+        }
+        float daysLeft = HARD_CODE_DAY_OFF - daysOff;
+
+        //count days in request
+        float daysInRequest = 0.0f;
+        for (LeavingRequest.LeavingDayDetail d : model.detail) {
+            if (d.session == LeavingRequestSessionEnum.FULL_DAY.getValue()) {
+                daysInRequest += 1;
+            } else {
+                daysInRequest += 0.5f;
+            }
+        }
+
+        if (daysInRequest > daysLeft){
+            return "Số ngày nghỉ phép còn lại trong năm không đủ";
+        }
+
+        return StringUtil.EMPTY;
     }
 
     private String validateDetailDates(LeavingRequestModel model) {
@@ -251,6 +315,6 @@ public class LeavingRequestController {
         long diffInMillies = Math.abs(today.getTime() - firstDay.getTime());
         long dayDiff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
-        return dayDiff <= 1;
+        return dayDiff <= HARD_CODE_DAY_ALLOW_CANCEL;
     }
 }
