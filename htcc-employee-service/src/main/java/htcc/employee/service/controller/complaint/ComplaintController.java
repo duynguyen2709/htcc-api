@@ -5,6 +5,7 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintModel;
 import htcc.common.entity.complaint.ComplaintRequest;
 import htcc.common.entity.complaint.ComplaintResponse;
+import htcc.common.entity.complaint.ResubmitComplaintModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.ComplaintService;
@@ -17,7 +18,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Api(tags = "API phản hồi/ khiếu nại",
      description = "API để phản hồi/ khiếu nại của nhân viên")
@@ -80,6 +84,27 @@ public class ComplaintController {
 
 
 
+    @ApiOperation(value = "Resubmit khiếu nại", response = BaseResponse.class)
+    @PutMapping("/complaint/resubmit")
+    public BaseResponse resubmitComplaint(@ApiParam(value = "[Body] Thông tin mới cần update", required = true)
+                                              @RequestBody ResubmitComplaintModel request) {
+        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        try {
+            if (DateTimeUtil.isRightFormat(request.getYyyyMM(), "yyyyMM") == false) {
+                return new BaseResponse(ReturnCodeEnum.DATE_WRONG_FORMAT, String.format("Tháng %s không phù hợp định dạng yyyyMM", request.getYyyyMM()));
+            }
+
+            response = service.resubmitComplaint(request);
+        } catch (Exception e) {
+            log.error(String.format("resubmitComplaint [%s] ex", StringUtil.toJsonString(request)), e);
+            response = new BaseResponse<>(e);
+        }
+        return response;
+    }
+
+
+
+
     @ApiOperation(value = "Lấy danh sách khiếu nại", response = ComplaintResponse.class)
     @GetMapping("/complaint/{companyId}/{username}/{month}")
     public BaseResponse getListComplaint(@ApiParam(value = "[Path] Mã công ty", required = true)
@@ -96,8 +121,8 @@ public class ComplaintController {
             }
 
             List<ComplaintResponse> list = service.getComplaintLog(companyId, username, yyyyMM);
-            if (list != null && !list.isEmpty()) {
-                Collections.reverse(list);
+            if (list == null){
+                throw new Exception("ComplaintService [getComplaintLog] return null");
             }
 
             response.data = list;

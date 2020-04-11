@@ -1,4 +1,4 @@
-package htcc.common.entity.log;
+package htcc.common.entity.leavingrequest;
 
 import htcc.common.entity.base.BaseLogEntity;
 import htcc.common.entity.leavingrequest.LeavingRequestModel;

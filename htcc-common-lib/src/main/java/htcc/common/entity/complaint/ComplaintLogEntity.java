@@ -1,4 +1,4 @@
-package htcc.common.entity.log;
+package htcc.common.entity.complaint;
 
 import htcc.common.entity.base.BaseLogEntity;
 import htcc.common.entity.complaint.ComplaintModel;
@@ -35,9 +35,9 @@ public class ComplaintLogEntity extends BaseLogEntity {
         this.receiverType = model.receiverType;
         this.isAnonymous = model.isAnonymous;
         this.category = model.category;
-        this.content = model.content;
+        this.content = StringUtil.toJsonString(model.content);
         this.images = StringUtil.toJsonString(model.images);
-        this.response = model.response;
+        this.response = StringUtil.toJsonString(model.response);
         this.status = model.status;
         this.complaintId = model.complaintId;
     }

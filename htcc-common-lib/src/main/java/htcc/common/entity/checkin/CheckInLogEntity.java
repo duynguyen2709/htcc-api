@@ -1,4 +1,4 @@
-package htcc.common.entity.log;
+package htcc.common.entity.checkin;
 
 import htcc.common.entity.base.BaseLogEntity;
 import htcc.common.entity.checkin.CheckinModel;
@@ -11,11 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
-@Log4j2
 @NoArgsConstructor
-public class CheckOutLogEntity extends BaseLogEntity {
+public class CheckInLogEntity extends BaseLogEntity {
 
-    private static final String TABLE_NAME = "CheckOutLog";
+    private static final String TABLE_NAME = "CheckInLog";
 
     public String  companyId        = "";
     public String  username         = "";
@@ -31,15 +30,15 @@ public class CheckOutLogEntity extends BaseLogEntity {
     public boolean usedWifi         = false;
     public String  ip               = "";
 
-    public CheckOutLogEntity(CheckinModel model) {
+    public CheckInLogEntity(CheckinModel model) {
         this.requestId = model.getRequestId();
         this.companyId = model.companyId;
         this.username = model.username;
         this.clientTime = model.clientTime;
         this.serverTime = model.serverTime;
-//        this.validTime = model.validTime;
-        this.validTime = "17:30";
-        this.isOnTime = DateTimeUtil.isAfter(this.clientTime + 60 * 1000, this.validTime);
+        this.validTime = "08:30";
+        //this.validTime = model.validTime;
+        this.isOnTime = DateTimeUtil.isBefore(this.clientTime + 2 * 60 * 1000, this.validTime);
         this.validLatitude = model.validLatitude;
         this.validLongitude = model.validLongitude;
         this.latitude = model.latitude;

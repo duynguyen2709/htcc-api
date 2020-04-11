@@ -5,7 +5,7 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
-import htcc.common.entity.log.LeavingRequestLogEntity;
+import htcc.common.entity.leavingrequest.LeavingRequestLogEntity;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.repository.LeavingRequestLogRepository;

@@ -4,7 +4,6 @@ import com.google.gson.reflect.TypeToken;
 import htcc.common.comparator.DateComparator;
 import htcc.common.component.LoggingConfiguration;
 import htcc.common.constant.ComplaintStatusEnum;
-import htcc.common.entity.log.LeavingRequestLogEntity;
 import htcc.common.util.StringUtil;
 import lombok.Data;
 

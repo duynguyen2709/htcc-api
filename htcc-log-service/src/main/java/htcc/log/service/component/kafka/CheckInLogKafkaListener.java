@@ -1,7 +1,7 @@
 package htcc.log.service.component.kafka;
 
 import htcc.common.entity.checkin.CheckinModel;
-import htcc.common.entity.log.CheckInLogEntity;
+import htcc.common.entity.checkin.CheckInLogEntity;
 import htcc.common.service.kafka.BaseKafkaConsumer;
 import htcc.common.util.StringUtil;
 import htcc.log.service.repository.BaseLogDAO;

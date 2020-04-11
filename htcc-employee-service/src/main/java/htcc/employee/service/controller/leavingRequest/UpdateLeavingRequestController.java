@@ -1,13 +1,9 @@
 package htcc.employee.service.controller.leavingRequest;
 
-import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.entity.leavingrequest.LeavingRequestResponse;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
-import htcc.common.entity.log.ComplaintLogEntity;
-import htcc.common.entity.log.LeavingRequestLogEntity;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.LeavingRequestService;

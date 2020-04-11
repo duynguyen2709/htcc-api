@@ -1,7 +1,7 @@
 package htcc.log.service.repository;
 
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
-import htcc.common.entity.log.LeavingRequestLogEntity;
+import htcc.common.entity.leavingrequest.LeavingRequestLogEntity;
 
 import java.util.List;
 

@@ -60,8 +60,7 @@ public class ComplaintResponse implements Serializable {
 
     @ApiModelProperty(notes = "Nội dung phản hồi/ khiếu nại",
                       example = "abc")
-    @NotEmpty
-    public String content = "";
+    public List<String> content = new ArrayList<>();
 
     @ApiModelProperty(notes = "Array URL Hình ảnh mô tả (tối đa 3 ảnh, có thể empty)")
     public List<String> images = new ArrayList<>();
@@ -74,8 +73,7 @@ public class ComplaintResponse implements Serializable {
 
     @ApiModelProperty(notes = "Phản hồi từ công ty (có thể empty)",
                       example = "Đã giải quyết yêu cầu")
-    @NotEmpty
-    public String response = "";
+    public List<String> response = new ArrayList<>();
 
     public ComplaintResponse(ComplaintModel model) {
         this.complaintId = model.complaintId;

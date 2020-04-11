@@ -2,6 +2,7 @@ package htcc.employee.service.service;
 
 import htcc.common.constant.Constant;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.complaint.ResubmitComplaintModel;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import lombok.extern.log4j.Log4j2;
@@ -45,6 +46,12 @@ public class LogService {
     public BaseResponse updateComplaintStatus(UpdateComplaintStatusModel model) {
         HttpEntity<UpdateComplaintStatusModel> request = new HttpEntity<>(model);
         String method = "/complaint/status";
+        return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
+    }
+
+    public BaseResponse resubmitComplaint(ResubmitComplaintModel model) {
+        HttpEntity<ResubmitComplaintModel> request = new HttpEntity<>(model);
+        String method = "/complaint/resubmit";
         return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
     }
 

@@ -1,6 +1,6 @@
 package htcc.log.service.mapper;
 
-import htcc.common.entity.log.CheckInLogEntity;
+import htcc.common.entity.checkin.CheckInLogEntity;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

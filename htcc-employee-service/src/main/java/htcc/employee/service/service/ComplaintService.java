@@ -7,6 +7,7 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintModel;
 import htcc.common.entity.complaint.ComplaintResponse;
+import htcc.common.entity.complaint.ResubmitComplaintModel;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.service.ICallback;
 import htcc.common.util.DateTimeUtil;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -66,6 +68,13 @@ public class ComplaintService {
                     if (models == null) {
                         throw new Exception(String.format("parseResponse %s return null", response));
                     }
+                    models.sort(new Comparator<ComplaintModel>() {
+
+                        @Override
+                        public int compare(ComplaintModel o1, ComplaintModel o2) {
+                            return Long.compare(o2.getClientTime(), o1.getClientTime());
+                        }
+                    });
 
                     models.forEach(c -> result.add(new ComplaintResponse(c)));
                 } catch (Exception e) {
@@ -151,8 +160,9 @@ public class ComplaintService {
         };
     }
 
-
-
+    public BaseResponse resubmitComplaint(ResubmitComplaintModel model) {
+        return logService.resubmitComplaint(model);
+    }
 
     public BaseResponse updateComplaintStatus(UpdateComplaintStatusModel model) {
         return logService.updateComplaintStatus(model);
