@@ -39,7 +39,8 @@ public class UpdateComplaintController {
             }
 
             List<ComplaintResponse> list = complaintService.getListComplaintLogByMonth(yyyyMM);
-            response.data = list;
+
+            response.setData(list);
 
         } catch (Exception e) {
             log.error(String.format("getListComplaint [%s] ex", month), e);

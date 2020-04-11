@@ -50,7 +50,7 @@ public class UpdateLeavingRequestStatusModel extends BaseJPAEntity implements Se
         }
 
         if (StringUtil.isEmpty(leavingRequestId)) {
-            return "Username không được rỗng";
+            return "ID đơn nghỉ phép không được rỗng";
         }
 
         if (status != ComplaintStatusEnum.DONE.getValue() &&

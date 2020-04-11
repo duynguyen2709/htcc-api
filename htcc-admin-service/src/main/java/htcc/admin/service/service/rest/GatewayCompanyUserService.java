@@ -67,6 +67,17 @@ public class GatewayCompanyUserService {
         }
     }
 
+    public BaseResponse blockAllCompanyUser(String companyId, int newStatus) {
+        try {
+            HttpEntity<Object> request = new HttpEntity<>(null);
+            String method = String.format("/companyusers/status/%s/%s", companyId, newStatus);
+            return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
+        } catch (Exception e) {
+            log.error(e);
+            return new BaseResponse(e);
+        }
+    }
+
 
     private BaseResponse callGet(String method){
         return restTemplate.getForObject(baseURL + method, BaseResponse.class);

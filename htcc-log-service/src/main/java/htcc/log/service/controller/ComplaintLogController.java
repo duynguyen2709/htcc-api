@@ -4,8 +4,9 @@ import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintModel;
+import htcc.common.entity.complaint.ResubmitComplaintModel;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
-import htcc.common.entity.log.ComplaintLogEntity;
+import htcc.common.entity.complaint.ComplaintLogEntity;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.repository.ComplaintLogRepository;
@@ -129,14 +130,64 @@ public class ComplaintLogController {
             }
 
             if (oldEnt.getStatus() == ComplaintStatusEnum.DONE.getValue() ||
-            oldEnt.getStatus() == ComplaintStatusEnum.REJECTED.getValue()) {
+                    oldEnt.getStatus() == ComplaintStatusEnum.REJECTED.getValue()) {
                 log.warn("[complaintRepo.getComplaint] oldEntity {}: status = [{}]", oldEnt.getComplaintId(), oldEnt.getStatus());
-                return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, "Khiếu nại đã được xử lý trước đó");
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage("Khiếu nại đã được xử lý trước đó");
+                return response;
             }
+
+            List<String> oldResponses = StringUtil.json2Collection(oldEnt.response, StringUtil.LIST_STRING_TYPE);
+            oldResponses.add(request.getResponse());
+
+            request.setResponse(StringUtil.toJsonString(oldResponses));
 
             complaintRepo.updateComplaintLogStatus(request);
         } catch (Exception e){
             log.error(String.format("[updateLeavingRequestStatus] [%s] ex", StringUtil.toJsonString(request)), e);
+            return new BaseResponse(e);
+        }
+
+        return response;
+    }
+
+
+
+
+    // resubmit complaint, call by mobile
+    @PostMapping("/complaint/resubmit")
+    public BaseResponse resubmitComplaint(@RequestBody ResubmitComplaintModel request){
+        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        response.setReturnMessage("Cập nhật khiếu nại thành công");
+
+        try {
+            UpdateComplaintStatusModel temp = new UpdateComplaintStatusModel();
+            temp.setComplaintId(request.getComplaintId());
+            temp.setYyyyMM(request.getYyyyMM());
+
+            ComplaintLogEntity logEntity = complaintRepo.getComplaint(temp);
+            if (logEntity == null) {
+                log.warn("[complaintRepo.getComplaint] {} return null", StringUtil.toJsonString(request));
+                response = new BaseResponse<>(ReturnCodeEnum.LOG_NOT_FOUND);
+                return response;
+            }
+
+            if (logEntity.getStatus() == ComplaintStatusEnum.PROCESSING.getValue()) {
+                log.warn("[complaintRepo.getComplaint] oldEntity {}: status = [{}]", logEntity.getComplaintId(), logEntity.getStatus());
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage("Khiếu nại chưa được xử lý");
+                return response;
+            }
+
+            ComplaintModel model = new ComplaintModel(logEntity);
+            model.getContent().add(request.getContent());
+            model.setStatus(ComplaintStatusEnum.PROCESSING.getValue());
+
+            complaintRepo.resubmitComplaint(request.getYyyyMM(), request.getComplaintId(),
+                    StringUtil.toJsonString(model.getContent()));
+
+        } catch (Exception e){
+            log.error(String.format("[resubmitComplaint] [%s] ex", StringUtil.toJsonString(request)), e);
             return new BaseResponse(e);
         }
 

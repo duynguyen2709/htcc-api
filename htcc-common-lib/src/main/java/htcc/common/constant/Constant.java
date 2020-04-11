@@ -11,6 +11,7 @@ public class Constant {
     public static final String BEARER        = "Bearer ";
 
     public static final String API_PATH               = "/api";
+    public static final String INTERNAL_API_PATH      = "/internal";
     public static final String PUBLIC_API_PATH        = "/public/";
     public static final String PRIVATE_API_PATH       = "/private/";
     public static final String BASE_API_GATEWAY_PATH  = "/api/gateway";

@@ -166,3 +166,17 @@
 07-04-2020:
  + Version 1.4.9:
     - [Employee] Update Leaving Request Status
+ + Version 1.5.0:
+    - [Employee] RestAPI For Company & Office Info
+
+08-04-2020:
+ + Version 1.5.1:
+    - [Employee] API CancelLeavingRequest, add field useDayOff in case using external day off
+
+10-04-2020:
+    - [Employee] Add check rule max day off left
+
+11-04-2020:
+ + Version 1.5.2:
+    - [Employee] API Resubmit Complaint
+    - [Gateway] Mass update account status on blocking company

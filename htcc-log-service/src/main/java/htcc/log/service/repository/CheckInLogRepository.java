@@ -1,7 +1,7 @@
 package htcc.log.service.repository;
 
-import htcc.common.entity.log.CheckInLogEntity;
-import htcc.common.entity.log.CheckOutLogEntity;
+import htcc.common.entity.checkin.CheckInLogEntity;
+import htcc.common.entity.checkin.CheckOutLogEntity;
 
 public interface CheckInLogRepository {
 

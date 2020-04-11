@@ -1,6 +1,7 @@
 package htcc.admin.service.controller;
 
 import htcc.admin.service.service.rest.EmployeeCompanyService;
+import htcc.admin.service.service.rest.GatewayCompanyUserService;
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
@@ -24,6 +25,10 @@ public class CompanyController {
 
     @Autowired
     private EmployeeCompanyService companyService;
+
+    @Autowired
+    private GatewayCompanyUserService gatewayService;
+
 
     @ApiOperation(value = "Lấy danh sách công ty", response = Company.class)
     @GetMapping("/companies")
@@ -101,10 +106,16 @@ public class CompanyController {
             company.setCompanyId(companyId);
             company.setStatus(newStatus);
 
-            return companyService.updateCompanyStatus(company);
+            response = companyService.updateCompanyStatus(company);
         } catch (Exception e){
             log.error("[lockCompany] [{} - {}] ex", companyId, newStatus, e);
-            return new BaseResponse<>(e);
+            response = new BaseResponse<>(e);
+        } finally {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+                gatewayService.blockAllCompanyUser(companyId, newStatus);
+            }
         }
+
+        return response;
     }
 }

@@ -1,17 +1,11 @@
 package htcc.common.entity.complaint;
 
-import htcc.common.component.LoggingConfiguration;
-import htcc.common.constant.ComplaintStatusEnum;
-import htcc.common.entity.log.ComplaintLogEntity;
-import htcc.common.util.StringUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @ApiModel(description = "Request để cập nhật trạng thái khiếu nại")

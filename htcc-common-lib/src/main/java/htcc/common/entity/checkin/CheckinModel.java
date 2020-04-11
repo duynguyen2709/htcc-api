@@ -2,8 +2,6 @@ package htcc.common.entity.checkin;
 
 import htcc.common.component.LoggingConfiguration;
 import htcc.common.constant.CheckinTypeEnum;
-import htcc.common.entity.log.CheckInLogEntity;
-import htcc.common.entity.log.CheckOutLogEntity;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import lombok.Data;

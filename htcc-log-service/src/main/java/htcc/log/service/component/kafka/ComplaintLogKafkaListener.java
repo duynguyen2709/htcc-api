@@ -3,7 +3,7 @@ package htcc.log.service.component.kafka;
 import htcc.common.component.redis.RedisComplaintService;
 import htcc.common.entity.complaint.ComplaintModel;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
-import htcc.common.entity.log.ComplaintLogEntity;
+import htcc.common.entity.complaint.ComplaintLogEntity;
 import htcc.common.service.ICallback;
 import htcc.common.service.kafka.BaseKafkaConsumer;
 import htcc.common.util.DateTimeUtil;

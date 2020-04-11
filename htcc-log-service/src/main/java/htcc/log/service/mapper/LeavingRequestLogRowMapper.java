@@ -1,7 +1,6 @@
 package htcc.log.service.mapper;
 
-import htcc.common.entity.log.ComplaintLogEntity;
-import htcc.common.entity.log.LeavingRequestLogEntity;
+import htcc.common.entity.leavingrequest.LeavingRequestLogEntity;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -17,6 +16,7 @@ public class LeavingRequestLogRowMapper implements RowMapper<LeavingRequestLogEn
         entity.companyId = rs.getString("companyId");
         entity.username = rs.getString("username");
         entity.clientTime = rs.getLong("clientTime");
+        entity.useDayOff = rs.getInt("useDayOff");
         entity.category = rs.getString("category");
         entity.reason = rs.getString("reason");
         entity.detail = rs.getString("detail");

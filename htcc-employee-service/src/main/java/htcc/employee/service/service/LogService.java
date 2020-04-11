@@ -2,6 +2,7 @@ package htcc.employee.service.service;
 
 import htcc.common.constant.Constant;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.complaint.ResubmitComplaintModel;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import lombok.extern.log4j.Log4j2;
@@ -48,11 +49,22 @@ public class LogService {
         return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
     }
 
+    public BaseResponse resubmitComplaint(ResubmitComplaintModel model) {
+        HttpEntity<ResubmitComplaintModel> request = new HttpEntity<>(model);
+        String method = "/complaint/resubmit";
+        return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
+    }
+
     /*
     ##################### Leaving Request Section #####################
      */
 
     // for employee
+    public BaseResponse getOneLeavingRequestLog(String leavingRequestId, String yyyyMM) {
+        String method = String.format("/leaving?leavingRequestId=%s&yyyyMM=%s", leavingRequestId, yyyyMM);
+        return callGet(method);
+    }
+
     public BaseResponse getListLeavingRequestLog(String companyId, String username, String year) {
         String method = String.format("/leaving/%s/%s/%s", companyId, username, year);
         return callGet(method);

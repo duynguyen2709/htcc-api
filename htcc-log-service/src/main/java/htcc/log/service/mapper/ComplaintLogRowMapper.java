@@ -1,6 +1,6 @@
 package htcc.log.service.mapper;
 
-import htcc.common.entity.log.ComplaintLogEntity;
+import htcc.common.entity.complaint.ComplaintLogEntity;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;

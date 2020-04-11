@@ -2,7 +2,7 @@ package htcc.log.service.repository.impl;
 
 import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
-import htcc.common.entity.log.ComplaintLogEntity;
+import htcc.common.entity.complaint.ComplaintLogEntity;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.mapper.ComplaintLogRowMapper;
@@ -72,6 +72,24 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
         int rowAffected = jdbcTemplate.update(query, model.getStatus(), model.getResponse());
         if (rowAffected == 1) {
             decreaseComplaintLogCounter(model);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void resubmitComplaint(String yyyyMM, String complaintId, String newContent) {
+        String tableName = "ComplaintLog" + yyyyMM;
+
+        String query = String.format("UPDATE %s SET status = ?, content = ? WHERE complaintId='%s'",
+                tableName, complaintId);
+
+        int rowAffected = jdbcTemplate.update(query, ComplaintStatusEnum.PROCESSING.getValue(), newContent);
+        if (rowAffected == 1) {
+            UpdateComplaintStatusModel model = new UpdateComplaintStatusModel();
+            model.setYyyyMM(yyyyMM);
+            model.setComplaintId(complaintId);
+
+            increasePendingComplaintCounter(model);
         }
     }
 

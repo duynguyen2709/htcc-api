@@ -22,20 +22,15 @@ public class ComplaintService {
     @Autowired
     private LogService logService;
 
-    public List<ComplaintResponse> getListComplaintLogByMonth(String yyyyMM) {
+    public List<ComplaintResponse> getListComplaintLogByMonth(String yyyyMM) throws Exception {
         List<ComplaintResponse> result = new ArrayList<>();
-        try {
-            BaseResponse response = logService.getListComplaintLogByMonth(yyyyMM);
-            List<ComplaintModel> models = parseResponse(response);
-            if (models == null) {
-                throw new Exception(String.format("parseResponse %s return null", response));
-            }
-
-            models.forEach(c -> result.add(new ComplaintResponse(c)));
-
-        } catch (Exception e) {
-            log.error(String.format("[getListComplaintLogByMonth] : [%s] ex", yyyyMM), e);
+        BaseResponse response = logService.getListComplaintLogByMonth(yyyyMM);
+        List<ComplaintModel> models = parseResponse(response);
+        if (models == null) {
+            throw new Exception(String.format("parseResponse %s return null", response));
         }
+
+        models.forEach(c -> result.add(new ComplaintResponse(c)));
 
         return result;
     }

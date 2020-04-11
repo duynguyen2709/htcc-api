@@ -3,21 +3,12 @@ package htcc.log.service.controller;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.CheckinModel;
-import htcc.common.entity.complaint.ComplaintModel;
-import htcc.common.entity.complaint.ComplaintResponse;
-import htcc.common.entity.log.CheckInLogEntity;
-import htcc.common.entity.log.CheckOutLogEntity;
-import htcc.common.entity.log.ComplaintLogEntity;
-import htcc.common.util.StringUtil;
+import htcc.common.entity.checkin.CheckInLogEntity;
+import htcc.common.entity.checkin.CheckOutLogEntity;
 import htcc.log.service.repository.CheckInLogRepository;
-import htcc.log.service.repository.ComplaintLogRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @Log4j2

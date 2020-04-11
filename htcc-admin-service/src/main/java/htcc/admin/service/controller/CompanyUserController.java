@@ -1,5 +1,7 @@
 package htcc.admin.service.controller;
 
+import com.google.gson.reflect.TypeToken;
+import htcc.admin.service.service.rest.EmployeeCompanyService;
 import htcc.admin.service.service.rest.EmployeeInfoService;
 import htcc.admin.service.service.rest.GatewayCompanyUserService;
 import htcc.common.component.kafka.KafkaProducerService;
@@ -8,6 +10,7 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.base.BaseUser;
 import htcc.common.entity.companyuser.CompanyUserModel;
+import htcc.common.entity.jpa.Company;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +18,8 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Api(tags = "API quản lý Admin của Công Ty",
      description = "API quản lý danh sách Admin của công ty")
@@ -27,6 +32,9 @@ public class CompanyUserController {
 
     @Autowired
     private EmployeeInfoService employeeInfoService;
+
+    @Autowired
+    private EmployeeCompanyService companyService;
 
     @Autowired
     private KafkaProducerService kafka;
@@ -59,6 +67,13 @@ public class CompanyUserController {
                 return response;
             }
 
+            Company company = findCompany(user.getCompanyId());
+            if (company == null) {
+                response = new BaseResponse(ReturnCodeEnum.DATA_NOT_FOUND);
+                response.setReturnMessage(String.format("Không tìm thấy công ty [%s]", user.companyId));
+                return response;
+            }
+
             response = service.createCompanyUser(user);
 
             if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
@@ -86,6 +101,26 @@ public class CompanyUserController {
         return response;
     }
 
+
+    private Company findCompany(String companyId) {
+        try {
+            BaseResponse response = companyService.getListCompany();
+            if (response == null || response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
+                throw new Exception(String.format("[companyService.getListCompany] response [%s]", StringUtil.toJsonString(response)));
+            }
+            String data = StringUtil.toJsonString(response.getData());
+
+            List<Company> list = StringUtil.json2Collection(data, new TypeToken<List<Company>>(){}.getType());
+            for (Company c : list) {
+                if (c.getCompanyId().equals(companyId)){
+                    return c;
+                }
+            }
+        } catch (Exception e){
+            log.error("[findCompany] [{}] ex", companyId, e);
+        }
+        return null;
+    }
 
 
 

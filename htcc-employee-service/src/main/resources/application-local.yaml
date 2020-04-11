@@ -36,5 +36,5 @@ redis:
 
 kafka:
   enableProducer: true
-  enableConsumer: true
+  enableConsumer: false
   bootstrapAddress: 127.0.0.1:9092
