@@ -193,12 +193,15 @@ public class InternalCompanyUserController {
 
         try {
             listUser = service.findByCompanyId(companyId);
-            // copy original list to handle
-            listUserCopy = new ArrayList<>(listUser);
+
+            for (CompanyUser user : listUser){
+                listUserCopy.add(new CompanyUser(user));
+            }
 
             listUser.forEach(c -> c.setStatus(newStatus));
 
             service.updateAll(listUser);
+            log.info("Doing Mass Update, status [{}] for Company [{}] Succeed", newStatus, companyId);
 
         } catch (Exception e) {
             log.error("[updateAllCompanyUserStatus] [{} - {}] ex", companyId, newStatus, e);
@@ -233,8 +236,10 @@ public class InternalCompanyUserController {
 
                     redis.set(tokenWeb, 0, redis.buzConfig.blacklistTokenFormat, ClientSystemEnum.MANAGER_WEB.getValue(), companyId, user.username);
                 }
+                String redisValue = StringUtil.toJsonString(listBlockedUser);
+                redis.set(redisValue, 0, redis.buzConfig.statusBlockUserFormat, companyId);
 
-                redis.set(StringUtil.toJsonString(listBlockedUser), 0, redis.buzConfig.statusBlockUserFormat, companyId);
+                log.info("Set Blocked User List of Company [{}], Value = [{}]", companyId, redisValue);
 
             } else if (newStatus == AccountStatusEnum.ACTIVE.getValue()) {
                 // get list user blocked in redis cache
@@ -261,6 +266,9 @@ public class InternalCompanyUserController {
 
                 // delete cache
                 redis.delete(redis.buzConfig.statusBlockUserFormat, companyId);
+
+                log.info("Doing Update status [0] for Company Original Blocked Users [{}] Succeed",
+                        StringUtil.toJsonString(listBlocked));
             }
         } catch (Exception e){
             log.error("[handleRedisBlock] [{} - {}]", companyId, newStatus, e);

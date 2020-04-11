@@ -36,6 +36,16 @@ public class CompanyUser extends BaseJPAEntity {
         this.status = model.status;
     }
 
+    public CompanyUser(CompanyUser model) {
+        this.companyId = model.companyId;
+        this.username = model.username;
+        this.password = model.password;
+        this.email = model.email;
+        this.phoneNumber = model.phoneNumber;
+        this.status = model.status;
+        this.role = model.role;
+    }
+
     public CompanyUserModel fromEntity() {
         CompanyUserModel model = new CompanyUserModel();
         model.companyId = this.companyId;
