@@ -179,3 +179,4 @@
 11-04-2020:
  + Version 1.5.2:
     - [Employee] API Resubmit Complaint
+    - [Gateway] Mass update account status on blocking company

@@ -1,10 +1,14 @@
 package htcc.gateway.service.controller;
 
 import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.component.redis.RedisService;
+import htcc.common.constant.AccountStatusEnum;
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.companyuser.CompanyUserModel;
 import htcc.common.util.StringUtil;
+import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.company.CompanyUser;
 import htcc.gateway.service.service.jpa.CompanyUserService;
 import lombok.extern.log4j.Log4j2;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +33,12 @@ public class InternalCompanyUserController {
 
     @Autowired
     private KafkaProducerService kafka;
+
+    @Autowired
+    private SecurityConfig securityConfig;
+
+    @Autowired
+    private RedisService redis;
 
 
     @PostMapping("/companyusers")
@@ -169,5 +180,90 @@ public class InternalCompanyUserController {
         }
 
         return response;
+    }
+
+
+
+
+    @PostMapping("/companyusers/status/{companyId}/{newStatus}")
+    public BaseResponse updateAllCompanyUserStatus(@PathVariable String companyId, @PathVariable int newStatus) {
+        BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        List<CompanyUser> listUser = new ArrayList<>();
+        List<CompanyUser> listUserCopy = new ArrayList<>();
+
+        try {
+            listUser = service.findByCompanyId(companyId);
+            // copy original list to handle
+            listUserCopy = new ArrayList<>(listUser);
+
+            listUser.forEach(c -> c.setStatus(newStatus));
+
+            service.updateAll(listUser);
+
+        } catch (Exception e) {
+            log.error("[updateAllCompanyUserStatus] [{} - {}] ex", companyId, newStatus, e);
+            response = new BaseResponse<>(e);
+        } finally {
+            // blacklist token
+            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
+                handleRedisBlock(listUserCopy, companyId, newStatus);
+            }
+        }
+
+        return response;
+    }
+
+    private void handleRedisBlock(List<CompanyUser> listUser, String companyId, int newStatus) {
+        try {
+            if (newStatus == AccountStatusEnum.BLOCK.getValue()) {
+
+                List<String> listBlockedUser = new ArrayList<>();
+
+                for (CompanyUser user : listUser) {
+                    // add to block list to restore after unblock
+                    if (user.status == AccountStatusEnum.BLOCK.getValue()) {
+                        listBlockedUser.add(user.username);
+                    }
+
+                    String tokenMobile = StringUtil.valueOf(redis.get(redis.buzConfig.tokenFormat, ClientSystemEnum.MOBILE.getValue(), companyId, user.username));
+
+                    String tokenWeb = StringUtil.valueOf(redis.get(redis.buzConfig.tokenFormat, ClientSystemEnum.MANAGER_WEB.getValue(), companyId, user.username));
+
+                    redis.set(tokenMobile, 0, redis.buzConfig.blacklistTokenFormat, ClientSystemEnum.MOBILE.getValue(), companyId, user.username);
+
+                    redis.set(tokenWeb, 0, redis.buzConfig.blacklistTokenFormat, ClientSystemEnum.MANAGER_WEB.getValue(), companyId, user.username);
+                }
+
+                redis.set(StringUtil.toJsonString(listBlockedUser), 0, redis.buzConfig.statusBlockUserFormat, companyId);
+
+            } else if (newStatus == AccountStatusEnum.ACTIVE.getValue()) {
+                // get list user blocked in redis cache
+                String listUserStr = StringUtil.valueOf(redis.get(redis.buzConfig.statusBlockUserFormat, companyId));
+                if (listUserStr.isEmpty()) {
+                    return;
+                }
+                List<String> listUsernameInCache = StringUtil.json2Collection(listUserStr, StringUtil.LIST_STRING_TYPE);
+
+                // find user in db
+                List<CompanyUser> listBlocked = new ArrayList<>();
+
+                for (String username : listUsernameInCache) {
+                    // for each user, set original status (block)
+                    CompanyUser user = service.findById(new CompanyUser.Key(companyId, username));
+                    if (user != null) {
+                        user.setStatus(AccountStatusEnum.BLOCK.getValue());
+                        listBlocked.add(user);
+                    }
+                }
+
+                // mass update blocked user
+                service.updateAll(listBlocked);
+
+                // delete cache
+                redis.delete(redis.buzConfig.statusBlockUserFormat, companyId);
+            }
+        } catch (Exception e){
+            log.error("[handleRedisBlock] [{} - {}]", companyId, newStatus, e);
+        }
     }
 }

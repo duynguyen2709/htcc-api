@@ -42,6 +42,10 @@ public class CompanyUserService extends BaseJPAService<CompanyUser, CompanyUser.
         return repo.save(companyUser);
     }
 
+    public List<CompanyUser> updateAll(List<CompanyUser> companyUsers) {
+        return repo.saveAll(companyUsers);
+    }
+
     @Override
     public void delete(CompanyUser.Key key) {
         repo.deleteById(key);
