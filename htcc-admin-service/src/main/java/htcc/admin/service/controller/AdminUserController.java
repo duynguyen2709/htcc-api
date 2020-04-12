@@ -208,8 +208,7 @@ public class AdminUserController {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()){
                 if (newStatus == AccountStatusEnum.BLOCK.getValue()) {
                     redis.setBlacklistToken(username);
-                } else if (newStatus == AccountStatusEnum.ACTIVE.getValue()) {
-                    redis.deleteBlacklistToken(username);
+                    redis.deleteToken(username);
                 }
 
                 redisUserInfo.setUserInfo(response.data);
@@ -242,6 +241,7 @@ public class AdminUserController {
         } finally {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()){
                 redis.deleteBlacklistToken(username);
+                redis.deleteToken(username);
                 redisUserInfo.deleteUserInfo(username);
             }
         }
