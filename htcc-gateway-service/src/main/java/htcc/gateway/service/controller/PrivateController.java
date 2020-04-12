@@ -78,6 +78,12 @@ public class PrivateController {
                         loginInfo.clientId,
                         StringUtil.valueOf(loginInfo.companyId),
                         loginInfo.username);
+
+                // delete old token
+                redis.delete(redis.buzConfig.tokenFormat,
+                        loginInfo.clientId,
+                        StringUtil.valueOf(loginInfo.companyId),
+                        loginInfo.username);
             }
         }
         return response;

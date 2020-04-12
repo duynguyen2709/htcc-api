@@ -29,4 +29,8 @@ public class RedisTokenService {
         redis.delete(redis.buzConfig.blacklistTokenFormat,
                 ClientSystemEnum.ADMIN_WEB.getValue(), "", username);
     }
+
+    public void deleteToken(String username) {
+        redis.delete(redis.buzConfig.tokenFormat, ClientSystemEnum.ADMIN_WEB.getValue(), "", username);
+    }
 }
