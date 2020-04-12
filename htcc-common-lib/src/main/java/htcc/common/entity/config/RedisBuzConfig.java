@@ -15,6 +15,13 @@ public class RedisBuzConfig {
     public String checkinFormat = "CHECKIN-%s-%s-%s"; // companyId-username-date
     public String checkoutFormat = "CHECKOUT-%s-%s-%s"; // companyId-username-date
 
+    // for special case when blocking:
+    // user A was blocked by company B
+    // System admin block all account of company B
+    // when admin unblock company B, user A was also unblocked.
+    // => save which user was blocked before company is blocked
+    public String statusBlockUserFormat = "STATUS-BLOCK-%s"; // companyId : save list user
+
     @Value("${security.jwt.expireSecond:86400}")
     public long jwtTTL;
 }

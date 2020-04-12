@@ -24,6 +24,7 @@ public class RequestLoggingServlet extends BaseRequestServlet {
 
     @Override
     protected boolean shouldNotProcessLog(String uri) {
-        return (!uri.startsWith(Constant.API_PATH));
+        return (!uri.startsWith(Constant.API_PATH) &&
+                !uri.startsWith(Constant.INTERNAL_API_PATH));
     }
 }
