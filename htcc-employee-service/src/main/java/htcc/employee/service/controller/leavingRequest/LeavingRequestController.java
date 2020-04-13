@@ -268,6 +268,10 @@ public class LeavingRequestController {
                 return response;
             }
 
+            if (!leavingRequestId.startsWith("#")) {
+                leavingRequestId = "#" + leavingRequestId;
+            }
+
             String yyyyMM = DateTimeUtil.convertToOtherFormat(dateSubmit, "yyyyMMdd", "yyyyMM");
 
             LeavingRequestModel model = service.getOneLeavingRequest(leavingRequestId.substring(1), yyyyMM);
