@@ -235,6 +235,10 @@ public class InternalCompanyUserController {
                     redis.set(tokenMobile, 0, redis.buzConfig.blacklistTokenFormat, ClientSystemEnum.MOBILE.getValue(), companyId, user.username);
 
                     redis.set(tokenWeb, 0, redis.buzConfig.blacklistTokenFormat, ClientSystemEnum.MANAGER_WEB.getValue(), companyId, user.username);
+
+                    redis.delete(redis.buzConfig.tokenFormat, ClientSystemEnum.MOBILE.getValue(), companyId, user.username);
+
+                    redis.delete(redis.buzConfig.tokenFormat, ClientSystemEnum.MANAGER_WEB.getValue(), companyId, user.username);
                 }
                 String redisValue = StringUtil.toJsonString(listBlockedUser);
                 redis.set(redisValue, 0, redis.buzConfig.statusBlockUserFormat, companyId);
