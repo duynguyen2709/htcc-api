@@ -2,13 +2,16 @@ package htcc.employee.service.service.jpa;
 
 import htcc.common.service.BaseJPAService;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.repository.jpa.EmployeeInfoRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -80,5 +83,21 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
     @Override
     public void delete(EmployeeInfo.Key key) {
         repo.deleteById(key);
+    }
+
+    @Async
+    public CompletableFuture<Float> getTotalDayOff(String companyId, String username) {
+        try {
+            EmployeeInfo employee = findById(new EmployeeInfo.Key(companyId, username));
+            if (employee == null) {
+                throw new Exception("Employee not found !");
+            }
+
+            float value = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(companyId).getDayOffByLevel().getOrDefault(employee.getLevel(), 10.0f);
+            return CompletableFuture.completedFuture(value);
+        } catch (Exception e){
+            log.error("[getTotalDayOff] [{} - {}] ex", companyId, username, e);
+            return CompletableFuture.completedFuture(10.0f);
+        }
     }
 }

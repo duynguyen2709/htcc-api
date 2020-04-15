@@ -21,14 +21,7 @@ import java.util.stream.Collectors;
 public class LeavingRequestService {
 
     @Autowired
-    private ServiceConfig serviceConfig;
-
-    @Autowired
     private LogService logService;
-
-    public List<String> getCategories(){
-        return new ArrayList<>(serviceConfig.getLeavingRequestCategoryList().keySet());
-    }
 
     // for employee
     public List<LeavingRequestResponse> getLeavingRequestLog(String companyId, String username, String year){

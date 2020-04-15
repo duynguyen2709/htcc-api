@@ -4,6 +4,7 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.Company;
 import htcc.common.util.StringUtil;
+import htcc.employee.service.service.jpa.BuzConfigService;
 import htcc.employee.service.service.jpa.CompanyService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,8 @@ public class InternalCompanyController {
     @Autowired
     private CompanyService companyService;
 
-
+    @Autowired
+    private BuzConfigService buzConfigService;
 
 
     @PostMapping("/companies")
@@ -37,6 +39,9 @@ public class InternalCompanyController {
             }
 
             Company newCompany = companyService.create(company);
+
+            buzConfigService.createDefaultDayOffInfo(company.getCompanyId());
+
             response.setData(newCompany);
 
         } catch (Exception e) {

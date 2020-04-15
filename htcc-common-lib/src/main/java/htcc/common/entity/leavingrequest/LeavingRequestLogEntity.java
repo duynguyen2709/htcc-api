@@ -20,6 +20,7 @@ public class LeavingRequestLogEntity extends BaseLogEntity {
     public String username         = "";
     public long   clientTime       = 0L;
     public int    useDayOff        = 1;
+    public int    hasSalary        = 0;
     public String category         = "";
     public String reason           = "";
     public String detail           = "";
@@ -34,6 +35,7 @@ public class LeavingRequestLogEntity extends BaseLogEntity {
         this.username = model.username;
         this.clientTime = model.clientTime;
         this.useDayOff = model.useDayOff ? 1 : 0;
+        this.hasSalary = model.hasSalary ? 1 : 0;
         this.category = model.category;
         this.reason = model.reason;
         this.detail = StringUtil.toJsonString(model.detail);
@@ -51,6 +53,7 @@ public class LeavingRequestLogEntity extends BaseLogEntity {
         params.put("username", this.username);
         params.put("clientTime", this.clientTime);
         params.put("useDayOff", this.useDayOff);
+        params.put("hasSalary", this.hasSalary);
         params.put("category", this.category);
         params.put("reason", this.reason);
         params.put("detail", this.detail);

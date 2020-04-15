@@ -183,3 +183,7 @@
 
 12-04-2020:
  + Hotfix: [Gateway] Fix bug case add token to blacklist but still response when login with this token.
+
+15-04-2020:
+ + Version 1.6.0:
+    - [Employee] Add Hazelcast, Get DayOffInfo from config, API UpdateDayOffInfo

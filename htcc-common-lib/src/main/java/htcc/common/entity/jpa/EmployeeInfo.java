@@ -60,10 +60,16 @@ public class EmployeeInfo extends BaseJPAEntity {
     public String department = "";
 
     @Column
-    @ApiModelProperty(notes = "(*) Chức danh/ Cấp độ nhân viên",
+    @ApiModelProperty(notes = "(*) Chức danh nhân viên",
                       example = "Junior Developer")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String title = "";
+
+    @Column
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @ApiModelProperty(notes = "(*) Cấp độ nhân viên",
+                      example = "2.1")
+    public float level = 0.0f;
 
     @Column
     @ApiModelProperty(notes = "Họ tên",
@@ -138,6 +144,7 @@ public class EmployeeInfo extends BaseJPAEntity {
         this.officeId = other.officeId;
         this.department = other.department;
         this.title = other.title;
+        this.level = other.level;
         this.avatar = other.avatar;
     }
 

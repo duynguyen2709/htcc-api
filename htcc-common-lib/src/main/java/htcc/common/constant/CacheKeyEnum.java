@@ -4,6 +4,7 @@ public enum CacheKeyEnum {
 
     COMPANY,
     BUZ_CONFIG,
+    COMPANY_DAY_OFF,
     ALL;
 
     public static CacheKeyEnum getKey(String type){

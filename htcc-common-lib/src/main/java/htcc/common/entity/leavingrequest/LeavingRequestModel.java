@@ -22,6 +22,7 @@ public class LeavingRequestModel implements Serializable {
     public String  username         = "";
     public long    clientTime       = 0L;
     public boolean useDayOff        = true;
+    public boolean hasSalary        = false;
     public String  category         = "";
     public String  reason           = "";
     public String  response         = "";
@@ -52,13 +53,13 @@ public class LeavingRequestModel implements Serializable {
         this.username = logEntity.username;
         this.clientTime = logEntity.clientTime;
         this.useDayOff = (logEntity.useDayOff == 1);
+        this.hasSalary = (logEntity.hasSalary == 1);
         this.category = logEntity.category;
         this.reason = logEntity.reason;
         this.response = logEntity.response;
         this.status = logEntity.status;
         this.approver = logEntity.approver;
-        this.detail =
-                StringUtil.json2Collection(logEntity.detail, new TypeToken<List<LeavingRequest.LeavingDayDetail>>() {
-                }.getType());
+        this.detail =StringUtil.json2Collection(logEntity.detail,
+                new TypeToken<List<LeavingRequest.LeavingDayDetail>>(){}.getType());
     }
 }

@@ -98,7 +98,7 @@ public class EmployeeInfoController {
         boolean needUpdate = false;
         EmployeeInfo model = null;
         try {
-            model = new EmployeeInfo(companyId, username, employeeId, officeId, department, title, fullName,
+            model = new EmployeeInfo(companyId, username, employeeId, officeId, department, title, 0.0f, fullName,
                     null, email, identityCardNo, phoneNumber, address, StringUtil.EMPTY);
             model.setBirthDate(birthDate);
 
