@@ -1,4 +1,4 @@
-package htcc.common.service.hazelcast;
+package htcc.common.component;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
@@ -9,20 +9,19 @@ import htcc.common.constant.CacheKeyEnum;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@Service
+@Component
 @Log4j2
 public class HazelcastService {
 
-    @Value("${service.hazelcast.useHazelcast}")
+    @Value("${service.hazelcast.useHazelcast:false}")
     private boolean useHazelcast;
 
-    @Autowired
+    @Autowired(required = false)
     private HazelcastInstance hazelcastInstance;
 
     private <K, V> IMap<K, V> getMap(String key) {

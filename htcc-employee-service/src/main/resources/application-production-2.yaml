@@ -17,8 +17,8 @@ service:
   debugMode: false
   allowDeleteCheckin: true
   hazelcast:
-    useHazelcast: false
-    enableRest: true
+    useHazelcast: true
+    enableRest: false
     monitorLevel: "OFF"
     address: 10.25.96.4
     port: 5702
