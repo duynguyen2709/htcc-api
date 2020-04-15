@@ -3,8 +3,7 @@ package htcc.employee.service.component.hazelcast;
 import htcc.common.component.HazelcastService;
 import htcc.common.constant.CacheKeyEnum;
 import htcc.common.entity.jpa.Company;
-import htcc.employee.service.config.DbStaticConfigMap;
-import htcc.employee.service.service.jpa.CompanyService;
+import htcc.employee.service.repository.jpa.CompanyRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,7 @@ public class HazelcastLoader {
     private HazelcastService hazelcastService;
 
     @Autowired
-    private CompanyService companyService;
+    private CompanyRepository companyRepository;
 
     @PostConstruct
     public void loadAllStaticMap(){
@@ -42,7 +41,7 @@ public class HazelcastLoader {
 
         Map<String, Company> map = new HashMap<>();
 
-        companyService.findAll().forEach(c -> map.put(c.getCompanyId(),c));
+        companyRepository.findAll().forEach(c -> map.put(c.getCompanyId(),c));
 
         COMPANY_MAP = hazelcastService.reload(map, CacheKeyEnum.COMPANY);
         log.info("[loadCompanyMap] COMPANY_MAP loaded succeed");
