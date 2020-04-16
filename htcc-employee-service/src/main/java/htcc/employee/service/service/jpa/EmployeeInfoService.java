@@ -113,4 +113,16 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
             log.error(String.format("[deleteOffice] [%s-%s] ex", companyId, officeId), e);
         }
     }
+
+    public void deleteDepartment(String companyId, String department){
+        try {
+            List<EmployeeInfo> listEmployee = repo.findByCompanyIdAndDepartment(companyId, department);
+            for (EmployeeInfo employee : listEmployee){
+                employee.setDepartment(StringUtil.EMPTY);
+            }
+            repo.saveAll(listEmployee);
+        } catch (Exception e){
+            log.error(String.format("[deleteDepartment] [%s-%s] ex", companyId, department), e);
+        }
+    }
 }

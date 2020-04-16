@@ -12,4 +12,6 @@ public interface EmployeeInfoRepository extends JpaRepository<EmployeeInfo, Empl
     List<EmployeeInfo> findByCompanyId(String companyId);
 
     List<EmployeeInfo> findByCompanyIdAndOfficeId(String companyId, String officeId);
+
+    List<EmployeeInfo> findByCompanyIdAndDepartment(String companyId, String department);
 }

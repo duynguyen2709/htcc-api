@@ -39,6 +39,7 @@ public class OfficeRestController {
             response.setData(officeService.findByCompanyId(companyId));
         } catch (Exception e){
             log.error("[getListOffice] [{}] ex", companyId, e);
+            response = new BaseResponse(e);
         }
         return response;
     }
@@ -67,6 +68,13 @@ public class OfficeRestController {
                 return response;
             }
 
+            Office oldOffice = officeService.findById(new Office.Key(office.getCompanyId(), office.getOfficeId()));
+            if (oldOffice != null) {
+                response = new BaseResponse<>(ReturnCodeEnum.DATA_ALREADY_EXISTED);
+                response.setReturnMessage(String.format("Phòng ban [%s] đã tồn tại. Vui lòng nhập lại", office.getOfficeId()));
+                return response;
+            }
+
             office = officeService.create(office);
             response.setData(office);
         } catch (Exception e) {
@@ -81,10 +89,7 @@ public class OfficeRestController {
             return StringUtil.EMPTY;
         }
 
-        List<Office> officeList = DbStaticConfigMap.OFFICE_MAP.values()
-                                                    .stream()
-                                                    .filter(o -> o.getCompanyId().equals(office.getCompanyId()))
-                                                    .collect(Collectors.toList());
+        List<Office> officeList = DbStaticConfigMap.findOfficeByCompanyId(office.getCompanyId());
 
         for (Office o : officeList) {
             if (o.getIsHeadquarter() && !o.getOfficeId().equals(office.getOfficeId())){
@@ -163,7 +168,6 @@ public class OfficeRestController {
             log.error("[deleteOffice] [{} - {}] ex", companyId, officeId, e);
             response = new BaseResponse<>(e);
         } finally {
-            // TODO : DELETE ALL USERS' OFFICE LINKED WITH THIS OFFICE
             employeeService.deleteOffice(companyId, officeId);
         }
         return response;

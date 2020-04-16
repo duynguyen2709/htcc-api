@@ -97,6 +97,10 @@ public class Office extends BaseJPAEntity {
             return "Tên chi nhánh không được rỗng";
         }
 
+        if (StringUtil.valueOf(officeName).length() > 128){
+            return "Tên chi nhánh có độ dài tối đa 128 kí tự";
+        }
+
         if (StringUtil.isEmpty(address)) {
             return "Địa chỉ không được rỗng";
         }
