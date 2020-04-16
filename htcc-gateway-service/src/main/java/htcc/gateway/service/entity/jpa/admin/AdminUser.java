@@ -11,6 +11,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+/**
+ * JPA Entity for user of admin web
+ */
 @Entity
 @Data
 @RequiredArgsConstructor

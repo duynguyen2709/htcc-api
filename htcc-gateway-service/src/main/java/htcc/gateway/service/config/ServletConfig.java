@@ -12,6 +12,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.DispatcherServlet;
 
+/**
+ * Bean to init Logging servlet and Multipart Handler
+ */
 @Configuration
 public class ServletConfig {
 

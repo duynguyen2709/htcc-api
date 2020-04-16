@@ -1,8 +1,8 @@
 package htcc.admin.service.service.jpa;
 
-import htcc.common.entity.jpa.AdminUser;
 import htcc.admin.service.jpa.AdminUserInfoRepository;
 import htcc.common.constant.Constant;
+import htcc.common.entity.jpa.AdminUser;
 import htcc.common.service.BaseJPAService;
 import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
@@ -32,13 +32,14 @@ public class AdminUserInfoService extends BaseJPAService<AdminUser, String> {
 
     @Override
     public AdminUser create(AdminUser adminUser) {
+        adminUser.setAvatar(Constant.USER_DEFAULT_AVATAR);
         return repo.save(adminUser);
     }
 
     @Override
     public AdminUser update(AdminUser adminUser) {
         if (StringUtil.valueOf(adminUser.avatar).isEmpty()) {
-            adminUser.avatar = Constant.USER_DEFAULT_AVATAR;
+            adminUser.setAvatar(Constant.USER_DEFAULT_AVATAR);
         }
         return repo.save(adminUser);
     }

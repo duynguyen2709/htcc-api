@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
+/**
+ * Zuul Request Pre-filter to add additional info to request
+ */
 @Component
 @Log4j2
 public class RequestPreFilter extends ZuulFilter {
@@ -38,8 +41,14 @@ public class RequestPreFilter extends ZuulFilter {
     @Override
     public Object run() throws ZuulException {
         RequestContext ctx = RequestContext.getCurrentContext();
+        /*
+            Add Request Time
+         */
         ctx.getRequest().setAttribute(Constant.REQUEST_TIME, System.currentTimeMillis());
 
+        /*
+            Add Username to Header to pass to modules
+         */
         Authentication auth = authService.getAuthentication();
         if (auth != null) {
             ctx.addZuulRequestHeader(Constant.USERNAME, StringUtil.valueOf(auth.getName()));

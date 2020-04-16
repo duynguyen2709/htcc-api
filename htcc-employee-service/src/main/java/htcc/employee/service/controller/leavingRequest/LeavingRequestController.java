@@ -61,29 +61,32 @@ public class LeavingRequestController {
 
             List<LeavingRequestResponse> detail = service.getLeavingRequestLog(companyId, username, yyyy);
             if (detail == null) {
-                throw new Exception("service.getLeavingRequestLog return null");
+                throw new Exception("[LogService.getLeavingRequestLog] return null");
             }
             // running async here to get total days off based on employee level
             CompletableFuture<Float> totalDaysOff = employeeInfoService.getTotalDayOff(companyId, username);
 
             detail.sort(new LeavingRequestResponseComparator());
 
+            // dataResponse
             LeavingRequestInfo data = new LeavingRequestInfo();
 
-            List<CompanyDayOffInfo.CategoryList> categoryList = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(companyId).getCategoryList();
-            data.setCategories(categoryList.stream().map(CompanyDayOffInfo.CategoryList::getCategory).collect(Collectors.toList()));
+            List<String> categoryList = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP
+                                        .get(companyId)
+                                        .getCategoryList()
+                                        .stream()
+                                        .map(CompanyDayOffInfo.CategoryList::getCategory)
+                                        .collect(Collectors.toList());
 
+            data.setCategories(categoryList);
             data.setListRequest(detail);
-
             data.setTotalDays(totalDaysOff.get());
             countDayOff(data, detail);
 
-            // if it was history year, then day off left = 0
-            if (DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyy").equals(yyyy)) {
-                data.setLeftDays(data.getTotalDays() - data.getUsedDays());
-            } else {
-                data.setLeftDays(0.0f);
-            }
+            // TODO : consider using counter for day off left
+            // example : last year employee was level 1.0
+            // this year level 2.0
+            // then total day is increased
 
             response.setData(data);
 

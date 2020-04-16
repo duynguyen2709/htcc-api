@@ -7,14 +7,12 @@ import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.leavingrequest.LeavingRequestResponse;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.config.ServiceConfig;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -23,7 +21,9 @@ public class LeavingRequestService {
     @Autowired
     private LogService logService;
 
-    // for employee
+    /*
+    For Employee to get their leaving requests submitted
+     */
     public List<LeavingRequestResponse> getLeavingRequestLog(String companyId, String username, String year){
         List<LeavingRequestResponse> result = new ArrayList<>();
         try {
@@ -56,7 +56,9 @@ public class LeavingRequestService {
         }
     }
 
-    // for manager
+    /*
+    For manager to get list leaving request and process
+     */
     public BaseResponse countPendingLeavingRequest(String companyId) {
         return logService.countPendingLeavingRequest(companyId);
     }
@@ -94,7 +96,7 @@ public class LeavingRequestService {
             return StringUtil.json2Collection(data, new TypeToken<List<LeavingRequestModel>>(){}.getType());
         } catch (Exception e){
             log.warn("parseResponse {} return null, ex {}", StringUtil.toJsonString(res), e.getMessage());
-            return new ArrayList<>();
+            return null;
         }
     }
 }

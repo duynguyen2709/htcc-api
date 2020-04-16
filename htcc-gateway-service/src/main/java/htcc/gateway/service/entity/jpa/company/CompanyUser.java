@@ -20,6 +20,9 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * JPA Entity for user of Company Web/Mobile
+ */
 @Entity
 @IdClass(CompanyUser.Key.class)
 @Data

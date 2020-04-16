@@ -3,6 +3,8 @@ package htcc.common.constant;
 public enum CacheKeyEnum {
 
     COMPANY,
+    OFFICE,
+    DEPARTMENT,
     BUZ_CONFIG,
     COMPANY_DAY_OFF,
     ALL;

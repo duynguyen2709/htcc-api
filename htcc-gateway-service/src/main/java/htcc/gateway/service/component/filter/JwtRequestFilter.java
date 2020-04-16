@@ -35,6 +35,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         if (securityConfig.bypassJWT) {
+            /*
+             *  For local bypass JWT check
+             */
             return true;
         }
 
@@ -42,16 +45,25 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         boolean shouldNotFilter = false;
 
         if (!uri.startsWith(Constant.API_PATH)) {
+            /*
+            Bypass Public path : Eureka Dashboard, SwaggerUI...
+             */
             shouldNotFilter = true;
         }
 
         if (uri.startsWith(Constant.BASE_API_GATEWAY_PATH + Constant.PUBLIC_API_PATH) ||
                 uri.startsWith(Constant.BASE_API_EMPLOYEE_PATH + Constant.PUBLIC_API_PATH) ||
                 uri.startsWith(Constant.BASE_API_ADMIN_PATH + Constant.PUBLIC_API_PATH)) {
+            /*
+            Bypass Public API Path of each service
+             */
             shouldNotFilter = true;
         }
 
         if (uri.contains(Constant.SWAGGER_DOCS_PATH)) {
+            /*
+            Bypass Swagger API Docs path of modules
+             */
             shouldNotFilter = true;
         }
 
@@ -60,14 +72,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException {
+        /*
+        Get Token from Header
+         */
         String jwtToken = getTokenFromHeader(request);
         try {
             if (jwtToken == null || !jwtTokenService.validateToken(jwtToken)) {
+                /*
+                [Important] Validate Token
+                 */
                 throw new Exception(String.format("JWT Token [%s] Invalid", jwtToken));
             }
 
             LoginRequest loginRequest = null;
             try {
+                /*
+                Get User Authorization info : clientId, companyId, username
+                 */
                 loginRequest = jwtTokenService.getLoginInfo(jwtToken);
 
                 if (loginRequest == null) {
@@ -77,6 +98,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 throw new Exception(String.format("JWT Token [%s] Invalid, Reason: %s", jwtToken, e.getMessage()));
             }
 
+            /*
+            Add User Info to GlobalContext to use later
+             */
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = jwtTokenService.loadUserByUsername(StringUtil.toJsonString(loginRequest));
                 UsernamePasswordAuthenticationToken detail =
@@ -87,6 +111,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
             chain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
+            /*
+            Exception throw in validation method in case jwt expired
+             */
             log.warn(String.format("%s : %s", e.getMessage(), jwtToken));
             response.sendError(ReturnCodeEnum.TOKEN_EXPIRED.getValue(), e.getMessage());
         } catch (Exception e) {
@@ -95,6 +122,10 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * @param request : Request of User
+     * @return JWT String or null
+     */
     private String getTokenFromHeader(HttpServletRequest request) {
         String requestTokenHeader = request.getHeader(Constant.AUTHORIZATION);
 

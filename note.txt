@@ -187,3 +187,11 @@
 15-04-2020:
  + Version 1.6.0:
     - [Employee] Add Hazelcast, Get DayOffInfo from config, API UpdateDayOffInfo
+
+16-04-2020:
+ + Version 1.6.1:
+    - [All] Refactor Code, Add comments, remove RedisUserInfo
+    - [Gateway] Block internal api from external ip calling
+    - [Employee] GetCheckinInfo with Office's info; load Office with Hazelcast;
+    Delete Employee's office info on delete office; Office Check already has headquarter;
+    load Department with Hazelcast; Delete Employee's department info on delete department;

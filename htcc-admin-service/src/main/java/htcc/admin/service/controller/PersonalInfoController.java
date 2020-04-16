@@ -2,7 +2,6 @@ package htcc.admin.service.controller;
 
 import htcc.admin.service.service.GoogleDriveService;
 import htcc.admin.service.service.jpa.AdminUserInfoService;
-import htcc.admin.service.service.redis.RedisUserInfoService;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
@@ -31,9 +30,6 @@ public class PersonalInfoController {
 
     @Autowired
     private GoogleDriveService driveService;
-
-    @Autowired
-    private RedisUserInfoService redisUserInfo;
 
 
     @ApiOperation(value = "Lấy thông tin cá nhân", response = AdminUser.class)
@@ -99,14 +95,9 @@ public class PersonalInfoController {
                 if (!fileId.isEmpty()) {
                     driveService.deleteFile(fileId);
                 }
-
-                // reset cache
-                redisUserInfo.setUserInfo(response.data);
             }
         }
 
         return response;
     }
-
-
 }

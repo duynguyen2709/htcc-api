@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -96,8 +97,20 @@ public class Office extends BaseJPAEntity {
             return "Tên chi nhánh không được rỗng";
         }
 
+        if (StringUtil.valueOf(officeName).length() > 128){
+            return "Tên chi nhánh có độ dài tối đa 128 kí tự";
+        }
+
         if (StringUtil.isEmpty(address)) {
             return "Địa chỉ không được rỗng";
+        }
+
+        if (maxAllowDistance < 0){
+            return "Khoảng cách cho phép điểm danh không được nhỏ hơn 0";
+        }
+
+        if (latitude < 0 || longitude < 0){
+            return "Tọa độ không được nhỏ hơn 0";
         }
 
         if (!StringUtil.isEmail(email)) {

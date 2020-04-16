@@ -21,6 +21,9 @@ spring:
     schemaName: HTCC_Company
     server: 127.0.0.1:3306
 
+service:
+  internalServerIp: "10.25.96.3;10.25.96.4"
+
 redis:
   useRedis: true
   password: abc@123

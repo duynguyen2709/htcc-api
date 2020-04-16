@@ -2,9 +2,12 @@ package htcc.employee.service.controller.contact;
 
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.jpa.Department;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.jpa.Office;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.entity.ContactFilterEntity;
+import htcc.common.entity.contact.ContactFilterEntity;
+import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.common.comparator.EmployeeIdComparator;
 import io.swagger.annotations.Api;
@@ -106,10 +109,8 @@ public class ContactController {
                                              @PathVariable String companyId) {
         BaseResponse<ContactFilterEntity> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
-            // TODO : Change from get department & officeID in EmployeeInfo to get from DB Config Map
-            List<EmployeeInfo> listEmployee = employeeService.findByCompanyId(companyId);
-            Set<String> departments = listEmployee.stream().map(EmployeeInfo::getDepartment).collect(Collectors.toSet());
-            Set<String> officeId = listEmployee.stream().map(EmployeeInfo::getOfficeId).collect(Collectors.toSet());
+            Set<String> departments = DbStaticConfigMap.findDepartmentByCompanyId(companyId).stream().map(Department::getDepartment).collect(Collectors.toSet());
+            Set<String> officeId = DbStaticConfigMap.findOfficeByCompanyId(companyId).stream().map(Office::getOfficeId).collect(Collectors.toSet());
 
             List<String> departmentList = new ArrayList<>(departments);
             List<String> officeIdList = new ArrayList<>(officeId);

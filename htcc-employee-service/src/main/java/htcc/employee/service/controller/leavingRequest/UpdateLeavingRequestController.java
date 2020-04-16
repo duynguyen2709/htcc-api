@@ -36,8 +36,9 @@ public class UpdateLeavingRequestController {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             String yyyyMM = StringUtil.valueOf(month);
-            if (DateTimeUtil.isRightFormat(yyyyMM, "yyyyMM") == false) {
-                return new BaseResponse<>(ReturnCodeEnum.DATE_WRONG_FORMAT, String.format("Tháng %s không phù hợp định dạng yyyyMM", month));
+            if (!DateTimeUtil.isRightFormat(yyyyMM, "yyyyMM")) {
+                return new BaseResponse<>(ReturnCodeEnum.DATE_WRONG_FORMAT,
+                        String.format("Tháng %s không phù hợp định dạng yyyyMM", month));
             }
 
             List<LeavingRequestResponse> list = service.getLeavingRequestLogByCompanyId(companyId, yyyyMM);

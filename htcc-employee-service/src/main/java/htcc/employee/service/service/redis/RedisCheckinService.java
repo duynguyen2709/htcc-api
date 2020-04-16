@@ -1,8 +1,8 @@
 package htcc.employee.service.service.redis;
 
 import htcc.common.component.redis.RedisService;
-import htcc.common.util.DateTimeUtil;
 import htcc.common.entity.checkin.CheckinModel;
+import htcc.common.util.DateTimeUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

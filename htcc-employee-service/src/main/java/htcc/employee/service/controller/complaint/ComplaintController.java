@@ -64,6 +64,14 @@ public class ComplaintController {
             }
 
             request = new ComplaintRequest(receiverType, isAnonymous, companyId, username, clientTime, category, content, Arrays.asList(images));
+
+            String error = request.isValid();
+            if (!error.isEmpty()){
+                response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(error);
+                return response;
+            }
+
             model = new ComplaintModel(request);
 
         } catch (Exception e){

@@ -7,7 +7,6 @@ import htcc.common.util.StringUtil;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.entity.response.LoginResponse;
 import htcc.gateway.service.service.authentication.JwtTokenService;
-import htcc.gateway.service.service.redis.RedisUserInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
@@ -43,9 +42,6 @@ public class AuthenticationController {
     private UserDetailsService jwtUserDetailService;
 
     @Autowired
-    private RedisUserInfoService redisUserInfo;
-
-    @Autowired
     private RestTemplate restTemplate;
     //</editor-fold>
 
@@ -79,18 +75,18 @@ public class AuthenticationController {
         return response;
     }
 
-    private Object getUserInfo(LoginRequest request){
+    private Object getUserInfo(LoginRequest request) throws Exception {
         BaseResponse response = null;
         String url = "";
         try {
-            ClientSystemEnum e = ClientSystemEnum.fromInt(request.clientId);
+            ClientSystemEnum e = ClientSystemEnum.fromInt(request.getClientId());
             switch (e) {
                 case ADMIN_WEB:
-                    url = String.format("http://htcc-admin-service/users/%s", request.username);
+                    url = String.format("http://htcc-admin-service/users/%s", request.getUsername());
                     break;
                 case MOBILE:
                 case MANAGER_WEB:
-                    url = String.format("http://htcc-employee-service/users/%s/%s", request.companyId, request.username);
+                    url = String.format("http://htcc-employee-service/users/%s/%s", request.getCompanyId(), request.getUsername());
                     break;
                 default:
                     return null;
@@ -99,19 +95,14 @@ public class AuthenticationController {
             response = restTemplate.getForObject(url, BaseResponse.class);
 
             if (response != null) {
-                return response.data;
+                return response.getData();
             }
+            throw new Exception("response = [null]");
         } catch (Exception e) {
-            log.error("[getUserInfo] request {}, ex",
-                    StringUtil.toJsonString(request), e);
+            throw new Exception("[getUserInfo] ex " + e.getMessage());
         } finally {
-            log.info("Call RestTemplate URL {} with request {} -> response {}",
+                log.info("Call GetUserInfo, URL [{}] with request [{}] -> response [{}]",
                     url, StringUtil.toJsonString(request), StringUtil.toJsonString(response));
         }
-
-        return redisUserInfo.getUserInfo(request.clientId + "",
-                StringUtil.valueOf(request.companyId),
-                request.username);
     }
-
 }

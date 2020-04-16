@@ -40,12 +40,13 @@ public class InternalCompanyController {
 
             Company newCompany = companyService.create(company);
 
+            // TODO : Create all default info when creating company
             buzConfigService.createDefaultDayOffInfo(company.getCompanyId());
 
             response.setData(newCompany);
 
         } catch (Exception e) {
-            log.error("[createOffice] {} ex", StringUtil.toJsonString(company), e);
+            log.error("[createCompany] {} ex", StringUtil.toJsonString(company), e);
             response = new BaseResponse<>(e);
         }
 
