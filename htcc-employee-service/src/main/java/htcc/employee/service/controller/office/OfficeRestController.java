@@ -6,6 +6,7 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.Company;
 import htcc.common.entity.jpa.Office;
 import htcc.common.util.StringUtil;
+import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.OfficeService;
 import io.swagger.annotations.Api;
@@ -14,6 +15,9 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "API quản lý danh sách chi nhánh (CỦA QUẢN LÝ)")
 @RestController
@@ -56,6 +60,13 @@ public class OfficeRestController {
                 return response;
             }
 
+            error = checkAlreadyHasHeadquarter(office);
+            if (!error.isEmpty()) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(error);
+                return response;
+            }
+
             office = officeService.create(office);
             response.setData(office);
         } catch (Exception e) {
@@ -65,8 +76,24 @@ public class OfficeRestController {
         return response;
     }
 
+    private String checkAlreadyHasHeadquarter(Office office) {
+        if (!office.getIsHeadquarter()) {
+            return StringUtil.EMPTY;
+        }
 
+        List<Office> officeList = DbStaticConfigMap.OFFICE_MAP.values()
+                                                    .stream()
+                                                    .filter(o -> o.getCompanyId().equals(office.getCompanyId()))
+                                                    .collect(Collectors.toList());
 
+        for (Office o : officeList) {
+            if (o.getIsHeadquarter() && !o.getOfficeId().equals(office.getOfficeId())){
+                return String.format("Công ty đã có trụ sở chính %s. Vui lòng cập nhật lại.", o.getOfficeId());
+            }
+        }
+
+        return StringUtil.EMPTY;
+    }
 
     @ApiOperation(value = "Cập nhật thông tin của chi nhánh", response = Office.class)
     @PutMapping("/offices/{companyId}/{officeId}")
@@ -80,6 +107,13 @@ public class OfficeRestController {
         response.setReturnMessage("Cập nhật thông tin chi nhánh thành công");
         try {
             String error = office.isValid();
+            if (!error.isEmpty()) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(error);
+                return response;
+            }
+
+            error = checkAlreadyHasHeadquarter(office);
             if (!error.isEmpty()) {
                 response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
                 response.setReturnMessage(error);
