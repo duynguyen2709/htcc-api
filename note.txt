@@ -191,3 +191,4 @@
 16-04-2020:
  + Version 1.6.1:
     - [All] Refactor Code, Add comments, remove RedisUserInfo
+    - [Gateway] Block internal api from external ip calling

@@ -66,7 +66,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
         if (wrapper != null) {
             byte[] buf = wrapper.getContentAsByteArray();
             if (buf.length > 0) {
-                int length = Math.min(buf.length, 40960);
+                int length = Math.min(buf.length, 40960 * 2);
                 try {
                     result = new String(buf, 0, length, wrapper.getCharacterEncoding());
                 } catch (Exception e) {

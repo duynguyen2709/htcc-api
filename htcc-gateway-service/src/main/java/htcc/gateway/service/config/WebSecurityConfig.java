@@ -1,6 +1,8 @@
 package htcc.gateway.service.config;
 
+import htcc.common.constant.Constant;
 import htcc.gateway.service.component.filter.JwtRequestFilter;
+import htcc.gateway.service.config.file.ServiceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static java.util.Collections.singletonList;
 
 @EnableWebSecurity
@@ -34,6 +40,9 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${eureka.dashboard.path}")
     private String eurekaDashboard;
+
+    @Autowired
+    private ServiceConfig serviceConfig;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -61,12 +70,25 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling();
 
         http.authorizeRequests()
+                .antMatchers(Constant.INTERNAL_API_PATH + "/**")
+                .access(hasIpAddressAllow())
                 .antMatchers(new String[]{eurekaDashboard})
                 .authenticated()
                 .and().formLogin();
 
         // jwt request for api paths
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    }
+
+    private String hasIpAddressAllow() {
+        String result = "";
+        List<String> ipAddresses = Arrays.asList(serviceConfig.getInternalServerIp().split(";"));
+        for (String ip : ipAddresses){
+            result += String.format(" or hasIpAddress('%s')", ip);
+        }
+        result = result.substring(4);
+
+        return result;
     }
 
     @Bean
