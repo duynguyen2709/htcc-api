@@ -124,6 +124,8 @@ public class OfficeRestController {
         } catch (Exception e){
             log.error("[deleteOffice] [{} - {}] ex", companyId, officeId, e);
             response = new BaseResponse<>(e);
+        } finally {
+            // TODO : DELETE ALL USERS' OFFICE LINKED WITH THIS OFFICE
         }
         return response;
     }

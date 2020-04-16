@@ -47,6 +47,7 @@ public class InternalCompanyUserController {
             employee.setOfficeId(StringUtil.EMPTY);
             employee.setDepartment(StringUtil.EMPTY);
             employee.setTitle(StringUtil.EMPTY);
+            employee.setLevel(0.0f);
             employee.setFullName(StringUtil.EMPTY);
             employee.birthDate = new Date(0);
             employee.setIdentityCardNo(StringUtil.EMPTY);

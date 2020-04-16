@@ -41,6 +41,9 @@ public class HazelcastLoader {
 
         loadCompanyMap();
 
+        // TODO: LOAD OFFICE MAP
+        loadOfficeMap();
+
         // must be below company map to traverse
         loadCompanyDayOffInfoMap();
 
@@ -59,6 +62,10 @@ public class HazelcastLoader {
 
         COMPANY_MAP = hazelcastService.reload(map, CacheKeyEnum.COMPANY);
         log.info("[loadCompanyMap] COMPANY_MAP loaded succeed [{}]", StringUtil.toJsonString(COMPANY_MAP));
+    }
+
+    public void loadOfficeMap(){
+
     }
 
     public void loadCompanyDayOffInfoMap() throws Exception {
@@ -109,4 +116,5 @@ public class HazelcastLoader {
 
         return StringUtil.EMPTY;
     }
+
 }

@@ -16,6 +16,9 @@ import java.io.IOException;
 @Log4j2
 public class MaxFileSizeExceptionHandler {
 
+    /**
+     * Description: Handle exception occurring when user upload too large file
+     */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public void handleMaxUploadException(MaxUploadSizeExceededException e, HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.warn("!!! MaxFileSizeException: " + e.getMessage());

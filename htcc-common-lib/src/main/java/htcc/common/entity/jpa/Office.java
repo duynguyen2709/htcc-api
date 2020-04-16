@@ -100,6 +100,14 @@ public class Office extends BaseJPAEntity {
             return "Địa chỉ không được rỗng";
         }
 
+        if (maxAllowDistance < 0){
+            return "Khoảng cách cho phép điểm danh không được nhỏ hơn 0";
+        }
+
+        if (latitude < 0 || longitude < 0){
+            return "Tọa độ không được nhỏ hơn 0";
+        }
+
         if (!StringUtil.isEmail(email)) {
             return String.format("Email %s không phù hợp định dạng email", email);
         }

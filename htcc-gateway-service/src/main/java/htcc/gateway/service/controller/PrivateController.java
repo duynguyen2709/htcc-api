@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/private")
 public class PrivateController {
 
+    //<editor-fold defaultstate="collapsed" desc="Autowired">
     @Autowired
     private JwtTokenService tokenService;
 
@@ -43,9 +44,7 @@ public class PrivateController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-
-
+    //</editor-fold>
 
     @ApiOperation(value = "API Logout")
     @PostMapping("/logout")
@@ -94,8 +93,10 @@ public class PrivateController {
 
     @ApiOperation(value = "API ChangePassword")
     @PutMapping("/changepassword/{clientId}")
-    public BaseResponse changePassword(@ApiParam(value = "[Path] clientId", defaultValue = "1", required = true) @PathVariable("clientId") int clientId,
-                                       @ApiParam(value = "[Body] Mật khẩu mới cần update", required = true) @RequestBody ChangePasswordRequest req,
+    public BaseResponse changePassword(@ApiParam(value = "[Path] clientId", defaultValue = "1", required = true)
+                                           @PathVariable("clientId") int clientId,
+                                       @ApiParam(value = "[Body] Mật khẩu mới cần update", required = true)
+                                       @RequestBody ChangePasswordRequest req,
                                        @RequestHeader("Authorization") String authorization) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         String token = authorization.substring(Constant.BEARER.length());

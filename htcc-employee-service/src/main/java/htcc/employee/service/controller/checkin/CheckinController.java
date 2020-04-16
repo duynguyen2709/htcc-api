@@ -51,7 +51,7 @@ public class CheckinController {
                 yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
             }
 
-            // TODO : GET REAL LOCATION FROM DB CONFIG MAP OF COMPANY
+            // TODO : GET REAL DATA FROM DB CONFIG MAP OF COMPANY
             CheckinResponse data = new CheckinResponse(yyyyMMdd);
 
             // get today checkin info
@@ -64,10 +64,6 @@ public class CheckinController {
 
             data.setHasCheckedIn(checkInFuture.get());
             data.setHasCheckedOut(checkOutFuture.get());
-
-            if (username.equalsIgnoreCase("duytv") && companyId.equalsIgnoreCase("HCMUS")) {
-                data.canCheckin = false;
-            }
 
             response.data = data;
         } catch (Exception e){
@@ -90,14 +86,17 @@ public class CheckinController {
         try {
             String error = model.isValid();
             if (!error.isEmpty()) {
-                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, error);
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(error);
                 return response;
             }
 
-            /*
-             TODO: Verify Checkin Info (Get Company Info, Long & Lat to compare)
-             Not Implemented
-            */
+            error = validateCheckinRequest(request);
+            if (!error.isEmpty()) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(error);
+                return response;
+            }
 
             // Verify time
             if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
@@ -142,9 +141,12 @@ public class CheckinController {
         return response;
     }
 
-
-
-
+    private String validateCheckinRequest(CheckinRequest request) {
+        /*
+             TODO: Verify Checkin Info (Get Company Info, Long & Lat to compare)
+        */
+        return StringUtil.EMPTY;
+    }
 
     @ApiOperation(value = "Xóa thông tin điểm danh (testing)", response = BaseResponse.class)
     @DeleteMapping("/checkin/{companyId}/{username}")

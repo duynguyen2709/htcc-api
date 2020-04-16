@@ -74,6 +74,10 @@ public class Company extends BaseJPAEntity {
             return "Tên công ty không được rỗng";
         }
 
+        if (StringUtil.isEmpty(address)) {
+            return "Địa chỉ công ty không được rỗng";
+        }
+
         if (!StringUtil.isEmail(email)) {
             return String.format("Email %s không phù hợp định dạng email", email);
         }

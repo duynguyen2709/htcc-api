@@ -80,7 +80,7 @@ public class CompanyUserController {
                 BaseResponse response1 = employeeInfoService.createDefaultEmployeeInfo(user);
                 // if create default employee failed, then rollback
                 if (response1.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
-                    log.warn("Rollback on creating new employee {}, response {}",
+                    log.error("Rollback on creating new employee {}, response {}",
                             StringUtil.toJsonString(user), StringUtil.toJsonString(response1));
                     service.deleteCompanyUser(user);
                     response = response1;

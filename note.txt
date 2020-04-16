@@ -187,3 +187,7 @@
 15-04-2020:
  + Version 1.6.0:
     - [Employee] Add Hazelcast, Get DayOffInfo from config, API UpdateDayOffInfo
+
+16-04-2020:
+ + Version 1.6.1:
+    - [All] Refactor Code, Add comments, remove RedisUserInfo

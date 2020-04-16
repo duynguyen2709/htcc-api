@@ -1,10 +1,8 @@
 package htcc.admin.service.controller;
 
 import htcc.admin.service.service.ComplaintService;
-import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.complaint.ComplaintResponse;
 import htcc.common.entity.home.HomeResponse;
 import htcc.common.util.DateTimeUtil;
 import io.swagger.annotations.Api;
@@ -13,8 +11,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Api(tags = "API để xử lý phản hồi/ khiếu nại")
 @RestController

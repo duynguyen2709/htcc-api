@@ -1,15 +1,14 @@
 package htcc.admin.service.controller;
 
-import htcc.common.component.kafka.KafkaProducerService;
-import htcc.common.entity.base.BaseUser;
-import htcc.common.entity.jpa.AdminUser;
 import htcc.admin.service.service.jpa.AdminUserInfoService;
 import htcc.admin.service.service.redis.RedisTokenService;
-import htcc.admin.service.service.redis.RedisUserInfoService;
+import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.base.BaseUser;
+import htcc.common.entity.jpa.AdminUser;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,9 +35,6 @@ public class AdminUserController {
 
     @Autowired
     private RedisTokenService redis;
-
-    @Autowired
-    private RedisUserInfoService redisUserInfo;
 
     @Autowired
     private KafkaProducerService kafka;
@@ -79,10 +75,6 @@ public class AdminUserController {
         } catch (Exception e){
             log.error("[findByUsername] ex", e);
             response = new BaseResponse<>(e);
-        } finally {
-            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()){
-                redisUserInfo.setUserInfo(response.data);
-            }
         }
         return response;
     }
@@ -163,10 +155,6 @@ public class AdminUserController {
         } catch (Exception e){
             log.error("[update] ex", e);
             response = new BaseResponse<>(e);
-        }  finally {
-            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()){
-                redisUserInfo.setUserInfo(response.data);
-            }
         }
         return response;
     }
@@ -210,8 +198,6 @@ public class AdminUserController {
                     redis.setBlacklistToken(username);
                     redis.deleteToken(username);
                 }
-
-                redisUserInfo.setUserInfo(response.data);
             }
         }
         return response;
@@ -242,7 +228,6 @@ public class AdminUserController {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()){
                 redis.deleteBlacklistToken(username);
                 redis.deleteToken(username);
-                redisUserInfo.deleteUserInfo(username);
             }
         }
         return response;

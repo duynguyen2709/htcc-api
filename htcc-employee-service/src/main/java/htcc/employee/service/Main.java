@@ -15,6 +15,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class Main {
 
 	public static void main(String[] args) {
+		// TODO : When update employee's level, then need to update total day off & salary
+
 		SpringApplication.run(Main.class, args);
 	}
 

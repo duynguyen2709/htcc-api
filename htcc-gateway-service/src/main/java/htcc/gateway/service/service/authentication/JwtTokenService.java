@@ -4,12 +4,12 @@ import htcc.common.component.redis.RedisService;
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.Constant;
+import htcc.common.entity.base.BaseUser;
 import htcc.common.service.ICallback;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.config.file.SecurityConfig;
-import htcc.common.entity.base.BaseUser;
 import htcc.gateway.service.entity.request.LoginRequest;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
@@ -44,6 +44,12 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 	private RedisService redis;
 	//</editor-fold>
 
+	/**
+	 * Description : UserDetailService of Spring Security to load user to SecurityContext
+	 * @param object
+	 * @return
+	 * @throws UsernameNotFoundException
+	 */
 	@Override
 	public UserDetails loadUserByUsername(String object) throws UsernameNotFoundException {
 		boolean isLoginDashboard = StringUtil.isJsonString(object);
@@ -145,6 +151,12 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 												request.username));
 	}
 
+	/**
+	 * Description: validate token, check token in blacklist, expired...
+	 * @param token : JWT
+	 * @return
+	 * @throws ExpiredJwtException
+	 */
 	public boolean validateToken(String token) throws ExpiredJwtException {
 		try {
 			// try parse token

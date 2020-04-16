@@ -1,10 +1,10 @@
 package htcc.gateway.service.service.authentication;
 
 import htcc.common.constant.ClientSystemEnum;
+import htcc.common.entity.base.BaseUser;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.admin.AdminUser;
-import htcc.common.entity.base.BaseUser;
 import htcc.gateway.service.entity.jpa.company.CompanyUser;
 import htcc.gateway.service.entity.request.ChangePasswordRequest;
 import htcc.gateway.service.entity.request.LoginRequest;

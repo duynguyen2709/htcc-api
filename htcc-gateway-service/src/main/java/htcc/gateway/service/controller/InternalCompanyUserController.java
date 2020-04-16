@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 @ApiIgnore
 public class InternalCompanyUserController {
 
+    //<editor-fold defaultstate="collapsed" desc="Autowired">
     @Autowired
     private CompanyUserService service;
 
@@ -39,6 +40,7 @@ public class InternalCompanyUserController {
 
     @Autowired
     private RedisService redis;
+    //</editor-fold>
 
 
     @PostMapping("/companyusers")
@@ -69,9 +71,11 @@ public class InternalCompanyUserController {
         return response;
     }
 
-
-
-
+    /**
+     * Rollback new created user in case create employee info failed
+     * @param model
+     * @return
+     */
     @PostMapping("/companyusers/delete")
     public BaseResponse deleteUser(@RequestBody CompanyUserModel model) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
@@ -216,6 +220,7 @@ public class InternalCompanyUserController {
         return response;
     }
 
+    // mass delete & blacklist all user in company
     private void handleRedisBlock(List<CompanyUser> listUser, String companyId, int newStatus) {
         try {
             if (newStatus == AccountStatusEnum.BLOCK.getValue()) {
@@ -223,7 +228,7 @@ public class InternalCompanyUserController {
                 List<String> listBlockedUser = new ArrayList<>();
 
                 for (CompanyUser user : listUser) {
-                    // add to block list to restore after unblock
+                    // add to origin block list to restore after unblock
                     if (user.status == AccountStatusEnum.BLOCK.getValue()) {
                         listBlockedUser.add(user.username);
                     }

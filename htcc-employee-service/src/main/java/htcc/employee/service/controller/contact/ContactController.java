@@ -4,7 +4,7 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.entity.ContactFilterEntity;
+import htcc.common.entity.contact.ContactFilterEntity;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.common.comparator.EmployeeIdComparator;
 import io.swagger.annotations.Api;

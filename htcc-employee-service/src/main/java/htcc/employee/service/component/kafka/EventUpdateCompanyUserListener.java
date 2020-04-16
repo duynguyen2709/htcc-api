@@ -11,6 +11,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * Kafka Listener for case admin update info of company user,
+ * then need to sync data between CompanyUser table and EmployeeInfo table (same 2 columns : phoneNumber & email)
+ */
 @Component
 @Log4j2
 @ConditionalOnProperty(value = "kafka.enableConsumer", havingValue = "true")

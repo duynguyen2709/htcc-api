@@ -3,19 +3,18 @@ package htcc.employee.service.controller.employee;
 import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.util.StringUtil;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.util.StringUtil;
 import htcc.employee.service.service.GoogleDriveService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
-import htcc.employee.service.service.redis.RedisUserInfoService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 @Api(tags = "API thông tin cá nhân",
@@ -26,9 +25,6 @@ public class EmployeeInfoController {
 
     @Autowired
     private EmployeeInfoService service;
-
-    @Autowired
-    private RedisUserInfoService redisUserInfo;
 
     @Autowired
     private GoogleDriveService driveService;
@@ -53,10 +49,6 @@ public class EmployeeInfoController {
         } catch (Exception e){
             log.error(String.format("getUserInfo [%s - %s] ex", companyId, username), e);
             response = new BaseResponse<>(e);
-        } finally {
-            if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
-                redisUserInfo.setUserInfo(response.data);
-            }
         }
         return response;
     }
@@ -122,6 +114,7 @@ public class EmployeeInfoController {
             }
 
             // check need send kafka
+            // case syncing between CompanyUser & EmployeeInfo
             if (!oldUser.getEmail().equals(model.getEmail()) ||
                     !oldUser.getPhoneNumber().equals(model.getPhoneNumber())) {
                 needUpdate = true;
@@ -129,6 +122,7 @@ public class EmployeeInfoController {
 
             model.refillImmutableValue(oldUser);
 
+            // avatar upload together with new info
             if (avatar != null) {
                 String fileName  = String.format("%s_%s", companyId, username);
                 String newAvatar = driveService.uploadAvatar(avatar, fileName);
@@ -162,9 +156,6 @@ public class EmployeeInfoController {
                         driveService.deleteFile(fileId);
                     }
                 }
-                // reset cache
-                redisUserInfo.setUserInfo(response.data);
-
                 // send kafka
                 if (needUpdate) {
                     kafka.sendMessage(kafka.getBuzConfig().eventUpdateEmployeeInfo.topicName, model);

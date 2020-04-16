@@ -1,4 +1,4 @@
-package htcc.employee.service.entity;
+package htcc.common.entity.contact;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
