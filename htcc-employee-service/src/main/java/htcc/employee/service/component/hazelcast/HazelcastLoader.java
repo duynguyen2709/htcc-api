@@ -7,9 +7,11 @@ import htcc.common.constant.Constant;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.jpa.BuzConfig;
 import htcc.common.entity.jpa.Company;
+import htcc.common.entity.jpa.Office;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.repository.jpa.BuzConfigRepository;
 import htcc.employee.service.repository.jpa.CompanyRepository;
+import htcc.employee.service.repository.jpa.OfficeRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,8 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static htcc.employee.service.config.DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP;
-import static htcc.employee.service.config.DbStaticConfigMap.COMPANY_MAP;
+import static htcc.employee.service.config.DbStaticConfigMap.*;
 
 @Component
 @Log4j2
@@ -33,6 +34,9 @@ public class HazelcastLoader {
     private CompanyRepository companyRepository;
 
     @Autowired
+    private OfficeRepository officeRepository;
+
+    @Autowired
     private BuzConfigRepository buzConfigRepository;
 
     @PostConstruct
@@ -41,7 +45,6 @@ public class HazelcastLoader {
 
         loadCompanyMap();
 
-        // TODO: LOAD OFFICE MAP
         loadOfficeMap();
 
         // must be below company map to traverse
@@ -65,7 +68,17 @@ public class HazelcastLoader {
     }
 
     public void loadOfficeMap(){
+        if (OFFICE_MAP != null) {
+            OFFICE_MAP.clear();
+            OFFICE_MAP = null;
+        }
 
+        Map<String, Office> map = new HashMap<>();
+
+        officeRepository.findAll().forEach(c -> map.put(c.getCompanyId() + "_" + c.getOfficeId(), c));
+
+        OFFICE_MAP = hazelcastService.reload(map, CacheKeyEnum.OFFICE);
+        log.info("[loadOfficeMap] OFFICE_MAP loaded succeed [{}]", StringUtil.toJsonString(OFFICE_MAP));
     }
 
     public void loadCompanyDayOffInfoMap() throws Exception {

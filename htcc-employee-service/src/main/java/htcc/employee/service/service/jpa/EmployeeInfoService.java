@@ -2,6 +2,7 @@ package htcc.employee.service.service.jpa;
 
 import htcc.common.service.BaseJPAService;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.repository.jpa.EmployeeInfoRepository;
 import lombok.extern.log4j.Log4j2;
@@ -98,6 +99,18 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
         } catch (Exception e){
             log.error("[getTotalDayOff] [{} - {}] ex", companyId, username, e);
             return CompletableFuture.completedFuture(10.0f);
+        }
+    }
+
+    public void deleteOffice(String companyId, String officeId){
+        try {
+            List<EmployeeInfo> listEmployee = repo.findByCompanyIdAndOfficeId(companyId, officeId);
+            for (EmployeeInfo employee : listEmployee){
+                employee.setOfficeId(StringUtil.EMPTY);
+            }
+            repo.saveAll(listEmployee);
+        } catch (Exception e){
+            log.error(String.format("[deleteOffice] [%s-%s] ex", companyId, officeId), e);
         }
     }
 }

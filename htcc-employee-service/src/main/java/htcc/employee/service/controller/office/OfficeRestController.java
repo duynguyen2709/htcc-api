@@ -6,6 +6,7 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.Company;
 import htcc.common.entity.jpa.Office;
 import htcc.common.util.StringUtil;
+import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.OfficeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,6 +22,9 @@ public class OfficeRestController {
 
     @Autowired
     private OfficeService officeService;
+
+    @Autowired
+    private EmployeeInfoService employeeService;
 
     @ApiOperation(value = "Lấy danh sách chi nhánh", response = Office.class)
     @GetMapping("/offices/{companyId}")
@@ -126,6 +130,7 @@ public class OfficeRestController {
             response = new BaseResponse<>(e);
         } finally {
             // TODO : DELETE ALL USERS' OFFICE LINKED WITH THIS OFFICE
+            employeeService.deleteOffice(companyId, officeId);
         }
         return response;
     }

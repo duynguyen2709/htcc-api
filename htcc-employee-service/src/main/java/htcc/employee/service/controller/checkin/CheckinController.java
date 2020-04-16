@@ -6,9 +6,14 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.checkin.CheckinRequest;
 import htcc.common.entity.checkin.CheckinResponse;
+import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.jpa.Office;
 import htcc.common.util.DateTimeUtil;
+import htcc.common.util.LocationUtil;
 import htcc.common.util.StringUtil;
+import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.service.CheckInService;
+import htcc.employee.service.service.jpa.EmployeeInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,7 +31,10 @@ import java.util.concurrent.CompletableFuture;
 public class CheckinController {
 
     @Autowired
-    private CheckInService service;
+    private CheckInService checkInService;
+
+    @Autowired
+    private EmployeeInfoService employeeService;
 
     @Value("${service.allowDeleteCheckin}")
     private boolean allowDeleteCheckin;
@@ -55,10 +63,32 @@ public class CheckinController {
             CheckinResponse data = new CheckinResponse(yyyyMMdd);
 
             // get today checkin info
-            CompletableFuture<CheckinModel> checkInFuture = service.getCheckInLog(companyId, username, yyyyMMdd);
+            CompletableFuture<CheckinModel> checkInFuture = checkInService.getCheckInLog(companyId, username, yyyyMMdd);
             // get today checkout info
-            CompletableFuture<CheckinModel> checkOutFuture = service.getCheckOutLog(companyId, username, yyyyMMdd);
+            CompletableFuture<CheckinModel> checkOutFuture = checkInService.getCheckOutLog(companyId, username, yyyyMMdd);
 
+            EmployeeInfo employee = employeeService.findById(new EmployeeInfo.Key(companyId, username));
+            if (employee == null) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(String.format("Không tìm thấy nhân viên %s", companyId));
+                return response;
+            }
+
+            String officeId = employee.getOfficeId();
+            Office officeInfo = DbStaticConfigMap.OFFICE_MAP.get(companyId + "_" + officeId);
+            if (officeInfo == null) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(String.format("Không tìm thấy địa điểm điểm danh hợp lệ cho nhân viên %s", username));
+                return response;
+            }
+
+            data.setForceUseWifi(officeInfo.isForceUseWifi());
+            data.setAllowWifiIP(officeInfo.getAllowWifiIP());
+            data.setMaxAllowDistance(officeInfo.getMaxAllowDistance());
+            data.setValidLatitude(officeInfo.getLatitude());
+            data.setValidLongitude(officeInfo.getLongitude());
+
+            // TODO : GET REAL DATA (canCheckIn, validCheckinTime, validCheckoutTime) FROM DB CONFIG MAP OF COMPANY
             // finish all
             CompletableFuture.allOf(checkInFuture,checkOutFuture).join();
 
@@ -78,7 +108,8 @@ public class CheckinController {
 
     @ApiOperation(value = "Điểm danh", response = BaseResponse.class)
     @PostMapping("/checkin")
-    public BaseResponse checkin(@ApiParam(value = "[Body] Thông tin điểm danh vào", required = true) @RequestBody CheckinRequest request) {
+    public BaseResponse checkin(@ApiParam(value = "[Body] Thông tin điểm danh vào", required = true)
+                                    @RequestBody CheckinRequest request) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Điểm danh thành công");
         CheckinModel model = new CheckinModel(request);
@@ -100,12 +131,12 @@ public class CheckinController {
 
             // Verify time
             if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
-                if (service.getCheckInLog(model.companyId, model.username, model.date).get() != null) {
+                if (checkInService.getCheckInLog(model.companyId, model.username, model.date).get() != null) {
                     response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_ALREADY);
                     return response;
                 }
             } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
-                CheckinModel checkinData = service.getCheckInLog(model.companyId, model.username, model.date).get();
+                CheckinModel checkinData = checkInService.getCheckInLog(model.companyId, model.username, model.date).get();
 
                 if (checkinData == null) {
                     response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKIN);
@@ -119,7 +150,7 @@ public class CheckinController {
                 }
 
                 //
-                CheckinModel checkOutData = service.getCheckOutLog(model.companyId, model.username, model.date).get();
+                CheckinModel checkOutData = checkInService.getCheckOutLog(model.companyId, model.username, model.date).get();
                 if (checkOutData != null) {
                     response = new BaseResponse<>(ReturnCodeEnum.CHECKOUT_ALREADY);
                     return response;
@@ -132,9 +163,9 @@ public class CheckinController {
         } finally {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
                 if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
-                    service.setCheckInLog(model);
+                    checkInService.setCheckInLog(model);
                 } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
-                    service.setCheckOutLog(model);
+                    checkInService.setCheckOutLog(model);
                 }
             }
         }
@@ -142,9 +173,25 @@ public class CheckinController {
     }
 
     private String validateCheckinRequest(CheckinRequest request) {
-        /*
-             TODO: Verify Checkin Info (Get Company Info, Long & Lat to compare)
-        */
+        EmployeeInfo employee = employeeService.findById(new EmployeeInfo.Key(request.getCompanyId(), request.getUsername()));
+        if (employee == null) {
+            return String.format("Không tìm thấy nhân viên %s", request.getUsername());
+        }
+
+        String officeId = employee.getOfficeId();
+        Office officeInfo = DbStaticConfigMap.OFFICE_MAP.get(request.getCompanyId() + "_" + officeId);
+        if (officeInfo == null){
+            return String.format("Không tìm thấy địa điểm điểm danh hợp lệ cho nhân viên %s", request.getUsername());
+        }
+
+        double distance = LocationUtil.calculateDistance(request.getLatitude(), request.getLongitude(),
+                officeInfo.getLatitude(), officeInfo.getLongitude());
+
+        // extra 1m for delta
+        if (distance > (officeInfo.getMaxAllowDistance() + 1)) {
+            return "Khoảng cách điểm danh quá xa. Vui lòng thực hiện lại";
+        }
+
         return StringUtil.EMPTY;
     }
 
@@ -169,7 +216,7 @@ public class CheckinController {
                 yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
             }
 
-            service.deleteCheckInLog(companyId, username, yyyyMMdd);
+            checkInService.deleteCheckInLog(companyId, username, yyyyMMdd);
         } catch (Exception e){
             log.error(String.format("deleteCheckinInfo [%s - %s - %s] ex", companyId, username, yyyyMMdd), e);
             response = new BaseResponse<>(e);

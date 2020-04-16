@@ -10,4 +10,6 @@ import java.util.List;
 public interface EmployeeInfoRepository extends JpaRepository<EmployeeInfo, EmployeeInfo.Key> {
 
     List<EmployeeInfo> findByCompanyId(String companyId);
+
+    List<EmployeeInfo> findByCompanyIdAndOfficeId(String companyId, String officeId);
 }

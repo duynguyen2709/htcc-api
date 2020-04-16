@@ -8,5 +8,4 @@ public abstract class BaseJPAService<T, K>  {
     public abstract T create(T t);
     public abstract T update(T t);
     public abstract void delete(K key);
-
 }
