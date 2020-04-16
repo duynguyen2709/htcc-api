@@ -7,11 +7,14 @@ import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.LeavingRequestSessionEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.leavingrequest.*;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
+import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.config.ServiceConfig;
 import htcc.employee.service.service.LeavingRequestService;
+import htcc.employee.service.service.jpa.EmployeeInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -29,12 +33,6 @@ import java.util.stream.Collectors;
 @Log4j2
 public class LeavingRequestController {
 
-    // TODO : Remove hard code day off
-    private static final float HARD_CODE_DAY_OFF = 20.0f;
-
-    // TODO : remove hard code num of day allow cancel, change to get from config
-    private static final int HARD_CODE_DAY_ALLOW_CANCEL = 1;
-
     @Autowired
     private LeavingRequestService service;
 
@@ -43,6 +41,9 @@ public class LeavingRequestController {
 
     @Autowired
     private ServiceConfig serviceConfig;
+
+    @Autowired
+    private EmployeeInfoService employeeInfoService;
 
     @ApiOperation(value = "Lấy thông tin phép còn lại & đơn đã submit", response = LeavingRequestInfo.class)
     @GetMapping("/leaving/{companyId}/{username}/{yyyy}")
@@ -62,15 +63,22 @@ public class LeavingRequestController {
             if (detail == null) {
                 throw new Exception("service.getLeavingRequestLog return null");
             }
+            // running async here to get total days off based on employee level
+            CompletableFuture<Float> totalDaysOff = employeeInfoService.getTotalDayOff(companyId, username);
+
             detail.sort(new LeavingRequestResponseComparator());
 
             LeavingRequestInfo data = new LeavingRequestInfo();
-            data.setCategories(service.getCategories());
+
+            List<CompanyDayOffInfo.CategoryList> categoryList = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(companyId).getCategoryList();
+            data.setCategories(categoryList.stream().map(CompanyDayOffInfo.CategoryList::getCategory).collect(Collectors.toList()));
+
             data.setListRequest(detail);
 
-            data.setTotalDays(HARD_CODE_DAY_OFF);
+            data.setTotalDays(totalDaysOff.get());
             countDayOff(data, detail);
 
+            // if it was history year, then day off left = 0
             if (DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyy").equals(yyyy)) {
                 data.setLeftDays(data.getTotalDays() - data.getUsedDays());
             } else {
@@ -135,8 +143,19 @@ public class LeavingRequestController {
 
             model = new LeavingRequestModel(request);
 
-            // TODO : GET CONFIG FROM DB OF COMPANY
-            model.setUseDayOff(serviceConfig.getLeavingRequestCategoryList().getOrDefault(request.getCategory(), true));
+            boolean useDayOff = true;
+            boolean hasSalary = false;
+            List<CompanyDayOffInfo.CategoryList> categoryLists = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(request.getCompanyId()).getCategoryList();
+            for (CompanyDayOffInfo.CategoryList category : categoryLists) {
+                if (category.getCategory().equals(model.getCategory())){
+                    useDayOff = category.isUseDayOff();
+                    hasSalary = category.isHasSalary();
+                    break;
+                }
+            }
+
+            model.setUseDayOff(useDayOff);
+            model.setHasSalary(hasSalary);
 
             // check if days off left is enough to register
             if (model.useDayOff) {
@@ -175,6 +194,8 @@ public class LeavingRequestController {
         if (response == null || response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()){
             throw new Exception("[getLeavingRequestInfo] return null");
         }
+        // running async here to get total days off based on employee level
+        CompletableFuture<Float> totalDaysOff = employeeInfoService.getTotalDayOff(model.getCompanyId(), model.getUsername());
 
         LeavingRequestInfo info = (LeavingRequestInfo) response.getData();
 
@@ -196,7 +217,6 @@ public class LeavingRequestController {
                 }
             }
         }
-        float daysLeft = HARD_CODE_DAY_OFF - daysOff;
 
         //count days in request
         float daysInRequest = 0.0f;
@@ -208,6 +228,7 @@ public class LeavingRequestController {
             }
         }
 
+        float daysLeft = totalDaysOff.get() - daysOff;
         if (daysInRequest > daysLeft){
             return "Số ngày nghỉ phép còn lại trong năm không đủ";
         }
@@ -282,8 +303,10 @@ public class LeavingRequestController {
                 return response;
             }
 
-            if (checkNotAllowDayCancel(model)){
-                response = new BaseResponse(ReturnCodeEnum.TIME_LIMIT_EXCEED);
+            String error = checkNotAllowDayCancel(model);
+            if (!error.isEmpty()){
+                response = new BaseResponse(ReturnCodeEnum.NOT_ALLOW_CANCEL_LEAVING_REQUEST);
+                response.setReturnMessage(error);
                 return response;
             }
 
@@ -308,7 +331,12 @@ public class LeavingRequestController {
         return response;
     }
 
-    private boolean checkNotAllowDayCancel(LeavingRequestModel model){
+    private String checkNotAllowDayCancel(LeavingRequestModel model){
+        CompanyDayOffInfo info = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(model.getCompanyId());
+        if (info.isAllowCancelRequest() == false) {
+            return "Công ty không cho phép hủy đơn nghỉ phép";
+        }
+
         model.getDetail().sort(new DateComparator());
 
         Date now = new Date(System.currentTimeMillis());
@@ -319,6 +347,6 @@ public class LeavingRequestController {
         long diffInMillies = Math.abs(today.getTime() - firstDay.getTime());
         long dayDiff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
-        return dayDiff <= HARD_CODE_DAY_ALLOW_CANCEL;
+        return (dayDiff <= info.getMaxDayAllowCancel()) ? "Quá thời gian cho phép hủy đơn nghỉ phép" : StringUtil.EMPTY;
     }
 }

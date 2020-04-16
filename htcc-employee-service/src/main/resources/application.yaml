@@ -68,17 +68,6 @@ service:
   debugMode: false
   allowDeleteCheckin: false
   maxFileSize: 10000000
-  leavingRequestCategoryList:
-    - reason: "Nghỉ phép năm"
-      useDayOff: 1
-    - reason: "Nghỉ bệnh"
-      useDayOff: 1
-    - reason: "Nghỉ thai sản"
-      useDayOff: 0
-    - reason: "Nghỉ phép không hưởng lương"
-      useDayOff: 0
-    - reason: "Nghỉ bù do làm thêm giờ"
-      useDayOff: 0
 
 ################## Redis Config ##################
 redis:
