@@ -59,13 +59,15 @@ public class LeavingRequestController {
                 return new BaseResponse(ReturnCodeEnum.DATE_WRONG_FORMAT, String.format("Năm %s không phù hợp định dạng yyyy", yyyy));
             }
 
-            List<LeavingRequestResponse> detail = service.getLeavingRequestLog(companyId, username, yyyy);
-            if (detail == null) {
-                throw new Exception("[LogService.getLeavingRequestLog] return null");
-            }
+            CompletableFuture<List<LeavingRequestResponse>> detailFuture = service.getLeavingRequestLog(companyId, username, yyyy);
+
             // running async here to get total days off based on employee level
             CompletableFuture<Float> totalDaysOff = employeeInfoService.getTotalDayOff(companyId, username);
 
+            List<LeavingRequestResponse> detail = detailFuture.get();
+            if (detail == null) {
+                throw new Exception("[LogService.getLeavingRequestLog] return null");
+            }
             detail.sort(new LeavingRequestResponseComparator());
 
             // dataResponse
@@ -83,10 +85,11 @@ public class LeavingRequestController {
             data.setTotalDays(totalDaysOff.get());
             countDayOff(data, detail);
 
-            // TODO : consider using counter for day off left
-            // example : last year employee was level 1.0
-            // this year level 2.0
-            // then total day is increased
+            // if it was history year, then day off left = 0
+            if (!DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyy").equals(yyyy)) {
+                data.setTotalDays(0.0f);
+                data.setLeftDays(0.0f);
+            }
 
             response.setData(data);
 
@@ -127,6 +130,7 @@ public class LeavingRequestController {
         }
         data.setUsedDays(Float.valueOf(String.format("%.1f", normalOffDay)));
         data.setExternalDaysOff(Float.valueOf(String.format("%.1f", externalOffDay)));
+        data.setLeftDays(data.getTotalDays() - data.getUsedDays());
     }
 
 
@@ -239,7 +243,7 @@ public class LeavingRequestController {
         return StringUtil.EMPTY;
     }
 
-    private String validateDetailDates(LeavingRequestModel model) {
+    private String validateDetailDates(LeavingRequestModel model) throws Exception {
         Set<String> listYear = new HashSet<>();
         for (LeavingRequest.LeavingDayDetail detail : model.detail) {
             listYear.add(detail.date.substring(0, 4));
@@ -247,10 +251,14 @@ public class LeavingRequestController {
 
         for (String year : listYear) {
             // get list leavingRequest in year
-            List<LeavingRequestResponse> response = service.getLeavingRequestLog(model.companyId, model.username, year)
-                                         .stream()
-                                         .filter(c -> c.getStatus() != ComplaintStatusEnum.REJECTED.getValue())
-                                         .collect(Collectors.toList());
+            List<LeavingRequestResponse> response = service.getLeavingRequestLog(model.companyId, model.username, year).get();
+            if (response == null){
+                throw new Exception(String.format("[service.getLeavingRequestLog] [%s - %s - %s] return null", model.companyId, model.username, year));
+            }
+
+            response = response.stream()
+                    .filter(c -> c.getStatus() != ComplaintStatusEnum.REJECTED.getValue())
+                    .collect(Collectors.toList());
 
             // check collision in day
             for (LeavingRequestResponse each : response) {
@@ -286,7 +294,7 @@ public class LeavingRequestController {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Đơn nghỉ phép của bạn đã hủy thành công");
         try {
-            if (DateTimeUtil.isRightFormat(dateSubmit, "yyyyMMdd") == false) {
+            if (!DateTimeUtil.isRightFormat(dateSubmit, "yyyyMMdd")) {
                 response = new BaseResponse(ReturnCodeEnum.DATE_WRONG_FORMAT,
                         String.format("Ngày %s không phù hợp định dạng yyyyMMdd", dateSubmit));
                 return response;
@@ -336,7 +344,7 @@ public class LeavingRequestController {
 
     private String checkNotAllowDayCancel(LeavingRequestModel model){
         CompanyDayOffInfo info = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(model.getCompanyId());
-        if (info.isAllowCancelRequest() == false) {
+        if (!info.isAllowCancelRequest()) {
             return "Công ty không cho phép hủy đơn nghỉ phép";
         }
 

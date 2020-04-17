@@ -9,10 +9,12 @@ import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Log4j2
@@ -24,7 +26,8 @@ public class LeavingRequestService {
     /*
     For Employee to get their leaving requests submitted
      */
-    public List<LeavingRequestResponse> getLeavingRequestLog(String companyId, String username, String year){
+    @Async
+    public CompletableFuture<List<LeavingRequestResponse>> getLeavingRequestLog(String companyId, String username, String year){
         List<LeavingRequestResponse> result = new ArrayList<>();
         try {
             BaseResponse response = logService.getListLeavingRequestLog(companyId, username, year);
@@ -34,10 +37,10 @@ public class LeavingRequestService {
             }
 
             list.forEach(c -> result.add(new LeavingRequestResponse(c)));
-            return result;
+            return CompletableFuture.completedFuture(result);
         } catch (Exception e){
             log.error("[getLeavingRequestLog] [{} - {} - {}]", companyId, username, year, e);
-            return null;
+            return CompletableFuture.completedFuture(null);
         }
     }
 

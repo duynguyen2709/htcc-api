@@ -195,3 +195,7 @@
     - [Employee] GetCheckinInfo with Office's info; load Office with Hazelcast;
     Delete Employee's office info on delete office; Office Check already has headquarter;
     load Department with Hazelcast; Delete Employee's department info on delete department;
+
+17-04-2020:
+ + Version 1.6.2:
+    - [Employee] refactor LeavingRequestController
