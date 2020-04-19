@@ -4,17 +4,17 @@ import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.companyuser.CompanyUserModel;
-import htcc.common.entity.jpa.Company;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.jpa.CompanyService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 

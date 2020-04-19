@@ -1,12 +1,9 @@
 package htcc.employee.service.controller.home;
 
-import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.complaint.ComplaintResponse;
 import htcc.common.entity.home.HomeResponse;
 import htcc.common.util.DateTimeUtil;
-import htcc.common.util.StringUtil;
 import htcc.employee.service.service.ComplaintService;
 import htcc.employee.service.service.LeavingRequestService;
 import io.swagger.annotations.Api;
@@ -17,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Api(tags = "API của quản lý",
      description = "API ở màn hình chính")

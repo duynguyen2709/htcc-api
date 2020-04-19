@@ -1,5 +1,6 @@
 package htcc.common.entity.dayoff;
 
+import htcc.common.constant.Constant;
 import htcc.common.entity.jpa.BaseJPAEntity;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.ApiModel;
@@ -33,11 +34,10 @@ public class CompanyDayOffInfo extends BaseJPAEntity implements Serializable {
     public int maxDayAllowCancel = 0;
 
     @ApiModelProperty(notes = "Danh sách loại nghỉ phép")
-    public List<CategoryList> categoryList = new ArrayList<>();
+    public List<CategoryEntity> categoryList = new ArrayList<>();
 
-    @ApiModelProperty(notes = "Số ngày nghỉ cho phép theo cấp bậc nhân viên," +
-            "\nVD {\"1.1\":15} : nhân viên cấp 1.1được nghỉ 15 ngày")
-    public Map<Float, Float> dayOffByLevel = new HashMap<>();
+    @ApiModelProperty(notes = "Số ngày nghỉ cho phép theo cấp bậc nhân viên")
+    public List<DayOffByLevelEntity> dayOffByLevel = new ArrayList<>();
 
     @Override
     public String isValid() {
@@ -49,13 +49,22 @@ public class CompanyDayOffInfo extends BaseJPAEntity implements Serializable {
             return "Danh sách số ngày nghỉ phép theo cấp bậc không được rỗng";
         }
 
-        for (Map.Entry<Float, Float> entry : dayOffByLevel.entrySet()){
-            if (entry.getKey() < 0 || entry.getValue() < 0) {
+        boolean hasDefaultDayOff = false;
+        for (DayOffByLevelEntity entry : dayOffByLevel){
+            if (entry.getTotalDayOff() < 0 || entry.getLevel() < 0) {
                 return "Giá trị cấp bậc/ Số ngày nghỉ không được âm";
+            }
+
+            if (entry.getLevel() == 0.0f){
+                hasDefaultDayOff = true;
             }
         }
 
-        for (CategoryList category : categoryList) {
+        if (!hasDefaultDayOff){
+            return "Thiếu giá trị ngày nghỉ mặc định (cấp bậc 0.0)";
+        }
+
+        for (CategoryEntity category : categoryList) {
             if (category.getCategory().isEmpty()) {
                 return "Loại nghỉ phép không được rỗng";
             }
@@ -68,7 +77,7 @@ public class CompanyDayOffInfo extends BaseJPAEntity implements Serializable {
     @AllArgsConstructor
     @RequiredArgsConstructor
     @ApiModel(description = "Thông tin loại nghỉ phép")
-    public static class CategoryList implements Serializable {
+    public static class CategoryEntity implements Serializable {
         @ApiModelProperty(notes = "Tên loại",
                           example = "Nghỉ phép năm")
         public String  category = "";
@@ -80,5 +89,19 @@ public class CompanyDayOffInfo extends BaseJPAEntity implements Serializable {
         @ApiModelProperty(notes = "Có được hưởng lương hay không",
                           example = "false")
         public boolean hasSalary = false;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @RequiredArgsConstructor
+    @ApiModel(description = "Số ngày nghỉ phép theo cấp bậc")
+    public static class DayOffByLevelEntity implements Serializable {
+        @ApiModelProperty(notes = "Cấp bậc",
+                          example = "1.1")
+        public float level = 0.0f;
+
+        @ApiModelProperty(notes = "Số ngày nghỉ phép",
+                          example = "10.0")
+        public float totalDayOff = Constant.DEFAULT_TOTAL_DAY_OFF;
     }
 }

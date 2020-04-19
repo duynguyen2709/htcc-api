@@ -3,12 +3,7 @@ package htcc.employee.service.controller.dayoff;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
-import htcc.common.entity.leavingrequest.LeavingRequestResponse;
-import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
-import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.config.DbStaticConfigMap;
-import htcc.employee.service.service.LeavingRequestService;
 import htcc.employee.service.service.jpa.BuzConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,7 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Comparator;
 
 @Api(tags = "API quản lý số ngày nghỉ phép và loại phép (CỦA QUẢN LÝ)",
      description = "API quản lý số ngày nghỉ phép và loại phép")
@@ -68,6 +63,13 @@ public class DayOffInfoController {
                 response.setReturnMessage(error);
                 return response;
             }
+
+            request.getDayOffByLevel().sort(new Comparator<CompanyDayOffInfo.DayOffByLevelEntity>() {
+                @Override
+                public int compare(CompanyDayOffInfo.DayOffByLevelEntity o1, CompanyDayOffInfo.DayOffByLevelEntity o2) {
+                    return Float.compare(o1.getLevel(), o2.getTotalDayOff());
+                }
+            });
 
             CompanyDayOffInfo data = buzConfigService.updateDayOffInfo(companyId, request);
             response.setData(data);

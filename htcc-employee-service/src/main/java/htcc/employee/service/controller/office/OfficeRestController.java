@@ -71,7 +71,7 @@ public class OfficeRestController {
             Office oldOffice = officeService.findById(new Office.Key(office.getCompanyId(), office.getOfficeId()));
             if (oldOffice != null) {
                 response = new BaseResponse<>(ReturnCodeEnum.DATA_ALREADY_EXISTED);
-                response.setReturnMessage(String.format("Phòng ban [%s] đã tồn tại. Vui lòng nhập lại", office.getOfficeId()));
+                response.setReturnMessage(String.format("Chi nhánh [%s] đã tồn tại. Vui lòng nhập lại", office.getOfficeId()));
                 return response;
             }
 

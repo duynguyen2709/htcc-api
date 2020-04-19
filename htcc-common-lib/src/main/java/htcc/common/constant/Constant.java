@@ -32,9 +32,10 @@ public class Constant {
     public static final String HTCC_GATEWAY_SERVICE  = "htcc-gateway-service";
 
     // Buz Config - Day Off Info
-    public static final String DAY_OFF_INFO         = "DAY_OFF_INFO";
-    public static final String ALLOW_CANCEL_REQUEST = "allowCancelRequest";
-    public static final String MAX_DAY_ALLOW_CANCEL = "maxDayAllowCancel";
-    public static final String CATEGORY_LIST        = "categoryList";
-    public static final String DAY_OFF_BY_LEVEL     = "dayOffByLevel";
+    public static final String DAY_OFF_INFO          = "DAY_OFF_INFO";
+    public static final String ALLOW_CANCEL_REQUEST  = "allowCancelRequest";
+    public static final String MAX_DAY_ALLOW_CANCEL  = "maxDayAllowCancel";
+    public static final String CATEGORY_LIST         = "categoryList";
+    public static final String DAY_OFF_BY_LEVEL      = "dayOffByLevel";
+    public static final float  DEFAULT_TOTAL_DAY_OFF = 10.0f;
 }

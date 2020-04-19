@@ -1,19 +1,16 @@
 package htcc.employee.service.service.jpa;
 
 import htcc.common.entity.jpa.Company;
-import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.service.BaseJPAService;
 import htcc.employee.service.component.hazelcast.HazelcastLoader;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.repository.jpa.CompanyRepository;
-import htcc.employee.service.repository.jpa.EmployeeInfoRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Log4j2

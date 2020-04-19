@@ -1,7 +1,9 @@
 package htcc.employee.service.service.jpa;
 
-import htcc.common.service.BaseJPAService;
+import htcc.common.constant.Constant;
+import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.service.BaseJPAService;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.repository.jpa.EmployeeInfoRepository;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -33,11 +34,12 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
     public List<EmployeeInfo> findByFullTextSearch(String searchValue) {
         List<EmployeeInfo> result = new ArrayList<>();
         try {
-            String nameValue = getSearchValue(searchValue);
+            String nameValue       = getSearchValue(searchValue);
             String employeeIdValue = "%" + searchValue + "%";
 
-            String query = String.format("SELECT * FROM EmployeeInfo WHERE (MATCH(employeeId,fullName) AGAINST ('%s' IN BOOLEAN MODE)) " +
-                    "OR (employeeId LIKE '%s')", nameValue, employeeIdValue);
+            String query = String.format(
+                    "SELECT * FROM EmployeeInfo WHERE (MATCH(employeeId,fullName) AGAINST ('%s' IN BOOLEAN MODE)) " +
+                            "OR (employeeId LIKE '%s')", nameValue, employeeIdValue);
             return em.createNativeQuery(query, EmployeeInfo.class).getResultList();
         } catch (Exception e) {
             log.error("[findByFullTextSearch] [{}]", searchValue, e);
@@ -47,9 +49,10 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
 
     private String getSearchValue(String searchValue) {
         List<String> values = new ArrayList<>();
-        if (searchValue.contains(" ")){
+        if (searchValue.contains(" ")) {
             values = Arrays.asList(searchValue.split(" "));
-        } else {
+        }
+        else {
             values = Collections.singletonList(searchValue);
         }
 
@@ -94,34 +97,63 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
                 throw new Exception("Employee not found !");
             }
 
-            float value = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(companyId).getDayOffByLevel().getOrDefault(employee.getLevel(), 10.0f);
+            final float level = employee.getLevel();
+            final List<CompanyDayOffInfo.DayOffByLevelEntity> dayOffByLevelList =
+                    DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(companyId).getDayOffByLevel();
+
+            float value = Constant.DEFAULT_TOTAL_DAY_OFF;
+            Optional<CompanyDayOffInfo.DayOffByLevelEntity> optValue = dayOffByLevelList
+                                                                        .stream()
+                                                                        .filter(d -> d.getLevel() == level)
+                                                                        .findFirst();
+
+            int index = 0;
+            if (!optValue.isPresent()) {
+                // find nearest level
+                for (int i = 0; i < dayOffByLevelList.size(); i++) {
+                    if (dayOffByLevelList.get(i).getLevel() > level) {
+                        index = i - 1;
+                        break;
+                    }
+                }
+
+                if (index < 0) {
+                    throw new Exception(String.format("Find DayOffByLevelEntity company [%s], level [%s] return null",
+                            companyId, level));
+                }
+
+                value = dayOffByLevelList.get(index).getTotalDayOff();
+            } else {
+                value = optValue.get().getTotalDayOff();
+            }
+
             return CompletableFuture.completedFuture(value);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("[getTotalDayOff] [{} - {}] ex", companyId, username, e);
-            return CompletableFuture.completedFuture(10.0f);
+            return CompletableFuture.completedFuture(Constant.DEFAULT_TOTAL_DAY_OFF);
         }
     }
 
-    public void deleteOffice(String companyId, String officeId){
+    public void deleteOffice(String companyId, String officeId) {
         try {
             List<EmployeeInfo> listEmployee = repo.findByCompanyIdAndOfficeId(companyId, officeId);
-            for (EmployeeInfo employee : listEmployee){
+            for (EmployeeInfo employee : listEmployee) {
                 employee.setOfficeId(StringUtil.EMPTY);
             }
             repo.saveAll(listEmployee);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error(String.format("[deleteOffice] [%s-%s] ex", companyId, officeId), e);
         }
     }
 
-    public void deleteDepartment(String companyId, String department){
+    public void deleteDepartment(String companyId, String department) {
         try {
             List<EmployeeInfo> listEmployee = repo.findByCompanyIdAndDepartment(companyId, department);
-            for (EmployeeInfo employee : listEmployee){
+            for (EmployeeInfo employee : listEmployee) {
                 employee.setDepartment(StringUtil.EMPTY);
             }
             repo.saveAll(listEmployee);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error(String.format("[deleteDepartment] [%s-%s] ex", companyId, department), e);
         }
     }

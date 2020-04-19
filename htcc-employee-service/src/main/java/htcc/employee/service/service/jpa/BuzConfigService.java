@@ -3,13 +3,11 @@ package htcc.employee.service.service.jpa;
 import htcc.common.constant.Constant;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.jpa.BuzConfig;
-import htcc.common.entity.jpa.Company;
 import htcc.common.service.BaseJPAService;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.component.hazelcast.HazelcastLoader;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.repository.jpa.BuzConfigRepository;
-import htcc.employee.service.repository.jpa.CompanyRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,8 +60,8 @@ public class BuzConfigService extends BaseJPAService<BuzConfig, BuzConfig.Key> {
         List<BuzConfig> list = new ArrayList<>();
         CompanyDayOffInfo info = new CompanyDayOffInfo();
 
-        info.getCategoryList().add(new CompanyDayOffInfo.CategoryList(DEFAULT_DAY_OFF_CATEGORY, true, true));
-        info.getDayOffByLevel().put(0.0f, 10.0f);
+        info.getCategoryList().add(new CompanyDayOffInfo.CategoryEntity(DEFAULT_DAY_OFF_CATEGORY, true, true));
+        info.getDayOffByLevel().add(new CompanyDayOffInfo.DayOffByLevelEntity(0.0f, Constant.DEFAULT_TOTAL_DAY_OFF));
         info.setAllowCancelRequest(true);
         info.setMaxDayAllowCancel(0);
 

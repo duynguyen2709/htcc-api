@@ -199,3 +199,7 @@
 17-04-2020:
  + Version 1.6.2:
     - [Employee] refactor LeavingRequestController
+
+17-04-2020:
+ + Version 1.6.3:
+    - [Employee] Change DayOffByLevel from Map to List

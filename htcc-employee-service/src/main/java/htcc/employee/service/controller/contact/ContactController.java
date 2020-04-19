@@ -1,15 +1,15 @@
 package htcc.employee.service.controller.contact;
 
+import htcc.common.comparator.EmployeeIdComparator;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.contact.ContactFilterEntity;
 import htcc.common.entity.jpa.Department;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.Office;
 import htcc.common.util.StringUtil;
-import htcc.common.entity.contact.ContactFilterEntity;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
-import htcc.common.comparator.EmployeeIdComparator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Api(tags = "API danh bạ công ty",

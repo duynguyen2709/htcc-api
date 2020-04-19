@@ -77,7 +77,7 @@ public class LeavingRequestController {
                                         .get(companyId)
                                         .getCategoryList()
                                         .stream()
-                                        .map(CompanyDayOffInfo.CategoryList::getCategory)
+                                        .map(CompanyDayOffInfo.CategoryEntity::getCategory)
                                         .collect(Collectors.toList());
 
             data.setCategories(categoryList);
@@ -152,8 +152,9 @@ public class LeavingRequestController {
 
             boolean useDayOff = true;
             boolean hasSalary = false;
-            List<CompanyDayOffInfo.CategoryList> categoryLists = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(request.getCompanyId()).getCategoryList();
-            for (CompanyDayOffInfo.CategoryList category : categoryLists) {
+
+            List<CompanyDayOffInfo.CategoryEntity> categoryLists = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(request.getCompanyId()).getCategoryList();
+            for (CompanyDayOffInfo.CategoryEntity category : categoryLists) {
                 if (category.getCategory().equals(model.getCategory())){
                     useDayOff = category.isUseDayOff();
                     hasSalary = category.isHasSalary();

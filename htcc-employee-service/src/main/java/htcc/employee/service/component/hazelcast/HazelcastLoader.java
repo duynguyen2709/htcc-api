@@ -119,12 +119,16 @@ public class HazelcastLoader {
             CompanyDayOffInfo info = new CompanyDayOffInfo();
 
             boolean allowCancelRequestValue = Boolean.parseBoolean(findByKey(configs, Constant.ALLOW_CANCEL_REQUEST));
+
             int maxDayAllowCancelValue  = Integer.parseInt(findByKey(configs, Constant.MAX_DAY_ALLOW_CANCEL));
-            List<CompanyDayOffInfo.CategoryList> categoryListValue =
+
+            List<CompanyDayOffInfo.CategoryEntity> categoryListValue =
                     StringUtil.json2Collection(findByKey(configs, Constant.CATEGORY_LIST),
-                            new TypeToken<List<CompanyDayOffInfo.CategoryList>>() {}.getType());
-            Map<Float, Float> dayOffByLevelValue =
-                    StringUtil.json2Collection(findByKey(configs, Constant.DAY_OFF_BY_LEVEL), new TypeToken<Map<Float, Float>>() {}.getType());
+                            new TypeToken<List<CompanyDayOffInfo.CategoryEntity>>() {}.getType());
+
+            List<CompanyDayOffInfo.DayOffByLevelEntity> dayOffByLevelValue =
+                    StringUtil.json2Collection(findByKey(configs, Constant.DAY_OFF_BY_LEVEL),
+                            new TypeToken<List<CompanyDayOffInfo.DayOffByLevelEntity>>() {}.getType());
 
             info.setAllowCancelRequest(allowCancelRequestValue);
             info.setMaxDayAllowCancel(maxDayAllowCancelValue);
