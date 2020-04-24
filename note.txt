@@ -203,3 +203,7 @@
 17-04-2020:
  + Version 1.6.3:
     - [Employee] Change DayOffByLevel from Map to List
+
+24-04-2020:
+ + Version 1.6.4:
+    - [Employee] Add WorkingDay handler

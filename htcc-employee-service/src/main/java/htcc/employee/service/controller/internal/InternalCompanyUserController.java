@@ -1,5 +1,6 @@
 package htcc.employee.service.controller.internal;
 
+import htcc.common.comparator.EmployeeIdComparator;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
@@ -35,7 +36,10 @@ public class InternalCompanyUserController {
         BaseResponse<EmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             List<EmployeeInfo> listEmployeeByCompany = service.findByCompanyId(model.getCompanyId());
-            int newId = listEmployeeByCompany.size() + 1;
+            listEmployeeByCompany.sort(new EmployeeIdComparator());
+            String lastId = listEmployeeByCompany.get(listEmployeeByCompany.size() - 1).getEmployeeId();
+
+            int newId = Integer.parseInt(lastId.substring(lastId.length() - 5)) + 1;
             String employeeId = StringUtil.genEmployeeId(model.getCompanyId(), newId);
 
             EmployeeInfo employee = new EmployeeInfo();

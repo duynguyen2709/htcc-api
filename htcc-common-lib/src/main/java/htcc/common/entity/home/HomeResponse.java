@@ -30,5 +30,7 @@ public class HomeResponse implements Serializable {
                       example = "10")
     public int pendingLeavingRequest = 0;
 
+    @ApiModelProperty(notes = "Danh sách các chi nhánh được phép quản lý")
+    public List<String> canManageOffices = new ArrayList<>();
 }
 

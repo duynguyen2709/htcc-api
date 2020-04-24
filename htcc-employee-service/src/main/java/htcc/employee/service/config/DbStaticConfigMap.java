@@ -1,10 +1,7 @@
 package htcc.employee.service.config;
 
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
-import htcc.common.entity.jpa.BuzConfig;
-import htcc.common.entity.jpa.Company;
-import htcc.common.entity.jpa.Department;
-import htcc.common.entity.jpa.Office;
+import htcc.common.entity.jpa.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +20,8 @@ public class DbStaticConfigMap {
 
     public static Map<String, CompanyDayOffInfo> COMPANY_DAY_OFF_INFO_MAP = new HashMap<>();
 
+    public static Map<String, List<WorkingDay>> WORKING_DAY_MAP = new HashMap<>();
+
     public static List<Office> findOfficeByCompanyId(String companyId){
         return OFFICE_MAP.values()
                 .stream()
@@ -35,5 +34,12 @@ public class DbStaticConfigMap {
                 .stream()
                 .filter(o -> o.getCompanyId().equals(companyId))
                 .collect(Collectors.toList());
+    }
+
+    public static Office findHeadquarter(String companyId){
+        return OFFICE_MAP.values()
+                .stream()
+                .filter(o -> o.getCompanyId().equals(companyId) && o.isHeadquarter)
+                .findFirst().orElse(null);
     }
 }

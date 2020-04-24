@@ -5,20 +5,15 @@ import htcc.common.component.HazelcastService;
 import htcc.common.constant.CacheKeyEnum;
 import htcc.common.constant.Constant;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
-import htcc.common.entity.jpa.BuzConfig;
-import htcc.common.entity.jpa.Company;
-import htcc.common.entity.jpa.Department;
-import htcc.common.entity.jpa.Office;
+import htcc.common.entity.jpa.*;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.repository.jpa.BuzConfigRepository;
-import htcc.employee.service.repository.jpa.CompanyRepository;
-import htcc.employee.service.repository.jpa.DepartmentRepository;
-import htcc.employee.service.repository.jpa.OfficeRepository;
+import htcc.employee.service.repository.jpa.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +39,9 @@ public class HazelcastLoader {
     @Autowired
     private BuzConfigRepository buzConfigRepository;
 
+    @Autowired
+    private WorkingDayRepository workingDayRepository;
+
     @PostConstruct
     public void loadAllStaticMap() throws Exception {
         log.info("####### Started Loading Static Config Map ########\n");
@@ -57,7 +55,30 @@ public class HazelcastLoader {
         // must be below company map to traverse
         loadCompanyDayOffInfoMap();
 
+        loadWorkingDayMap();
+
         log.info("####### Loaded All Static Config Map Done ########\n");
+    }
+
+    public void loadWorkingDayMap() {
+        if (WORKING_DAY_MAP != null) {
+            WORKING_DAY_MAP.clear();
+            WORKING_DAY_MAP = null;
+        }
+
+        Map<String, List<WorkingDay>> map = new HashMap<>();
+
+        workingDayRepository.findAll().forEach(c -> {
+                    String key = String.format("%s_%s", c.getCompanyId(), c.getOfficeId());
+                    if (!map.containsKey(key) || map.get(key) == null) {
+                        map.put(key, new ArrayList<>());
+                    }
+
+                    map.get(key).add(c);
+                });
+
+        WORKING_DAY_MAP = hazelcastService.reload(map, CacheKeyEnum.WORKING_DAY);
+        log.info("[loadCompanyMap] WORKING_DAY_MAP loaded succeed [{}]", StringUtil.toJsonString(WORKING_DAY_MAP));
     }
 
     public void loadCompanyMap() {

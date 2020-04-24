@@ -4,7 +4,7 @@ import htcc.common.comparator.DateComparator;
 import htcc.common.comparator.LeavingRequestResponseComparator;
 import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ComplaintStatusEnum;
-import htcc.common.constant.LeavingRequestSessionEnum;
+import htcc.common.constant.SessionEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
@@ -56,7 +56,9 @@ public class LeavingRequestController {
         BaseResponse<LeavingRequestInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             if (!DateTimeUtil.isRightFormat(yyyy, "yyyy")) {
-                return new BaseResponse(ReturnCodeEnum.DATE_WRONG_FORMAT, String.format("Năm %s không phù hợp định dạng yyyy", yyyy));
+                response = new BaseResponse<>(ReturnCodeEnum.DATE_WRONG_FORMAT,
+                        String.format("Năm %s không phù hợp định dạng yyyy", yyyy));
+                return response;
             }
 
             CompletableFuture<List<LeavingRequestResponse>> detailFuture = service.getLeavingRequestLog(companyId, username, yyyy);
@@ -112,14 +114,14 @@ public class LeavingRequestController {
 
             for (LeavingRequest.LeavingDayDetail d : entity.detail) {
                 if (entity.useDayOff) {
-                    if (d.session == LeavingRequestSessionEnum.FULL_DAY.getValue()) {
+                    if (d.session == SessionEnum.FULL_DAY.getValue()) {
                         normalOffDay += 1;
                     }
                     else {
                         normalOffDay += 0.5f;
                     }
                 } else {
-                    if (d.session == LeavingRequestSessionEnum.FULL_DAY.getValue()) {
+                    if (d.session == SessionEnum.FULL_DAY.getValue()) {
                         externalOffDay += 1;
                     }
                     else {
@@ -217,7 +219,7 @@ public class LeavingRequestController {
 
             for (LeavingRequest.LeavingDayDetail d : entity.detail) {
                 if (entity.useDayOff) {
-                    if (d.session == LeavingRequestSessionEnum.FULL_DAY.getValue()) {
+                    if (d.session == SessionEnum.FULL_DAY.getValue()) {
                         daysOff += 1;
                     } else {
                         daysOff += 0.5f;
@@ -229,7 +231,7 @@ public class LeavingRequestController {
         //count days in request
         float daysInRequest = 0.0f;
         for (LeavingRequest.LeavingDayDetail d : model.detail) {
-            if (d.session == LeavingRequestSessionEnum.FULL_DAY.getValue()) {
+            if (d.session == SessionEnum.FULL_DAY.getValue()) {
                 daysInRequest += 1;
             } else {
                 daysInRequest += 0.5f;
@@ -266,14 +268,14 @@ public class LeavingRequestController {
                 for (LeavingRequest.LeavingDayDetail detailInHistory : each.detail) {
                     for (LeavingRequest.LeavingDayDetail detailInNewForm : model.detail) {
                         if (detailInHistory.date.equals(detailInNewForm.date)) {
-                            if (detailInHistory.session == LeavingRequestSessionEnum.FULL_DAY.getValue() ||
-                                detailInNewForm.session == LeavingRequestSessionEnum.FULL_DAY.getValue()) {
+                            if (detailInHistory.session == SessionEnum.FULL_DAY.getValue() ||
+                                detailInNewForm.session == SessionEnum.FULL_DAY.getValue()) {
                                 return String.format("Ngày %s đã được đăng ký nghỉ trước đó",
                                         DateTimeUtil.convertToOtherFormat(detailInHistory.date, "yyyyMMdd", "dd/MM/yyyy"));
 
                             } else if (detailInHistory.session == detailInNewForm.session) {
                                 return String.format("Buổi %s ngày %s đã được đăng ký nghỉ trước đó",
-                                        detailInHistory.session == LeavingRequestSessionEnum.MORNING.getValue() ? "sáng" : "chiều",
+                                        detailInHistory.session == SessionEnum.MORNING.getValue() ? "sáng" : "chiều",
                                         DateTimeUtil.convertToOtherFormat(detailInHistory.date, "yyyyMMdd", "dd/MM/yyyy"));
                             }
                         }
