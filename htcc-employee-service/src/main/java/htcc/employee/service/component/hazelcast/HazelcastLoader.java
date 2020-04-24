@@ -42,6 +42,9 @@ public class HazelcastLoader {
     @Autowired
     private WorkingDayRepository workingDayRepository;
 
+    @Autowired
+    private ShiftTimeRepository shiftTimeRepository;
+
     @PostConstruct
     public void loadAllStaticMap() throws Exception {
         log.info("####### Started Loading Static Config Map ########\n");
@@ -57,7 +60,31 @@ public class HazelcastLoader {
 
         loadWorkingDayMap();
 
+        loadShiftTimeMap();
+
         log.info("####### Loaded All Static Config Map Done ########\n");
+    }
+
+    public void loadShiftTimeMap() {
+        if (SHIFT_TIME_MAP != null) {
+            SHIFT_TIME_MAP.clear();
+            SHIFT_TIME_MAP = null;
+        }
+
+        Map<String, List<ShiftTime>> map = new HashMap<>();
+
+        shiftTimeRepository.findAll().forEach(c -> {
+            String key = String.format("%s_%s", c.getCompanyId(), c.getOfficeId());
+            if (!map.containsKey(key) || map.get(key) == null) {
+                map.put(key, new ArrayList<>());
+            }
+
+            map.get(key).add(c);
+        });
+
+        SHIFT_TIME_MAP = hazelcastService.reload(map, CacheKeyEnum.SHIFT_TIME);
+        log.info("[loadShiftTimeMap] SHIFT_TIME_MAP loaded succeed [{}]", StringUtil.toJsonString(SHIFT_TIME_MAP));
+
     }
 
     public void loadWorkingDayMap() {
@@ -78,7 +105,7 @@ public class HazelcastLoader {
                 });
 
         WORKING_DAY_MAP = hazelcastService.reload(map, CacheKeyEnum.WORKING_DAY);
-        log.info("[loadCompanyMap] WORKING_DAY_MAP loaded succeed [{}]", StringUtil.toJsonString(WORKING_DAY_MAP));
+        log.info("[loadWorkingDayMap] WORKING_DAY_MAP loaded succeed [{}]", StringUtil.toJsonString(WORKING_DAY_MAP));
     }
 
     public void loadCompanyMap() {

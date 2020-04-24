@@ -206,4 +206,4 @@
 
 24-04-2020:
  + Version 1.6.4:
-    - [Employee] Add WorkingDay handler
+    - [Employee] Add WorkingDay & ShiftTime handler

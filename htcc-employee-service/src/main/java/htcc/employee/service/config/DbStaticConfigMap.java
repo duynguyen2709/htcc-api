@@ -22,6 +22,8 @@ public class DbStaticConfigMap {
 
     public static Map<String, List<WorkingDay>> WORKING_DAY_MAP = new HashMap<>();
 
+    public static Map<String, List<ShiftTime>> SHIFT_TIME_MAP = new HashMap<>();
+
     public static List<Office> findOfficeByCompanyId(String companyId){
         return OFFICE_MAP.values()
                 .stream()

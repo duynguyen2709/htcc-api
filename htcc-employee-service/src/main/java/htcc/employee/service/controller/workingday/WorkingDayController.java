@@ -108,10 +108,11 @@ public class WorkingDayController {
     @PutMapping("/workingday/{id}")
     public BaseResponse updateWorkingDay(@ApiParam(name = "id", value = "[Path] Id định danh của ngày làm việc", defaultValue = "1", required = true)
                                              @PathVariable int id,
-                                         @ApiParam(value = "[Body] Thông tin ngày làm việc mới cần tạo")
+                                         @ApiParam(value = "[Body] Thông tin ngày làm việc mới cần cập nhật")
                                          @RequestBody WorkingDay request) {
         BaseResponse<WorkingDay> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
+            request.setId(id);
             String error = request.isValid();
             if (!error.isEmpty()){
                 response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
@@ -126,12 +127,11 @@ public class WorkingDayController {
                 return response;
             }
 
-            request.setId(id);
             workingDay = workingDayService.update(request);
 
             response.setData(workingDay);
         } catch (Exception e){
-            log.error("[updateWorkingDay] [{} - {}] ex", id, StringUtil.toJsonString(request), e);
+            log.error("[updateWorkingDay] [{}] ex", StringUtil.toJsonString(request), e);
             response = new BaseResponse<>(e);
         }
 
