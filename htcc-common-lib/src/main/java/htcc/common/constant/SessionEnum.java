@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public enum SessionEnum {
 
-    NIGHT(3),
+//    NIGHT(3),
     AFTERNOON(2),
     MORNING(1),
     FULL_DAY (0)

@@ -51,7 +51,7 @@ public class WorkingDay extends BaseJPAEntity {
                       example = "20200424")
     public String date = "";
 
-    @ApiModelProperty(notes = "Buổi nghỉ/làm việc (0 : cả ngày/ 1: buổi sáng / 2: buổi chiều / 3: buổi tối)",
+    @ApiModelProperty(notes = "Buổi nghỉ/làm việc (0 : cả ngày/ 1: buổi sáng / 2: buổi chiều)",
                       example = "0")
     public int session = 0;
 
@@ -102,18 +102,31 @@ public class WorkingDay extends BaseJPAEntity {
                 return String.format("Thứ %s không hợp lệ", weekDay);
             }
 
-            date = "";
-            extraInfo = "";
+            date = StringUtil.EMPTY;
+            extraInfo = StringUtil.EMPTY;
         } else {
             if (!DateTimeUtil.isRightFormat(date, "yyyyMMdd")){
                 return String.format("Ngày %s không phù hợp định dạng yyyyMMdd", date);
             }
 
-            weekDay = 0;
+            weekDay = WeekDayEnum.DEFAULT.getValue();
         }
 
 
         return StringUtil.EMPTY;
 
+    }
+
+    public void refillImmutableValue(WorkingDay workingDay) {
+        this.companyId = workingDay.companyId;
+        this.officeId = workingDay.officeId;
+        this.type = workingDay.type;
+
+        if (this.type == WorkingDayTypeEnum.NORMAL.getValue()){
+            this.date = StringUtil.EMPTY;
+            this.extraInfo = StringUtil.EMPTY;
+        } else {
+            this.weekDay = WeekDayEnum.DEFAULT.getValue();
+        }
     }
 }

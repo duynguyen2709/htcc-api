@@ -57,6 +57,14 @@ public class DateTimeUtil {
         }
     }
 
+    public static int getWeekDayInt(String yyyyMMdd){
+        Date d = parseStringToDate(yyyyMMdd, "yyyyMMdd");
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        return dayOfWeek;
+    }
+
     private static String getWeekDayString(int dayOfWeek) {
         if (dayOfWeek == Calendar.SUNDAY) {
             return "CN";

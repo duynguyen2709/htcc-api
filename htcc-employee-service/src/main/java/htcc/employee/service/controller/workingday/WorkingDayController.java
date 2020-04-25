@@ -1,6 +1,8 @@
 package htcc.employee.service.controller.workingday;
 
 import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.constant.SessionEnum;
+import htcc.common.constant.WeekDayEnum;
 import htcc.common.constant.WorkingDayTypeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.Office;
@@ -84,7 +86,15 @@ public class WorkingDayController {
                                                    @RequestBody WorkingDay request) {
         BaseResponse<WorkingDay> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
+            request.setId(0);
             String error = request.isValid();
+            if (!error.isEmpty()){
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(error);
+                return response;
+            }
+
+            error = validateDetailDate(request);
             if (!error.isEmpty()){
                 response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
                 response.setReturnMessage(error);
@@ -101,8 +111,52 @@ public class WorkingDayController {
         return response;
     }
 
+    // handle collision/ duplicate dates
+    private String validateDetailDate(WorkingDay request) {
+        if (request.getType() == WorkingDayTypeEnum.NORMAL.getValue()){
+            List<WorkingDay> workingDays = workingDayService.findByCompanyIdAndOfficeId(request.getCompanyId(), request.getOfficeId())
+                             .stream()
+                             .filter(d -> d.getType() == WorkingDayTypeEnum.NORMAL.getValue()
+                             && d.getWeekDay() == request.getWeekDay())
+                             .collect(Collectors.toList());
 
+            for (WorkingDay day : workingDays) {
+                // skip itself
+                if (day.getId() == request.getId()){
+                    continue;
+                }
 
+                if (day.getSession() == SessionEnum.FULL_DAY.getValue()
+                        || request.getSession() == SessionEnum.FULL_DAY.getValue()
+                        || day.getSession() == request.getSession()){
+                    return String.format("Ngày %s đã có lịch làm việc. Vui lòng kiểm tra lại.",
+                            (day.getWeekDay() == 1) ? "Chủ nhật" : "Thứ " + day.getWeekDay());
+                }
+            }
+        } else {
+            List<WorkingDay> workingDays = workingDayService.findByCompanyIdAndOfficeId(request.getCompanyId(), request.getOfficeId())
+                    .stream()
+                    .filter(d -> d.getType() == WorkingDayTypeEnum.SPECIAL.getValue()
+                            && d.getDate().equals(request.getDate()))
+                    .collect(Collectors.toList());
+
+            for (WorkingDay day : workingDays) {
+                // skip itself
+                if (day.getId() == request.getId()){
+                    continue;
+                }
+
+                if (day.getSession() == SessionEnum.FULL_DAY.getValue()
+                        || request.getSession() == SessionEnum.FULL_DAY.getValue()
+                        || day.getSession() == request.getSession()){
+                    return String.format("Ngày %s đã có lịch làm việc. Vui lòng kiểm tra lại.",
+                            DateTimeUtil.convertToOtherFormat(day.getDate(), "yyyyMMdd", "dd-MM-yyyy"));
+                }
+            }
+        }
+
+        return StringUtil.EMPTY;
+    }
 
     @ApiOperation(value = "Cập nhật thông tin ngày làm việc/ ngày nghỉ", response = WorkingDay.class)
     @PutMapping("/workingday/{id}")
@@ -120,12 +174,21 @@ public class WorkingDayController {
                 return response;
             }
 
+            error = validateDetailDate(request);
+            if (!error.isEmpty()){
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(error);
+                return response;
+            }
+
             WorkingDay workingDay = workingDayService.findById(id);
             if (workingDay == null){
                 response = new BaseResponse<>(ReturnCodeEnum.DATA_NOT_FOUND);
                 response.setReturnMessage("Không tìm thấy thông tin ngày làm việc có id " + id);
                 return response;
             }
+
+            request.refillImmutableValue(workingDay);
 
             workingDay = workingDayService.update(request);
 

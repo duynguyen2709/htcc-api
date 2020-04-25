@@ -6,8 +6,11 @@ import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.SessionEnum;
 import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.constant.WorkingDayTypeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
+import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.jpa.WorkingDay;
 import htcc.common.entity.leavingrequest.*;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
@@ -15,6 +18,7 @@ import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.config.ServiceConfig;
 import htcc.employee.service.service.LeavingRequestService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.WorkingDayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -44,6 +48,9 @@ public class LeavingRequestController {
 
     @Autowired
     private EmployeeInfoService employeeInfoService;
+
+    @Autowired
+    private WorkingDayService workingDayService;
 
     @ApiOperation(value = "Lấy thông tin phép còn lại & đơn đã submit", response = LeavingRequestInfo.class)
     @GetMapping("/leaving/{companyId}/{username}/{yyyy}")
@@ -152,20 +159,13 @@ public class LeavingRequestController {
 
             model = new LeavingRequestModel(request);
 
-            boolean useDayOff = true;
-            boolean hasSalary = false;
-
-            List<CompanyDayOffInfo.CategoryEntity> categoryLists = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(request.getCompanyId()).getCategoryList();
-            for (CompanyDayOffInfo.CategoryEntity category : categoryLists) {
-                if (category.getCategory().equals(model.getCategory())){
-                    useDayOff = category.isUseDayOff();
-                    hasSalary = category.isHasSalary();
-                    break;
-                }
+            removeNonWorkingDays(model);
+            if (model.getDetail().isEmpty()){
+                response = new BaseResponse(ReturnCodeEnum.DAY_OFF_CONFLICT_REMOVED);
+                return response;
             }
 
-            model.setUseDayOff(useDayOff);
-            model.setHasSalary(hasSalary);
+            setUseDayOff(model);
 
             // check if days off left is enough to register
             if (model.useDayOff) {
@@ -196,6 +196,99 @@ public class LeavingRequestController {
         }
         return response;
     }
+
+    private void setUseDayOff(LeavingRequestModel model) {
+        boolean useDayOff = true;
+        boolean hasSalary = false;
+
+        List<CompanyDayOffInfo.CategoryEntity> categoryLists = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP.get(model.getCompanyId()).getCategoryList();
+        for (CompanyDayOffInfo.CategoryEntity category : categoryLists) {
+            if (category.getCategory().equals(model.getCategory())){
+                useDayOff = category.isUseDayOff();
+                hasSalary = category.isHasSalary();
+                break;
+            }
+        }
+
+        model.setUseDayOff(useDayOff);
+        model.setHasSalary(hasSalary);
+    }
+
+    private void removeNonWorkingDays(LeavingRequestModel model) throws Exception {
+        String officeId = employeeInfoService.findById(new EmployeeInfo.Key(model.getCompanyId(), model.getUsername())).getOfficeId();
+
+        if (officeId.isEmpty()){
+            throw new Exception("[removeNonWorkingDays] officeId empty");
+        }
+
+        List<WorkingDay> workingDays = workingDayService.findByCompanyIdAndOfficeId(model.getCompanyId(), officeId);
+
+        List<WorkingDay> normalOffDays = workingDays.stream()
+                .filter(d -> d.getType() == WorkingDayTypeEnum.NORMAL.getValue() && !d.getIsWorking())
+                         .collect(Collectors.toList());
+
+        List<WorkingDay> specialOffDays = workingDays.stream()
+                .filter(d -> d.getType() == WorkingDayTypeEnum.SPECIAL.getValue() && !d.getIsWorking())
+                .collect(Collectors.toList());
+
+        List<LeavingRequest.LeavingDayDetail> toRemove = new ArrayList<>();
+
+        for (LeavingRequest.LeavingDayDetail day : model.getDetail()){
+            for (WorkingDay specialDay : specialOffDays){
+                if (day.date.equals(specialDay.date)){
+                    // collision here, need to remove
+                    if (specialDay.getSession() == SessionEnum.FULL_DAY.getValue()){
+                        toRemove.add(day);
+                    } else if (specialDay.getSession() == SessionEnum.MORNING.getValue()){
+                        if (day.session == SessionEnum.FULL_DAY.getValue()) {
+                            day.session = SessionEnum.AFTERNOON.getValue();
+                        } else if (day.session == SessionEnum.MORNING.getValue()){
+                            toRemove.add(day);
+                        }
+                    } else if (specialDay.getSession() == SessionEnum.AFTERNOON.getValue()){
+                        if (day.session == SessionEnum.FULL_DAY.getValue()) {
+                            day.session = SessionEnum.MORNING.getValue();
+                        } else if (day.session == SessionEnum.AFTERNOON.getValue()){
+                            toRemove.add(day);
+                        }
+                    }
+                }
+            }
+        }
+
+        // remove all special day off
+        model.getDetail().removeAll(toRemove);
+        toRemove = new ArrayList<>();
+
+        for (LeavingRequest.LeavingDayDetail day : model.getDetail()){
+            for (WorkingDay normalDay : normalOffDays){
+                int weekDay = DateTimeUtil.getWeekDayInt(day.date);
+
+                if (weekDay == normalDay.getWeekDay()){
+                    // collision here, need to remove
+                    if (normalDay.getSession() == SessionEnum.FULL_DAY.getValue()){
+                        toRemove.add(day);
+                    } else if (normalDay.getSession() == SessionEnum.MORNING.getValue()){
+                        if (day.session == SessionEnum.FULL_DAY.getValue()) {
+                            day.session = SessionEnum.AFTERNOON.getValue();
+                        } else if (day.session == SessionEnum.MORNING.getValue()){
+                            toRemove.add(day);
+                        }
+                    } else if (normalDay.getSession() == SessionEnum.AFTERNOON.getValue()){
+                        if (day.session == SessionEnum.FULL_DAY.getValue()) {
+                            day.session = SessionEnum.MORNING.getValue();
+                        } else if (day.session == SessionEnum.AFTERNOON.getValue()){
+                            toRemove.add(day);
+                        }
+                    }
+                }
+            }
+        }
+
+        // remove all normal day off
+        model.getDetail().removeAll(toRemove);
+    }
+
 
     private String validateNumOfDayOffLeft(LeavingRequestModel model) throws Exception {
         BaseResponse response = getLeavingRequestInfo(model.getCompanyId(), model.getUsername(),

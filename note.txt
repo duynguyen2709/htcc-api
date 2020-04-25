@@ -206,4 +206,6 @@
 
 24-04-2020:
  + Version 1.6.4:
-    - [Employee] Add WorkingDay & ShiftTime handler
+    - [Employee] Add WorkingDay & ShiftTime handler;
+    Remove non-working days in leaving request;
+    Reject duplicate inserting/updating WorkingDay

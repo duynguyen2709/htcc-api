@@ -71,7 +71,7 @@ public class LeavingRequest extends BaseJPAEntity {
         }
 
         for (LeavingDayDetail d : detail) {
-            if (DateTimeUtil.isRightFormat(d.date, "yyyyMMdd") == false) {
+            if (!DateTimeUtil.isRightFormat(d.date, "yyyyMMdd")) {
                 return String.format("Ngày %s không phù hợp định dạng yyyyMMdd", d.date);
             }
 
