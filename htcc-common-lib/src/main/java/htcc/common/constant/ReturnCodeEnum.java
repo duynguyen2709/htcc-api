@@ -30,7 +30,7 @@ public enum ReturnCodeEnum {
     DATA_NOT_FOUND(-17, "Không tìm thấy dữ liệu"),
     DATA_ALREADY_EXISTED(-18, "Dữ liệu đã tồn tại"),
     NOT_ALLOW_CANCEL_LEAVING_REQUEST(-19, "Không cho phép hủy đơn nghỉ phép"),
-    DAY_OFF_CONFLICT_REMOVED(-20, "Các ngày bạn đăng ký là ngày nghỉ của chi nhánh. Vui lòng kiểm tra lại"),
+    DAY_OFF_CONFLICT_REMOVED(-20, "Ngày bạn đăng ký là ngày nghỉ của chi nhánh. Vui lòng kiểm tra lại"),
     ;
 
     private final int value;

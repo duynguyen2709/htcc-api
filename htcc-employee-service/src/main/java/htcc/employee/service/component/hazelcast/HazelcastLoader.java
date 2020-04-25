@@ -4,6 +4,8 @@ import com.google.gson.reflect.TypeToken;
 import htcc.common.component.HazelcastService;
 import htcc.common.constant.CacheKeyEnum;
 import htcc.common.constant.Constant;
+import htcc.common.constant.SessionEnum;
+import htcc.common.constant.WorkingDayTypeEnum;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.jpa.*;
 import htcc.common.util.StringUtil;
@@ -66,11 +68,6 @@ public class HazelcastLoader {
     }
 
     public void loadShiftTimeMap() {
-        if (SHIFT_TIME_MAP != null) {
-            SHIFT_TIME_MAP.clear();
-            SHIFT_TIME_MAP = null;
-        }
-
         Map<String, List<ShiftTime>> map = new HashMap<>();
 
         shiftTimeRepository.findAll().forEach(c -> {
@@ -87,12 +84,7 @@ public class HazelcastLoader {
 
     }
 
-    public void loadWorkingDayMap() {
-        if (WORKING_DAY_MAP != null) {
-            WORKING_DAY_MAP.clear();
-            WORKING_DAY_MAP = null;
-        }
-
+    public void loadWorkingDayMap() throws Exception {
         Map<String, List<WorkingDay>> map = new HashMap<>();
 
         workingDayRepository.findAll().forEach(c -> {
@@ -104,16 +96,38 @@ public class HazelcastLoader {
                     map.get(key).add(c);
                 });
 
+        for (List<WorkingDay> workingDays : map.values()){
+            // validate logic to reject duplicate here
+            Map<String, WorkingDay> temp = new HashMap<>();
+            for (WorkingDay day : workingDays) {
+                if (day.getType() == WorkingDayTypeEnum.SPECIAL.getValue()){
+                    continue;
+                }
+
+                String key = String.format("%s_%s", day.getWeekDay(), day.getSession());
+                if (temp.containsKey(key)){
+                    throw new Exception(String.format("[WORKING_DAY_MAP] [%s - %s] already contains key [%s]",
+                            day.getCompanyId(), day.getOfficeId(), key));
+                }
+
+                if (day.getSession() == SessionEnum.MORNING.getValue() ||
+                    day.getSession() == SessionEnum.AFTERNOON.getValue()){
+                    String subKey = String.format("%s_0", day.getWeekDay());
+                    if (temp.containsKey(subKey)){
+                        throw new Exception(String.format("[WORKING_DAY_MAP] [%s - %s] already contains full day config for week day [%s]",
+                                day.getCompanyId(), day.getOfficeId(), day.getWeekDay()));
+                    }
+                }
+
+                temp.put(key, day);
+            }
+        }
+
         WORKING_DAY_MAP = hazelcastService.reload(map, CacheKeyEnum.WORKING_DAY);
         log.info("[loadWorkingDayMap] WORKING_DAY_MAP loaded succeed [{}]", StringUtil.toJsonString(WORKING_DAY_MAP));
     }
 
     public void loadCompanyMap() {
-        if (COMPANY_MAP != null) {
-            COMPANY_MAP.clear();
-            COMPANY_MAP = null;
-        }
-
         Map<String, Company> map = new HashMap<>();
 
         companyRepository.findAll().forEach(c -> map.put(c.getCompanyId(), c));
@@ -123,11 +137,6 @@ public class HazelcastLoader {
     }
 
     public void loadOfficeMap(){
-        if (OFFICE_MAP != null) {
-            OFFICE_MAP.clear();
-            OFFICE_MAP = null;
-        }
-
         Map<String, Office> map = new HashMap<>();
 
         officeRepository.findAll().forEach(c -> map.put(c.getCompanyId() + "_" + c.getOfficeId(), c));
@@ -137,11 +146,6 @@ public class HazelcastLoader {
     }
 
     public void loadDepartmentMap() {
-        if (DEPARTMENT_MAP != null) {
-            DEPARTMENT_MAP.clear();
-            DEPARTMENT_MAP = null;
-        }
-
         Map<String, Department> map = new HashMap<>();
 
         departmentRepository.findAll().forEach(c -> map.put(c.getCompanyId() + "_" + c.getDepartment(), c));
@@ -151,11 +155,6 @@ public class HazelcastLoader {
     }
 
     public void loadCompanyDayOffInfoMap() throws Exception {
-        if (COMPANY_DAY_OFF_INFO_MAP != null) {
-            COMPANY_DAY_OFF_INFO_MAP.clear();
-            COMPANY_DAY_OFF_INFO_MAP = null;
-        }
-
         Map<String, CompanyDayOffInfo> map = new HashMap<>();
 
         for (String companyId : COMPANY_MAP.keySet()) {

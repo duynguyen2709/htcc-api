@@ -224,15 +224,101 @@ public class LeavingRequestController {
         List<WorkingDay> workingDays = workingDayService.findByCompanyIdAndOfficeId(model.getCompanyId(), officeId);
 
         List<WorkingDay> normalOffDays = workingDays.stream()
-                .filter(d -> d.getType() == WorkingDayTypeEnum.NORMAL.getValue() && !d.getIsWorking())
+                .filter(d -> d.getType() == WorkingDayTypeEnum.NORMAL.getValue())
                          .collect(Collectors.toList());
 
         List<WorkingDay> specialOffDays = workingDays.stream()
                 .filter(d -> d.getType() == WorkingDayTypeEnum.SPECIAL.getValue() && !d.getIsWorking())
                 .collect(Collectors.toList());
 
+        removeSpecialOffDays(model, specialOffDays);
+        removeNormalOffDays(model, normalOffDays);
+    }
+
+    private void removeNormalOffDays(LeavingRequestModel model, List<WorkingDay> normalOffDays) {
         List<LeavingRequest.LeavingDayDetail> toRemove = new ArrayList<>();
 
+        Map<String, WorkingDay> fullWeekWorkingDays = new HashMap<>();
+        for (WorkingDay day : normalOffDays){
+            String key = String.format("%s_%s", day.getWeekDay(), day.getSession());
+            fullWeekWorkingDays.put(key, day);
+        }
+
+        for (int i = 1; i <= 7; i++){
+            boolean isFullDay = false;
+            if (fullWeekWorkingDays.containsKey(String.format("%s_0", i))){
+                isFullDay = true;
+            }
+
+            if (fullWeekWorkingDays.containsKey(String.format("%s_1", i)) &&
+                    fullWeekWorkingDays.containsKey(String.format("%s_2", i))){
+                isFullDay = true;
+            }
+
+            if (!isFullDay){
+                // there is at least 1 session
+                if (fullWeekWorkingDays.containsKey(String.format("%s_1", i))){
+                    // has session 1, then add session 2
+                    WorkingDay workingDay = new WorkingDay();
+                    workingDay.setType(WorkingDayTypeEnum.NORMAL.getValue());
+                    workingDay.setWeekDay(i);
+                    workingDay.setSession(SessionEnum.AFTERNOON.getValue());
+                    workingDay.setIsWorking(false);
+                    normalOffDays.add(workingDay);
+                } else if (fullWeekWorkingDays.containsKey(String.format("%s_2", i))) {
+                    // has session 1, then add session 2
+                    WorkingDay workingDay = new WorkingDay();
+                    workingDay.setType(WorkingDayTypeEnum.NORMAL.getValue());
+                    workingDay.setWeekDay(i);
+                    workingDay.setSession(SessionEnum.MORNING.getValue());
+                    workingDay.setIsWorking(false);
+                    normalOffDays.add(workingDay);
+                } else {
+                    // no session at all, then add full day
+                    WorkingDay workingDay = new WorkingDay();
+                    workingDay.setType(WorkingDayTypeEnum.NORMAL.getValue());
+                    workingDay.setWeekDay(i);
+                    workingDay.setSession(SessionEnum.FULL_DAY.getValue());
+                    workingDay.setIsWorking(false);
+                    normalOffDays.add(workingDay);
+                }
+            }
+        }
+
+        normalOffDays = normalOffDays.stream().filter(d -> !d.getIsWorking())
+                .collect(Collectors.toList());
+
+        for (LeavingRequest.LeavingDayDetail day : model.getDetail()){
+            for (WorkingDay normalDay : normalOffDays){
+                int weekDay = DateTimeUtil.getWeekDayInt(day.date);
+
+                if (weekDay == normalDay.getWeekDay()){
+                    // collision here, need to remove
+                    if (normalDay.getSession() == SessionEnum.FULL_DAY.getValue()){
+                        toRemove.add(day);
+                    } else if (normalDay.getSession() == SessionEnum.MORNING.getValue()){
+                        if (day.session == SessionEnum.FULL_DAY.getValue()) {
+                            day.session = SessionEnum.AFTERNOON.getValue();
+                        } else if (day.session == SessionEnum.MORNING.getValue()) {
+                            toRemove.add(day);
+                        }
+                    } else if (normalDay.getSession() == SessionEnum.AFTERNOON.getValue()){
+                        if (day.session == SessionEnum.FULL_DAY.getValue()) {
+                            day.session = SessionEnum.MORNING.getValue();
+                        } else if (day.session == SessionEnum.AFTERNOON.getValue()){
+                            toRemove.add(day);
+                        }
+                    }
+                }
+            }
+        }
+
+        // remove all normal day off
+        model.getDetail().removeAll(toRemove);
+    }
+
+    private void removeSpecialOffDays(LeavingRequestModel model, List<WorkingDay> specialOffDays) {
+        List<LeavingRequest.LeavingDayDetail> toRemove = new ArrayList<>();
         for (LeavingRequest.LeavingDayDetail day : model.getDetail()){
             for (WorkingDay specialDay : specialOffDays){
                 if (day.date.equals(specialDay.date)){
@@ -258,37 +344,7 @@ public class LeavingRequestController {
 
         // remove all special day off
         model.getDetail().removeAll(toRemove);
-        toRemove = new ArrayList<>();
-
-        for (LeavingRequest.LeavingDayDetail day : model.getDetail()){
-            for (WorkingDay normalDay : normalOffDays){
-                int weekDay = DateTimeUtil.getWeekDayInt(day.date);
-
-                if (weekDay == normalDay.getWeekDay()){
-                    // collision here, need to remove
-                    if (normalDay.getSession() == SessionEnum.FULL_DAY.getValue()){
-                        toRemove.add(day);
-                    } else if (normalDay.getSession() == SessionEnum.MORNING.getValue()){
-                        if (day.session == SessionEnum.FULL_DAY.getValue()) {
-                            day.session = SessionEnum.AFTERNOON.getValue();
-                        } else if (day.session == SessionEnum.MORNING.getValue()){
-                            toRemove.add(day);
-                        }
-                    } else if (normalDay.getSession() == SessionEnum.AFTERNOON.getValue()){
-                        if (day.session == SessionEnum.FULL_DAY.getValue()) {
-                            day.session = SessionEnum.MORNING.getValue();
-                        } else if (day.session == SessionEnum.AFTERNOON.getValue()){
-                            toRemove.add(day);
-                        }
-                    }
-                }
-            }
-        }
-
-        // remove all normal day off
-        model.getDetail().removeAll(toRemove);
     }
-
 
     private String validateNumOfDayOffLeft(LeavingRequestModel model) throws Exception {
         BaseResponse response = getLeavingRequestInfo(model.getCompanyId(), model.getUsername(),

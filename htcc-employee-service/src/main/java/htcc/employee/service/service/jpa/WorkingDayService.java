@@ -56,7 +56,11 @@ public class WorkingDayService extends BaseJPAService<WorkingDay, Integer> {
     @Override
     public WorkingDay create(WorkingDay entity) {
         WorkingDay newCompany = repo.save(entity);
-        hazelcastLoader.loadWorkingDayMap();
+        try {
+            hazelcastLoader.loadWorkingDayMap();
+        } catch (Exception e) {
+            log.error("[hazelcastLoader.loadWorkingDayMap] ex", e);
+        }
         return entity;
     }
 
@@ -68,11 +72,15 @@ public class WorkingDayService extends BaseJPAService<WorkingDay, Integer> {
     @Override
     public void delete(Integer key) {
         repo.deleteById(key);
-        hazelcastLoader.loadWorkingDayMap();
+        try {
+            hazelcastLoader.loadWorkingDayMap();
+        } catch (Exception e) {
+            log.error("[hazelcastLoader.loadWorkingDayMap] ex", e);
+        }
     }
 
     @Transactional
-    public List<WorkingDay> batchInsert(List<WorkingDay> list){
+    public List<WorkingDay> batchInsert(List<WorkingDay> list) throws Exception {
         if (list == null || list.isEmpty()){
             return list;
         }
@@ -83,7 +91,7 @@ public class WorkingDayService extends BaseJPAService<WorkingDay, Integer> {
     }
 
     @Transactional
-    public void batchDelete(List<WorkingDay> list){
+    public void batchDelete(List<WorkingDay> list) throws Exception {
         if (list == null || list.isEmpty()){
             return;
         }
