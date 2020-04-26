@@ -103,6 +103,13 @@ public class LogService {
     }
 
     /*
+    ##################### Notification Section #####################
+     */
+    public BaseResponse getNotificationLog(String companyId, String username, int startIndex, int size) {
+        String method = String.format("/notications/%s/%s/%s/%s", companyId, username, startIndex, size);
+        return callGet(method);
+    }
+    /*
     ##################### Common #####################
      */
     private BaseResponse callGet(String method){
