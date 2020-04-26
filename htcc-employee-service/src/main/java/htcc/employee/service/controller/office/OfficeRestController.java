@@ -1,9 +1,7 @@
 package htcc.employee.service.controller.office;
 
-import htcc.common.constant.AccountStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.jpa.Company;
 import htcc.common.entity.jpa.Office;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
@@ -17,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Api(tags = "API quản lý danh sách chi nhánh (CỦA QUẢN LÝ)")
 @RestController

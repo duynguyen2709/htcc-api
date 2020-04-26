@@ -1,5 +1,6 @@
 package htcc.employee.service.service;
 
+import com.google.gson.reflect.TypeToken;
 import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -28,10 +30,10 @@ public class CheckInService {
     private KafkaProducerService kafka;
 
     @Async("asyncExecutor")
-    public CompletableFuture<CheckinModel> getCheckInLog(String companyId, String username, String yyyyMMdd) {
+    public CompletableFuture<List<CheckinModel>> getCheckInLog(String companyId, String username, String yyyyMMdd) {
         String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
 
-        CheckinModel result = null;
+        List<CheckinModel> result = null;
         if (today.equals(yyyyMMdd)) {
             result = redisService.getCheckInLog(companyId, username, yyyyMMdd);
         } else {
@@ -41,10 +43,11 @@ public class CheckInService {
         return CompletableFuture.completedFuture(result);
     }
 
-    public CompletableFuture<CheckinModel> getCheckOutLog(String companyId, String username, String yyyyMMdd) {
+    @Async("asyncExecutor")
+    public CompletableFuture<List<CheckinModel>> getCheckOutLog(String companyId, String username, String yyyyMMdd) {
         String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
 
-        CheckinModel result = null;
+        List<CheckinModel> result = null;
         if (today.equals(yyyyMMdd)) {
             result = redisService.getCheckOutLog(companyId, username, yyyyMMdd);
         } else {
@@ -73,16 +76,17 @@ public class CheckInService {
         redisService.deleteCheckInLog(companyId, username, date);
     }
 
-    private CheckinModel parseResponse(BaseResponse res) {
+    private List<CheckinModel> parseResponse(BaseResponse res) {
         try {
-            if (res == null || res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue() ||
-            res.getData() == null) {
+            if (res == null ||
+                    res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue() ||
+                    res.getData() == null) {
                 return null;
             }
 
             String data = StringUtil.toJsonString(res.data);
 
-            return StringUtil.fromJsonString(data, CheckinModel.class);
+            return StringUtil.json2Collection(data, new TypeToken<List<CheckinModel>>() {}.getType());
         } catch (Exception e){
             log.warn("parseResponse {} return null", StringUtil.toJsonString(res));
             return null;

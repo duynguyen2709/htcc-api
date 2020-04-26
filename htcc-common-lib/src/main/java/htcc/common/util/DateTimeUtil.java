@@ -117,7 +117,7 @@ public class DateTimeUtil {
             String HHmm = parseTimestampToString(time, HHMM_FORMAT);
             Date   dt   = parseStringToDate(HHmm, HHMM_FORMAT);
             Date   dt2  = parseStringToDate(validTime, HHMM_FORMAT);
-            return dt.compareTo(dt2) <= 0;
+            return dt.before(dt2);
         } catch (Exception e){
             log.warn("isBefore time: {} - validTime {} ex", time, validTime, e);
             return false;
@@ -129,7 +129,7 @@ public class DateTimeUtil {
             String HHmm = parseTimestampToString(time, HHMM_FORMAT);
             Date   dt   = parseStringToDate(HHmm, HHMM_FORMAT);
             Date   dt2  = parseStringToDate(validTime, HHMM_FORMAT);
-            return dt.compareTo(dt2) >= 0;
+            return dt.after(dt2);
         } catch (Exception e){
             log.warn("isAfter time: {} - validTime {} ex {}", time, validTime, e.getMessage());
             return false;

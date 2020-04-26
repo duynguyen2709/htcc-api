@@ -18,8 +18,6 @@ public class StringUtil {
 
     public static final String EMPTY = "";
 
-    private static final List<String> MULTIPART_FIELDS = Arrays.asList("images", "avatarFile");
-
     public static final Type LIST_STRING_TYPE = new TypeToken<List<String>>() {}.getType();
 
     private static final Gson gson;

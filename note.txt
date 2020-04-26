@@ -209,3 +209,8 @@
     - [Employee] Add WorkingDay & ShiftTime handler;
     Remove non-working days in leaving request;
     Reject duplicate inserting/updating WorkingDay
+
+26-04-2020:
+ + Version 1.7.0:
+    - [Employee] Change new model CheckIn,
+    add officeId & image to request, add list office to response.

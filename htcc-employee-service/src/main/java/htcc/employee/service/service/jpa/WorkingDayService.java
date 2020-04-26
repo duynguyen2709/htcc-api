@@ -1,11 +1,9 @@
 package htcc.employee.service.service.jpa;
 
-import htcc.common.entity.jpa.Company;
 import htcc.common.entity.jpa.WorkingDay;
 import htcc.common.service.BaseJPAService;
 import htcc.employee.service.component.hazelcast.HazelcastLoader;
 import htcc.employee.service.config.DbStaticConfigMap;
-import htcc.employee.service.repository.jpa.CompanyRepository;
 import htcc.employee.service.repository.jpa.WorkingDayRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

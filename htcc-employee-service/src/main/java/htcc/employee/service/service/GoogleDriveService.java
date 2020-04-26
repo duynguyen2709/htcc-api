@@ -106,6 +106,48 @@ public class GoogleDriveService {
     }
 
 
+
+
+    public String uploadCheckInImage(MultipartFile multipartFile, String fileName) {
+        java.io.File tempFile = null;
+        long start = System.currentTimeMillis();
+        try {
+            tempFile = java.io.File.createTempFile("temp", null);
+            tempFile.deleteOnExit();
+
+            multipartFile.transferTo(tempFile);
+
+            File newGGDriveFile = new File()
+                    .setParents(Collections.singletonList(buzConfig.buz.checkInImageFolder))
+                    .setName(fileName);
+
+            FileContent mediaContent = new FileContent(multipartFile.getContentType(), tempFile);
+
+            File uploadedFile = googleDrive.files()
+                    .create(newGGDriveFile, mediaContent)
+                    .setFields("id")
+                    .execute();
+
+            log.info(String.format("[uploadCheckInImage] Uploaded Filename [%s] " +
+                            "- File Size [%s] - Total Time [%sms] -  Id [%s] Succeed",
+                    fileName,
+                    multipartFile.getSize(),
+                    (System.currentTimeMillis() - start),
+                    uploadedFile.getId()));
+
+            return Constant.GOOGLE_DRIVE_IMAGE_FORMAT + uploadedFile.getId();
+        } catch (Exception e) {
+            log.error("uploadCheckInImage ex", e);
+        } finally {
+            if (tempFile != null) {
+                tempFile.delete();
+            }
+        }
+        // error case
+        return null;
+    }
+
+
     @Async("asyncExecutor")
     public void deleteFile(String fileId) {
         try {
