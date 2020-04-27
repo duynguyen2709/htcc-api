@@ -82,6 +82,13 @@ public class DateTimeUtil {
         }
     }
 
+    public static String subtractMonthFromDate(Date dt, int month){
+        Calendar c = Calendar.getInstance();
+        c.setTime(dt);
+        c.add(Calendar.MONTH, month * (-1));
+        return parseDateToString(c.getTime(), "yyyyMM");
+    }
+
     public static String parseDateToString(Date dt) {
         return parseDateToString(dt, DATE_FORMAT);
     }

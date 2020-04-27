@@ -54,8 +54,8 @@ public class NotificationResponse {
         this.notiId = model.notiId;
         this.time = model.title;
         this.content = model.content;
-        this.date = DateTimeUtil.parseTimestampToString(model.sentTime, "dd/MM/yyyy");
-        this.time = DateTimeUtil.parseTimestampToString(model.sentTime, "HH:mm");
+        this.date = DateTimeUtil.parseTimestampToString(model.sendTime, "dd/MM/yyyy");
+        this.time = DateTimeUtil.parseTimestampToString(model.sendTime, "HH:mm");
         this.iconId = model.iconId;
         this.iconUrl = model.iconUrl;
     }

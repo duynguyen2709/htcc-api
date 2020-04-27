@@ -93,6 +93,9 @@ kafka:
     eventCreateUser:
       topicName: EVENT-CREATE-USER
       groupId: EVENT-CREATE-USER
+#    notificationLog:
+#      topicName: NOTIFICATION-LOG
+#      groupId: NOTIFICATION-LOG
 
 ################## Mail Buz Config ##################
 mail:
