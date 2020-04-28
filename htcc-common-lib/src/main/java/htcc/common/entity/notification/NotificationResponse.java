@@ -56,7 +56,7 @@ public class NotificationResponse {
 
     public NotificationResponse(NotificationModel model){
         this.notiId = model.notiId;
-        this.time = model.title;
+        this.title = model.title;
         this.content = model.content;
         this.date = DateTimeUtil.parseTimestampToString(model.sendTime, "dd/MM/yyyy");
         this.time = DateTimeUtil.parseTimestampToString(model.sendTime, "HH:mm");
