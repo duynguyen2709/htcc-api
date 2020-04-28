@@ -214,3 +214,7 @@
  + Version 1.7.0:
     - [Employee] Change new model CheckIn,
     add officeId & image to request, add list office to response.
+
+28-04-2020:
+ + Version 1.7.1:
+    - [Employee & Log] Add Notification History controller
