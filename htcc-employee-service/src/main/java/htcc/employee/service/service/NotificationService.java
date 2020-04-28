@@ -1,12 +1,15 @@
 package htcc.employee.service.service;
 
 import com.google.gson.reflect.TypeToken;
+import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.notification.NotificationModel;
+import htcc.common.entity.notification.UpdateNotificationReadStatusModel;
 import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,6 +18,9 @@ import java.util.List;
 @Service
 @Log4j2
 public class NotificationService {
+
+    @Autowired
+    private KafkaProducerService kafka;
 
     @Autowired
     private LogService logService;
@@ -37,5 +43,10 @@ public class NotificationService {
             log.error("parseResponse {} return null, ex {}", StringUtil.toJsonString(res), e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+    @Async
+    public void updateNotificationHasReadStatus(UpdateNotificationReadStatusModel model){
+        kafka.sendMessage(kafka.getBuzConfig().getEventReadNotification().getTopicName(), model);
     }
 }

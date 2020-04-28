@@ -55,7 +55,7 @@ public class LeavingRequest extends BaseJPAEntity {
         }
 
         if (StringUtil.isEmpty(username)) {
-            return "Username không được rỗng";
+            return "Tên người dùng không được rỗng";
         }
 
         if (StringUtil.isEmpty(companyId)) {

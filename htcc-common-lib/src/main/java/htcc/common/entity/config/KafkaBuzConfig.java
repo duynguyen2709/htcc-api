@@ -13,6 +13,7 @@ public class KafkaBuzConfig {
     public KafkaTopicConfig eventCreateUser;
     public KafkaTopicConfig eventUpdateCompanyUser;
     public KafkaTopicConfig eventUpdateEmployeeInfo;
+    public KafkaTopicConfig eventReadNotification;
 
     @Data
     public static class KafkaTopicConfig {

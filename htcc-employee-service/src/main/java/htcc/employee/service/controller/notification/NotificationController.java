@@ -1,10 +1,10 @@
 package htcc.employee.service.controller.notification;
 
-import htcc.common.comparator.EmployeeIdComparator;
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.notification.NotificationResponse;
+import htcc.common.entity.notification.UpdateNotificationReadStatusModel;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.NotificationService;
 import io.swagger.annotations.Api;
@@ -12,12 +12,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +37,7 @@ public class NotificationController {
                                                " nếu khác 0 cần gửi thêm index để lấy trang tiếp theo",
                                                  defaultValue = "0", required = false)
                                        @RequestParam(required = false, defaultValue = "0") Integer size) {
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        BaseResponse<List<NotificationResponse>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             if (size == null || size == 0){
                 size = 20;
@@ -59,8 +55,31 @@ public class NotificationController {
         } catch (Exception e){
             log.error(String.format("[getListNotification] [%s-%s-%s-%s]",
                     companyId, username, index, size), e);
+            response = new BaseResponse<>(e);
+        }
+        return response;
+    }
+
+
+
+
+    @ApiOperation(value = "Cập nhật trạng thái đã đọc của noti", response = BaseResponse.class)
+    @PostMapping("/notifications/status")
+    public BaseResponse updateNotificationHasReadStatus(@ApiParam(name = "request", value = "[Body] Thông tin noti cần update", required = true)
+                                                @RequestBody UpdateNotificationReadStatusModel request) {
+        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        try {
+            if (!request.isValid().isEmpty()){
+                throw new Exception("Data invalid");
+            }
+            request.setClientId(ClientSystemEnum.MOBILE.getValue());
+
+            notiService.updateNotificationHasReadStatus(request);
+        } catch (Exception e){
+            log.error("[updateNotificationHasReadStatus] request = {}, ex", StringUtil.toJsonString(request), e);
             response = new BaseResponse(e);
         }
         return response;
     }
+
 }

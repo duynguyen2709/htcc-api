@@ -17,7 +17,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
   datasource:
-    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
+    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8&useServerPrepStmts=false&rewriteBatchedStatements=true
     url: jdbc:mysql://${spring.datasource.server}/${spring.datasource.schemaName}?${spring.datasource.options}
     username: ${security.user.name}
     password: ${security.user.password}
@@ -93,9 +93,9 @@ kafka:
     eventCreateUser:
       topicName: EVENT-CREATE-USER
       groupId: EVENT-CREATE-USER
-#    notificationLog:
-#      topicName: NOTIFICATION-LOG
-#      groupId: NOTIFICATION-LOG
+    eventReadNotification:
+      topicName: EVENT-READ-NOTIFICATION
+      groupId: EVENT-READ-NOTIFICATION
 
 ################## Mail Buz Config ##################
 mail:

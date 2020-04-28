@@ -116,3 +116,6 @@ kafka:
     eventUpdateEmployeeInfo:
       topicName: EVENT-UPDATE-EMPLOYEE-INFO
       groupId: EVENT-UPDATE-EMPLOYEE-INFO
+    eventReadNotification:
+      topicName: EVENT-READ-NOTIFICATION
+      groupId: EVENT-READ-NOTIFICATION

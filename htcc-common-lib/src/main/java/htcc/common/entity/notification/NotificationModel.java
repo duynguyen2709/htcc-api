@@ -25,6 +25,7 @@ public class NotificationModel {
     public String       iconId    = "";
     public String       iconUrl   = "";
     public int          status    = 1;
+    public boolean      hasRead   = false;
     public List<String> tokenPush = new ArrayList<>();
 
     public NotificationModel(NotificationLogEntity log){
@@ -40,6 +41,7 @@ public class NotificationModel {
         this.iconId = log.iconId;
         this.iconUrl = log.iconUrl;
         this.status = log.status;
+        this.hasRead = (log.hasRead == 1);
         this.tokenPush = StringUtil.json2Collection(log.tokenPush, StringUtil.LIST_STRING_TYPE);
     }
 }

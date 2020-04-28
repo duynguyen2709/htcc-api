@@ -25,6 +25,7 @@ public class NotificationLogEntity extends BaseLogEntity {
     public String iconId    = "";
     public String iconUrl   = "";
     public int    status    = 1;
+    public int    hasRead   = 0;
     public String tokenPush = "";
 
     public NotificationLogEntity(NotificationModel model) {
@@ -40,6 +41,7 @@ public class NotificationLogEntity extends BaseLogEntity {
         this.iconId = model.iconId;
         this.iconUrl = model.iconUrl;
         this.status = model.status;
+        this.hasRead = (model.hasRead ? 1 : 0);
         this.tokenPush = StringUtil.toJsonString(model.tokenPush);
     }
 
@@ -59,6 +61,7 @@ public class NotificationLogEntity extends BaseLogEntity {
         params.put("iconUrl", this.iconUrl);
         params.put("tokenPush", this.tokenPush);
         params.put("status", this.status);
+        params.put("hasRead", this.hasRead);
         return params;
     }
 

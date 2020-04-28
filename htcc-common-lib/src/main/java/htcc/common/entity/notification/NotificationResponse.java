@@ -50,6 +50,10 @@ public class NotificationResponse {
     @NotEmpty
     public String iconUrl = "";
 
+    @ApiModelProperty(notes = "Trạng thái đã đọc của noti")
+    @NotEmpty
+    public boolean hasRead = false;
+
     public NotificationResponse(NotificationModel model){
         this.notiId = model.notiId;
         this.time = model.title;
@@ -58,5 +62,6 @@ public class NotificationResponse {
         this.time = DateTimeUtil.parseTimestampToString(model.sendTime, "HH:mm");
         this.iconId = model.iconId;
         this.iconUrl = model.iconUrl;
+        this.hasRead = model.hasRead;
     }
 }
