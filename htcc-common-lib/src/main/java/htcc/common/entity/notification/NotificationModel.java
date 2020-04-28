@@ -18,7 +18,7 @@ public class NotificationModel {
     public String       companyId = "";
     public String       username  = "";
     public String       notiId    = "";
-    public int          screenId  = 1;
+    public int          screenId  = 0;
     public long         sendTime  = 0L;
     public long         retryTime = 0L;
     public String       title     = "";
@@ -35,6 +35,7 @@ public class NotificationModel {
         this.companyId = log.companyId;
         this.username = log.username;
         this.notiId = log.notiId;
+        this.screenId = log.screenId;
         this.sendTime = log.sendTime;
         this.retryTime = log.retryTime;
         this.title = log.title;

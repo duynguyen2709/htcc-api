@@ -22,8 +22,8 @@ public class NotificationResponse {
     public String notiId = "";
 
     @ApiModelProperty(notes = "Id của màn hình cần navigate tới",
-                      example = "1")
-    public int screenId = 1;
+                      example = "0")
+    public int screenId = 0;
 
     @ApiModelProperty(notes = "Title của noti (in đậm)",
                       example = "Thông báo về bảng lương")
