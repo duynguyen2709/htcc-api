@@ -13,6 +13,7 @@ public class NotificationLogRowMapper implements RowMapper<NotificationLogEntity
     public NotificationLogEntity mapRow(ResultSet rs, int i) throws SQLException {
         NotificationLogEntity entity = new NotificationLogEntity();
         entity.notiId = rs.getString("notiId");
+        entity.screenId = rs.getInt("screenId");
         entity.requestId = rs.getString("requestId");
         entity.companyId = rs.getString("companyId");
         entity.username = rs.getString("username");

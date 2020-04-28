@@ -21,6 +21,10 @@ public class NotificationResponse {
     @NotEmpty
     public String notiId = "";
 
+    @ApiModelProperty(notes = "Id của màn hình cần navigate tới",
+                      example = "1")
+    public int screenId = 1;
+
     @ApiModelProperty(notes = "Title của noti (in đậm)",
                       example = "Thông báo về bảng lương")
     @NotEmpty
@@ -56,6 +60,7 @@ public class NotificationResponse {
 
     public NotificationResponse(NotificationModel model){
         this.notiId = model.notiId;
+        this.screenId = model.screenId;
         this.title = model.title;
         this.content = model.content;
         this.date = DateTimeUtil.parseTimestampToString(model.sendTime, "dd/MM/yyyy");

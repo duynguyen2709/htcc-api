@@ -18,6 +18,7 @@ public class NotificationModel {
     public String       companyId = "";
     public String       username  = "";
     public String       notiId    = "";
+    public int          screenId  = 1;
     public long         sendTime  = 0L;
     public long         retryTime = 0L;
     public String       title     = "";

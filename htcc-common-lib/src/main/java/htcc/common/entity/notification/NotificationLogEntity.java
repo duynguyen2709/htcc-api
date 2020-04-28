@@ -18,6 +18,7 @@ public class NotificationLogEntity extends BaseLogEntity {
     public String companyId = "";
     public String username  = "";
     public String notiId    = "";
+    public int    screenId  = 1;
     public long   sendTime  = 0L;
     public long   retryTime = 0L;
     public String title     = "";
@@ -34,6 +35,7 @@ public class NotificationLogEntity extends BaseLogEntity {
         this.companyId = model.companyId;
         this.username = model.username;
         this.notiId = model.notiId;
+        this.screenId = model.screenId;
         this.sendTime = model.sendTime;
         this.retryTime = model.retryTime;
         this.title = model.title;
@@ -53,6 +55,7 @@ public class NotificationLogEntity extends BaseLogEntity {
         params.put("companyId", this.companyId);
         params.put("username", this.username);
         params.put("notiId", this.notiId);
+        params.put("screenId", this.screenId);
         params.put("sendTime", this.sendTime);
         params.put("retryTime", this.retryTime);
         params.put("title", this.title);
