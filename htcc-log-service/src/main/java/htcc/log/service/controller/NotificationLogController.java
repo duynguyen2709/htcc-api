@@ -55,4 +55,20 @@ public class NotificationLogController {
         }
         return response;
     }
+
+    @GetMapping("/notifications/count")
+    public BaseResponse countUnreadNotifications(@RequestParam int clientId,
+                                                 @RequestParam String companyId,
+                                                 @RequestParam String username) {
+        BaseResponse<Integer> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        try {
+            int count = repo.countUnreadNotifications(clientId, companyId, username);
+            response.setData(count);
+        } catch (Exception e){
+            log.error("[countUnreadNotifications] [{} - {} - {}] ex",
+                    clientId, companyId, username, e);
+            response = new BaseResponse<>(e);
+        }
+        return response;
+    }
 }

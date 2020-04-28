@@ -12,4 +12,6 @@ public interface NotificationLogRepository {
     void updateReadAllNotification(UpdateNotificationReadStatusModel model);
 
     void updateReadOneNotification(UpdateNotificationReadStatusModel model);
+
+    int countUnreadNotifications(int clientId, String companyId, String username);
 }

@@ -78,7 +78,8 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
                 }
 
                 String query = String.format("SELECT * FROM %s%s WHERE clientId = '%s' AND companyId = '%s' " +
-                        "AND username = '%s' LIMIT %s,%s", TABLE_LOG, month, clientId, companyId, username, startIndex, size);
+                        "AND username = '%s' ORDER BY sendTime ASC LIMIT %s,%s",
+                        TABLE_LOG, month, clientId, companyId, username, startIndex, size);
 
                 List<NotificationLogEntity> temp = jdbcTemplate.query(query, new NotificationLogRowMapper());
 
@@ -170,6 +171,20 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
             logCounter.count -= 1;
             logCounterService.update(logCounter);
         }
+    }
+
+    @Override
+    public int countUnreadNotifications(int clientId, String companyId, String username) {
+        try {
+            String params = String.format("%s-%s-%s", clientId, companyId, username);
+            LogCounter logCounter = logCounterService.findById(new LogCounter.Key(NON_READ_PREFIX + TABLE_LOG, "", params));
+            if (logCounter != null){
+                return logCounter.getCount();
+            }
+        } catch (Exception e){
+            log.error("[countUnreadNotifications] [{} - {} - {}]", clientId, companyId, username, e);
+        }
+        return 0;
     }
 
     private NotificationLogEntity getOneNotification(UpdateNotificationReadStatusModel model) {

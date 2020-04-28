@@ -36,11 +36,35 @@ public class HomeController {
     private LeavingRequestService leavingRequestService;
 
 
+    // TODO : delete this method
     @ApiOperation(value = "API Home", response = HomeResponse.class)
     @GetMapping("/home/{companyId}")
     public BaseResponse home(@ApiParam(value = "[Path] Mã công ty", required = true)
                                                   @PathVariable String companyId,
                              @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String username) {
+        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        try {
+            String yyyyMM = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMM");
+
+            HomeResponse data = new HomeResponse();
+            countPendingComplaint(data, companyId);
+            countPendingLeavingRequest(data, companyId);
+            setCanManageOffices(data, companyId, username);
+            response.data = data;
+
+        } catch (Exception e) {
+            log.error(String.format("home [%s] ex", companyId), e);
+            response = new BaseResponse<>(e);
+        }
+        return response;
+    }
+
+    @ApiOperation(value = "API Home", response = HomeResponse.class)
+    @GetMapping("/home/manager/{companyId}/{username}")
+    public BaseResponse home2(@ApiParam(value = "[Path] Mã công ty", required = true)
+                             @PathVariable String companyId,
+                             @ApiParam(value = "[Path] Tên đăng nhập", defaultValue = "admin", required = true)
+                             @PathVariable String username) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             String yyyyMM = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMM");

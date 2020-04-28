@@ -217,4 +217,5 @@
 
 28-04-2020:
  + Version 1.7.1:
-    - [Employee & Log] Add Notification History controller
+    - [Employee & Log] Add Notification History controller;
+    Add api Home for Employee

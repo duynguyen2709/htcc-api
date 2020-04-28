@@ -111,6 +111,12 @@ public class LogService {
                 ClientSystemEnum.MOBILE.getValue(), companyId, username, startIndex, size);
         return callGet(method);
     }
+
+    public BaseResponse countUnreadNotificationForMobile(String companyId, String username) {
+        String method = String.format("/notifications/count?clientId=%s&companyId=%s&username=%s",
+                ClientSystemEnum.MOBILE.getValue(), companyId, username);
+        return callGet(method);
+    }
     /*
     ##################### Common #####################
      */

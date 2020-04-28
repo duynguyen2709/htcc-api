@@ -161,7 +161,7 @@ public class GetCheckinInfoController {
                 d.getSession() == SessionEnum.FULL_DAY.getValue()).collect(Collectors.toList());
 
         List<WorkingDay> specialOffDays = workingDays.stream().filter(d -> !d.getIsWorking() &&
-                d.getType() == WorkingDayTypeEnum.NORMAL.getValue() && d.getDate().equals(yyyyMMdd) &&
+                d.getType() == WorkingDayTypeEnum.SPECIAL.getValue() && d.getDate().equals(yyyyMMdd) &&
                 d.getSession() == SessionEnum.FULL_DAY.getValue()).collect(Collectors.toList());
 
         return specialOffDays.isEmpty() && normalOffDays.isEmpty();

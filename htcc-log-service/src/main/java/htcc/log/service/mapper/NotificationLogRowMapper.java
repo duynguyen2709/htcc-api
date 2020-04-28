@@ -24,6 +24,7 @@ public class NotificationLogRowMapper implements RowMapper<NotificationLogEntity
         entity.iconUrl = rs.getString("iconUrl");
         entity.iconId = rs.getString("iconId");
         entity.tokenPush = rs.getString("tokenPush");
+        entity.hasRead = rs.getInt("hasRead");
         entity.status = rs.getInt("status");
         return entity;
     }
