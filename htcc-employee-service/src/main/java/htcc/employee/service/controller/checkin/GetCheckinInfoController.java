@@ -124,10 +124,6 @@ public class GetCheckinInfoController {
     private void setDetailCheckinTimes(CheckinResponse data, List<CheckinModel> checkinList,
                                        List<CheckinModel> checkoutList) {
         int n = checkinList.size();
-
-        log.info(StringUtil.toJsonString(checkinList));
-        log.info(StringUtil.toJsonString(checkoutList));
-
         for (int i = 0; i < n; i++) {
             data.detailCheckinTimes.add(new CheckinResponse.DetailCheckinTime(checkinList.get(i)));
 
