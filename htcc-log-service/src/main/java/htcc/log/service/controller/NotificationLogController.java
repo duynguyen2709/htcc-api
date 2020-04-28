@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,9 +38,14 @@ public class NotificationLogController {
                 throw new Exception("repo.getListNotification return null");
             }
 
-            List<NotificationModel> dataResponse = rawData.stream()
-                                                            .map(NotificationModel::new)
-                                                            .collect(Collectors.toList());
+            List<NotificationModel> dataResponse =
+                    rawData.stream().map(NotificationModel::new)
+                            .sorted(new Comparator<NotificationModel>() {
+                                @Override
+                                public int compare(NotificationModel o1, NotificationModel o2) {
+                                    return Long.compare(o2.getSendTime(), o1.getSendTime());
+                                }
+                            }).collect(Collectors.toList());
 
             response.setData(dataResponse);
         } catch (Exception e){

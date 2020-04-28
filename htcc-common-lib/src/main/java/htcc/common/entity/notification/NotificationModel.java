@@ -19,7 +19,7 @@ public class NotificationModel {
     public String       username  = "";
     public String       notiId    = "";
     public long         sendTime  = 0L;
-    public long         retryTime  = 0L;
+    public long         retryTime = 0L;
     public String       title     = "";
     public String       content   = "";
     public String       iconId    = "";
