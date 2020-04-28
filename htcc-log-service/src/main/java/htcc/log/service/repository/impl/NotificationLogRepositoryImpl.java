@@ -142,6 +142,12 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
     @Override
     @Transactional
     public void updateReadOneNotification(UpdateNotificationReadStatusModel model) {
+        NotificationLogEntity logEntity = getOneNotification(model);
+        if (logEntity == null || logEntity.hasRead == 1){
+            log.error("[updateReadOneNotification] entity = {}", StringUtil.toJsonString(logEntity));
+            return;
+        }
+
         String month = model.getNotiId().substring(0, 6);
         String tableName = String.format("%s%s", TABLE_LOG, month);
 
@@ -164,6 +170,17 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
             logCounter.count -= 1;
             logCounterService.update(logCounter);
         }
+    }
+
+    private NotificationLogEntity getOneNotification(UpdateNotificationReadStatusModel model) {
+        String month = model.getNotiId().substring(0, 6);
+        String tableName = String.format("%s%s", TABLE_LOG, month);
+
+        String query = String.format("SELECT * FROM %s WHERE notiId = '%s' AND clientId = '%s'" +
+                        " AND companyId = '%s' AND username = '%s'",
+                tableName, model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
+
+        return jdbcTemplate.queryForObject(query, new NotificationLogRowMapper());
     }
 
     private LogCounter createNonReadLogCounter(int clientId, String companyId, String username) {
