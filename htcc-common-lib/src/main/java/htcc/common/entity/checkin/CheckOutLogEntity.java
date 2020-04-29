@@ -16,6 +16,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
 
     private static final String TABLE_NAME = "CheckOutLog";
 
+    public int     subType          = 1;
     public String  companyId        = "";
     public String  officeId         = "";
     public String  username         = "";
@@ -34,6 +35,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
 
     public CheckOutLogEntity(CheckinModel model) {
         this.requestId = model.getRequestId();
+        this.subType = model.subType;
         this.companyId = model.companyId;
         this.officeId = model.officeId;
         this.username = model.username;
@@ -55,6 +57,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
     public Map<String, Object> getParamsMap() {
         Map<String, Object> params = new HashMap<>();
         params.put("requestId", this.requestId);
+        params.put("subType", this.subType);
         params.put("companyId", this.companyId);
         params.put("officeId", this.officeId);
         params.put("username", this.username);

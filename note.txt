@@ -219,3 +219,8 @@
  + Version 1.7.1:
     - [Employee & Log] Add Notification History controller;
     Add api Home for Employee
+
+29-04-2020:
+ + Version 1.7.2:
+    - [Employee & Log] Fix missing column subType in CheckInLog in database;
+    fix missing subType & image in logEntity; add log request for multipart controllers

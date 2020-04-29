@@ -102,3 +102,7 @@ mail:
   buz:
     subject:
       createNewUserMail: "Thông tin tài khoản mới trên hệ thống HTCC"
+
+firebase:
+  databaseURL: "https://checkinapp-9eac2.firebaseio.com"
+  serviceAccountFile: "FireBase_AdminSDK.json"

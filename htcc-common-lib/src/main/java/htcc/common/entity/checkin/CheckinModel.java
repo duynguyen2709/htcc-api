@@ -131,6 +131,7 @@ public class CheckinModel implements Serializable {
 
     public CheckinModel(CheckInLogEntity model) {
         this.requestId = model.requestId;
+        this.subType = model.subType;
         this.companyId = model.companyId;
         this.officeId = model.officeId;
         this.username = model.username;
@@ -152,6 +153,7 @@ public class CheckinModel implements Serializable {
 
     public CheckinModel(CheckOutLogEntity model) {
         this.requestId = model.requestId;
+        this.subType = model.subType;
         this.companyId = model.companyId;
         this.officeId = model.officeId;
         this.username = model.username;

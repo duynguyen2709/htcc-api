@@ -1,9 +1,12 @@
 package htcc.employee.service.controller.employee;
 
 import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.constant.ServiceSystemEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.GoogleDriveService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
@@ -12,9 +15,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Api(tags = "API thông tin cá nhân",
@@ -83,18 +89,23 @@ public class EmployeeInfoController {
                                      @ApiParam(name = "address", value = "Địa chỉ nơi ở", defaultValue = "TPHCM", required = true)
                                      @RequestParam(name = "address", required = true) String address,
                                      @ApiParam(value = "[Multipart/form-data] Avatar mới cần update", required = false)
-                                         @RequestParam(name = "avatar", required = false) MultipartFile avatar) {
+                                         @RequestParam(name = "avatar", required = false) MultipartFile avatar,
+                                       @ApiParam(hidden = true) HttpServletRequest httpServletRequest) {
         BaseResponse<EmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Cập nhật thông tin thành công");
         String oldAvatar = "";
         boolean needUpdate = false;
         EmployeeInfo model = null;
+
+        long now = System.currentTimeMillis();
+        Object requestTime = httpServletRequest.getAttribute(Constant.REQUEST_TIME);
+        if (requestTime != null){
+            now = (long)requestTime;
+        }
         try {
             model = new EmployeeInfo(companyId, username, employeeId, officeId, department, title, 0.0f, fullName,
                     null, email, identityCardNo, phoneNumber, address, StringUtil.EMPTY);
             model.setBirthDate(birthDate);
-
-            log.info("[UpdateUserInfo] EmployeeInfo: " + StringUtil.toJsonString(model));
 
             // validate model
             String errorMessage = model.isValid();
@@ -161,10 +172,32 @@ public class EmployeeInfoController {
                     kafka.sendMessage(kafka.getBuzConfig().eventUpdateEmployeeInfo.topicName, model);
                 }
             }
+
+            printRequestLogEntity(httpServletRequest, response, model, now);
         }
         return response;
     }
 
+    private void printRequestLogEntity(HttpServletRequest request, BaseResponse response, EmployeeInfo model, long requestTime){
+        RequestLogEntity logEnt = new RequestLogEntity();
+        try {
+            logEnt.setRequestTime(requestTime);
+            logEnt.setResponseTime(System.currentTimeMillis());
+            logEnt.setMethod(request.getMethod());
+            logEnt.setPath(request.getRequestURI());
+            logEnt.setParams(request.getParameterMap());
+            logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
+            logEnt.setServiceId(ServiceSystemEnum.getServiceFromUri(logEnt.path));
+            logEnt.setIp(request);
+            logEnt.body = StringUtil.toJsonString(model);
+            logEnt.setResponse(StringUtil.toJsonString(response));
+        } catch (Exception e) {
+            log.warn("printRequestLogEntity ex {}", e.getMessage(), e);
+        } finally {
+            log.info(String.format("%s , Total Time : %sms\n",
+                    StringUtil.toJsonString(logEnt), (logEnt.responseTime - logEnt.requestTime)));
+        }
+    }
 
 
 

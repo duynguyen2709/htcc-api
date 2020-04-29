@@ -1,12 +1,13 @@
 package htcc.employee.service.controller.checkin;
 
-import htcc.common.constant.CheckinSubTypeEnum;
-import htcc.common.constant.CheckinTypeEnum;
-import htcc.common.constant.Constant;
-import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.constant.*;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.base.RequestWrapper;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.checkin.CheckinRequest;
+import htcc.common.entity.log.RequestLogEntity;
+import htcc.common.util.NumberUtil;
+import htcc.common.util.StringUtil;
 import htcc.employee.service.service.CheckInService;
 import htcc.employee.service.service.GoogleDriveService;
 import htcc.employee.service.service.checkin.CheckInBuzService;
@@ -16,12 +17,15 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Api(tags = "API điểm danh",
      description = "API điểm danh của nhân viên")
@@ -83,7 +87,7 @@ public class ImageCheckinController {
             }
 
             // upload image to ggdrive
-            setCheckInImage(model, image);
+            model.setImage(getCheckInImage(model, image));
 
         } catch (Exception e){
             log.error(String.format("checkinByImage [%s - %s] ex", request.companyId, request.username), e);
@@ -96,11 +100,34 @@ public class ImageCheckinController {
                     checkInService.setCheckOutLog(model);
                 }
             }
+
+            printRequestLogEntity(httpServletRequest, response, model, now);
         }
         return response;
     }
 
-    private void setCheckInImage(CheckinModel model, MultipartFile image) throws Exception {
+    private void printRequestLogEntity(HttpServletRequest request, BaseResponse response, CheckinModel model, long requestTime){
+        RequestLogEntity logEnt = new RequestLogEntity();
+        try {
+            logEnt.setRequestTime(requestTime);
+            logEnt.setResponseTime(System.currentTimeMillis());
+            logEnt.setMethod(request.getMethod());
+            logEnt.setPath(request.getRequestURI());
+            logEnt.setParams(request.getParameterMap());
+            logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
+            logEnt.setServiceId(ServiceSystemEnum.getServiceFromUri(logEnt.path));
+            logEnt.setIp(request);
+            logEnt.body = StringUtil.toJsonString(model);
+            logEnt.setResponse(StringUtil.toJsonString(response));
+        } catch (Exception e) {
+            log.warn("printRequestLogEntity ex {}", e.getMessage(), e);
+        } finally {
+            log.info(String.format("%s , Total Time : %sms\n",
+                    StringUtil.toJsonString(logEnt), (logEnt.responseTime - logEnt.requestTime)));
+        }
+    }
+
+    private String getCheckInImage(CheckinModel model, MultipartFile image) throws Exception {
         if (image == null){
             throw new Exception("CheckInImage is null");
         }
@@ -110,6 +137,6 @@ public class ImageCheckinController {
                 model.getCompanyId(), model.getUsername(), model.getDate(), model.getClientTime());
 
         String imageURL = googleDriveService.uploadCheckInImage(image, fileName);
-        model.setImage(imageURL);
+        return imageURL;
     }
 }

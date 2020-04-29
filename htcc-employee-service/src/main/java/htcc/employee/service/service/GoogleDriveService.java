@@ -144,7 +144,7 @@ public class GoogleDriveService {
             }
         }
         // error case
-        return null;
+        return buzConfig.getBuz().getErrorImage();
     }
 
 

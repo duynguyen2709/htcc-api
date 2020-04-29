@@ -12,7 +12,9 @@ public class CheckOutLogRowMapper implements RowMapper<CheckOutLogEntity> {
     public CheckOutLogEntity mapRow(ResultSet rs, int i) throws SQLException {
         CheckOutLogEntity entity = new CheckOutLogEntity();
         entity.requestId = rs.getString("requestId");
+        entity.subType = rs.getInt("subType");
         entity.companyId = rs.getString("companyId");
+        entity.officeId = rs.getString("officeId");
         entity.username = rs.getString("username");
         entity.clientTime = rs.getLong("clientTime");
         entity.serverTime = rs.getLong("serverTime");
@@ -25,6 +27,7 @@ public class CheckOutLogRowMapper implements RowMapper<CheckOutLogEntity> {
         entity.maxAllowDistance = rs.getInt("maxAllowDistance");
         entity.usedWifi = rs.getInt("usedWifi") == 1;
         entity.ip = rs.getString("ip");
+        entity.image = rs.getString("image");
 
         return entity;
     }
