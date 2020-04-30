@@ -98,7 +98,10 @@ public class EventChangeLogInStatusListener extends BaseKafkaConsumer<Notificati
         }
     }
 
-    private void createNewNotificationBuz(NotificationBuz model) {
+    private void createNewNotificationBuz(NotificationBuz model) throws Exception {
+        if (model.getTokens().isEmpty()){
+            throw new Exception(String.format("Token Push for user [%s - %s] is empty", model.getCompanyId(), model.getUsername()));
+        }
         String token = StringUtil.toJsonString(Collections.singletonList(model.getTokens()));
         model.setTokens(token);
         notificationBuzRepository.save(model);

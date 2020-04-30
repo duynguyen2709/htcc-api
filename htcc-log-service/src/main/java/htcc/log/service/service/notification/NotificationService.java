@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -25,6 +26,11 @@ public class NotificationService {
 
     public boolean sendNotify(NotificationModel model){
         try {
+            List<String> tokens = model.getTokenPush().stream().filter(t -> !t.isEmpty()).collect(Collectors.toList());
+            if (tokens.isEmpty()){
+                throw new Exception(String.format("Token Push for user [%s - %s] is empty", model.getCompanyId(), model.getUsername()));
+            }
+
             Notification noti = Notification.builder()
                     .setTitle(model.getTitle())
                     .setBody(model.getContent())
@@ -44,11 +50,13 @@ public class NotificationService {
                 if (response.isSuccessful()) {
                     log.info("Send Noti Succeed, Id = [{}]", response.getMessageId());
                 } else {
-                    log.error("Send Noti Failed, Id = [{}], ex = {}", response.getMessageId(), response.getException());
+                    log.error("Send Noti Failed, Id = [{}], ex = {}",
+                            response.getMessageId(), response.getException());
+
+                    // TODO : remove token
                 }
             }
-
-            return (allResponse.getFailureCount() == 0);
+            return (allResponse.getSuccessCount() > 0);
         } catch (Exception e){
             log.error("[sendNotify] {} ex", StringUtil.toJsonString(model), e);
             return false;

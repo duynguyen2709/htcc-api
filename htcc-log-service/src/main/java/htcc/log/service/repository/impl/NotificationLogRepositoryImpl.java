@@ -66,8 +66,8 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
                                                            int startIndex, int size) {
         List<NotificationLogEntity> res = new ArrayList<>();
         try {
-            Date date = new Date(System.currentTimeMillis());
-            int indexMonth = 0;
+            Date date       = new Date(System.currentTimeMillis());
+            int  indexMonth = 0;
             do {
                 String month  = DateTimeUtil.subtractMonthFromDate(date, indexMonth);
                 String params = String.format("%s-%s-%s", clientId, companyId, username);
@@ -85,7 +85,8 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
 
                 String query = String.format("SELECT * FROM %s%s WHERE clientId = '%s' AND companyId = '%s' " +
                         "AND username = '%s' ORDER BY sendTime ASC LIMIT %s,%s",
-                        TABLE_LOG, month, clientId, companyId, username, startIndex, size);
+                        TABLE_LOG, month, clientId,
+                        companyId, username, startIndex, size);
 
                 List<NotificationLogEntity> temp = jdbcTemplate.query(query, new NotificationLogRowMapper());
 
@@ -94,20 +95,20 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
                 startIndex = 0;
 
                 int index = 0;
-                while (res.size() < size && index < temp.size()){
+                while (res.size() < size && index < temp.size()) {
                     res.add(temp.get(index++));
                 }
 
-                if (res.size() < size){
+                if (res.size() < size) {
                     indexMonth++;
                 } else {
                     break;
                 }
             } while (true);
 
-        } catch (Exception e){
-            log.error("[getListNotification] [{} - {} - {} - {} - {}] ex",
-                    clientId, companyId, username, startIndex, size, e);
+        } catch (Exception e) {
+            log.error("[getListNotification] [{} - {} - {} - {} - {}] ex", clientId, companyId, username,
+                    startIndex, size, e);
         }
 
         return res;
@@ -116,23 +117,25 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
     @Override
     @Transactional
     public void updateReadAllNotification(UpdateNotificationReadStatusModel model) {
-        Date date = new Date(System.currentTimeMillis());
-        int indexMonth = 0;
-        String month  = "";
-        String tableName = "";
-        boolean isTableExist = false;
-        List<String> queries = new ArrayList<>();
+        Date         date         = new Date(System.currentTimeMillis());
+        int          indexMonth   = 0;
+        String       month        = "";
+        String       tableName    = "";
+        boolean      isTableExist = false;
+        List<String> queries      = new ArrayList<>();
 
         do {
             month = DateTimeUtil.subtractMonthFromDate(date, indexMonth++);
             tableName = String.format("%s%s", TABLE_LOG, month);
             isTableExist = checkTableExist(tableName);
-            if (!isTableExist){
+            if (!isTableExist) {
                 break;
             }
 
-            String query = String.format("UPDATE %s SET hasRead = 1 WHERE clientId = '%s' AND companyId = '%s' AND username = '%s'",
+            String query = String.format( "UPDATE %s SET hasRead = 1 " +
+                    "WHERE clientId = '%s' AND companyId = '%s' AND username = '%s'",
                     tableName, model.getClientId(), model.getCompanyId(), model.getUsername());
+
             queries.add(query);
         } while (true);
 
@@ -149,28 +152,29 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
     @Override
     @Transactional
     public void updateReadOneNotification(UpdateNotificationReadStatusModel model) {
-        NotificationLogEntity logEntity = getOneNotification(model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
-        if (logEntity == null || logEntity.hasRead == 1){
+        NotificationLogEntity logEntity =
+                getOneNotification(model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
+        if (logEntity == null || logEntity.hasRead == 1) {
             log.error("[updateReadOneNotification] entity = {}", StringUtil.toJsonString(logEntity));
             return;
         }
 
-        String month = model.getNotiId().substring(0, 6);
+        String month     = model.getNotiId().substring(0, 6);
         String tableName = String.format("%s%s", TABLE_LOG, month);
 
         String query = String.format("UPDATE %s SET hasRead = 1 WHERE notiId = '%s' AND clientId = '%s'" +
-                        " AND companyId = '%s' AND username = '%s'",
-                tableName, model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
+                " AND companyId = '%s' AND username = '%s'", tableName, model.getNotiId(), model.getClientId(),
+                model.getCompanyId(), model.getUsername());
 
         jdbcTemplate.update(query);
 
         // update non read counter
         String params = String.format("%s-%s-%s", model.getClientId(), model.getCompanyId(), model.getUsername());
         LogCounter logCounter = logCounterService.findById(new LogCounter.Key(NON_READ_PREFIX + TABLE_LOG, "", params));
-        if (logCounter == null){
+        if (logCounter == null) {
             logCounter = createNonReadLogCounter(model.getClientId(), model.getCompanyId(), model.getUsername());
         } else {
-            if (logCounter.getCount() == 0){
+            if (logCounter.getCount() == 0) {
                 return;
             }
 
@@ -183,11 +187,12 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
     public int countUnreadNotifications(int clientId, String companyId, String username) {
         try {
             String params = String.format("%s-%s-%s", clientId, companyId, username);
-            LogCounter logCounter = logCounterService.findById(new LogCounter.Key(NON_READ_PREFIX + TABLE_LOG, "", params));
-            if (logCounter != null){
+            LogCounter logCounter =
+                    logCounterService.findById(new LogCounter.Key(NON_READ_PREFIX + TABLE_LOG, "", params));
+            if (logCounter != null) {
                 return logCounter.getCount();
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("[countUnreadNotifications] [{} - {} - {}]", clientId, companyId, username, e);
         }
         return 0;
@@ -196,22 +201,53 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
     @Override
     @Transactional
     public void saveNotification(NotificationModel model) {
-        NotificationLogEntity logEntity = getOneNotification(model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
-        if (logEntity == null){
-            logEntity = new NotificationLogEntity(model);
-            baseLogDAO.insertLog(logEntity);
+        NotificationLogEntity logEntity =
+                getOneNotification(model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
+
+        if (logEntity == null) {
+            handleCreateNewNoti(model);
         }
 
-        String month = model.getNotiId().substring(0, 6);
+        String month     = model.getNotiId().substring(0, 6);
         String tableName = String.format("%s%s", TABLE_LOG, month);
 
-        String query = String.format("UPDATE %s SET status = '%s', retryTime = '%s'" +
-                        " WHERE notiId = '%s' AND clientId = '%s'" +
-                        " AND companyId = '%s' AND username = '%s'",
-                tableName, model.getStatus(), model.getRetryTime(),
-                model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
+        String query = String.format(
+                "UPDATE %s SET status = '%s', retryTime = '%s'" + " WHERE notiId = '%s' AND clientId = '%s'" +
+                        " AND companyId = '%s' AND username = '%s'", tableName, model.getStatus(),
+                model.getRetryTime(), model.getNotiId(), model.getClientId(), model.getCompanyId(),
+                model.getUsername());
 
         jdbcTemplate.update(query);
+    }
+
+    private void handleCreateNewNoti(NotificationModel model) {
+        NotificationLogEntity logEntity = new NotificationLogEntity(model);
+        baseLogDAO.insertLog(logEntity);
+
+        String params = String.format("%s-%s-%s", model.getClientId(), model.getCompanyId(), model.getUsername());
+        LogCounter logCounter =
+                logCounterService.findById(new LogCounter.Key(TABLE_LOG,
+                        DateTimeUtil.parseTimestampToString(model.getSendTime(), "yyyyMM"), params));
+
+        if (logCounter == null) {
+            logCounter =
+                    createLogCounter(model.getClientId(), model.getCompanyId(), model.getUsername(),
+                            DateTimeUtil.parseTimestampToString(model.getSendTime(), "yyyyMM"));
+        }
+        else {
+            logCounter.setCount(logCounter.getCount() + 1);
+            logCounter = logCounterService.update(logCounter);
+        }
+
+        LogCounter nonReadLogCounter =
+                logCounterService.findById(new LogCounter.Key(NON_READ_PREFIX + TABLE_LOG, "", params));
+        if (nonReadLogCounter == null) {
+            nonReadLogCounter = createNonReadLogCounter(model.getClientId(), model.getCompanyId(), model.getUsername());
+        }
+        else {
+            nonReadLogCounter.setCount(nonReadLogCounter.getCount() + 1);
+            nonReadLogCounter = logCounterService.update(nonReadLogCounter);
+        }
     }
 
     private NotificationLogEntity getOneNotification(String notiId, int clientId, String companyId, String username) {
@@ -223,40 +259,59 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
                     " AND companyId = '%s' AND username = '%s'", tableName, notiId, clientId, companyId, username);
 
             return jdbcTemplate.queryForObject(query, new NotificationLogRowMapper());
-        } catch (IncorrectResultSizeDataAccessException ignored){
+        } catch (IncorrectResultSizeDataAccessException ignored) {
         } catch (Exception e) {
-            log.error(String.format("[getOneNotification] [%s-%s-%s-%s] ex ", notiId, clientId, companyId, username), e);
+            log.error(String.format("[getOneNotification] [%s-%s-%s-%s] ex ", notiId, clientId, companyId, username),
+                    e);
         }
         return null;
     }
 
     private LogCounter createNonReadLogCounter(int clientId, String companyId, String username) {
-        String params = String.format("%s-%s-%s", clientId, companyId, username);
+        String     params     = String.format("%s-%s-%s", clientId, companyId, username);
         LogCounter logCounter = new LogCounter(NON_READ_PREFIX + TABLE_LOG, "", params, 0);
 
-        Date date = new Date(System.currentTimeMillis());
-        int indexMonth = 0;
-        String month  = "";
-        String tableName = "";
+        Date    date         = new Date(System.currentTimeMillis());
+        int     indexMonth   = 0;
+        String  month        = "";
+        String  tableName    = "";
         boolean isTableExist = false;
 
         do {
             month = DateTimeUtil.subtractMonthFromDate(date, indexMonth++);
             tableName = String.format("%s%s", TABLE_LOG, month);
             isTableExist = checkTableExist(tableName);
-            if (!isTableExist){
+            if (!isTableExist) {
                 break;
             }
 
             String query = String.format("SELECT count(*) FROM %s WHERE hasRead = '0' AND" +
-                            " clientId = '%s' AND companyId = '%s' AND username = '%s'",
-                    tableName, clientId, companyId, username);
+                    " clientId = '%s' AND companyId = '%s' AND username = '%s'", tableName, clientId, companyId,
+                    username);
 
             Integer count = jdbcTemplate.queryForObject(query, Integer.class);
-            if (count != null){
+            if (count != null) {
                 logCounter.count += count;
             }
         } while (true);
+
+        return logCounterService.create(logCounter);
+    }
+
+    private LogCounter createLogCounter(int clientId, String companyId, String username, String yyyyMM) {
+        String     params     = String.format("%s-%s-%s", clientId, companyId, username);
+        LogCounter logCounter = new LogCounter(TABLE_LOG, yyyyMM, params, 0);
+
+        String tableName = String.format("%s%s", TABLE_LOG, yyyyMM);
+
+        String query = String.format(
+                "SELECT count(*) FROM %s WHERE clientId = '%s' AND companyId = '%s' AND username = " +
+                        "'%s'", tableName, clientId, companyId, username);
+
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class);
+        if (count != null) {
+            logCounter.count = count;
+        }
 
         return logCounterService.create(logCounter);
     }
