@@ -32,6 +32,8 @@ public class NotificationModel {
     public boolean      hasRead   = false;
     public List<String> tokenPush = new ArrayList<>();
 
+    public int numRetries = 0;
+
     public NotificationModel(NotificationLogEntity log){
         this.requestId = log.requestId;
         this.clientId = log.clientId;

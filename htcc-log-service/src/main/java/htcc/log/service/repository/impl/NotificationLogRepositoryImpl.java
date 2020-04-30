@@ -2,15 +2,18 @@ package htcc.log.service.repository.impl;
 
 import com.zaxxer.hikari.HikariDataSource;
 import htcc.common.entity.notification.NotificationLogEntity;
+import htcc.common.entity.notification.NotificationModel;
 import htcc.common.entity.notification.UpdateNotificationReadStatusModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.mapper.NotificationLogRowMapper;
+import htcc.log.service.repository.BaseLogDAO;
 import htcc.log.service.repository.NotificationLogRepository;
 import htcc.log.service.service.jpa.LogCounterService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +33,9 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
     private static final String NON_READ_PREFIX = "NonRead";
 
     private static final Map<String, String> MAP_TABLE_NOTIFICATION_LOG = new HashMap<>();
+
+    @Autowired
+    private BaseLogDAO baseLogDAO;
 
     @PostConstruct
     private void initListTableNotificationLog() {
@@ -143,7 +149,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
     @Override
     @Transactional
     public void updateReadOneNotification(UpdateNotificationReadStatusModel model) {
-        NotificationLogEntity logEntity = getOneNotification(model);
+        NotificationLogEntity logEntity = getOneNotification(model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
         if (logEntity == null || logEntity.hasRead == 1){
             log.error("[updateReadOneNotification] entity = {}", StringUtil.toJsonString(logEntity));
             return;
@@ -187,15 +193,41 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
         return 0;
     }
 
-    private NotificationLogEntity getOneNotification(UpdateNotificationReadStatusModel model) {
+    @Override
+    @Transactional
+    public void saveNotification(NotificationModel model) {
+        NotificationLogEntity logEntity = getOneNotification(model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
+        if (logEntity == null){
+            logEntity = new NotificationLogEntity(model);
+            baseLogDAO.insertLog(logEntity);
+        }
+
         String month = model.getNotiId().substring(0, 6);
         String tableName = String.format("%s%s", TABLE_LOG, month);
 
-        String query = String.format("SELECT * FROM %s WHERE notiId = '%s' AND clientId = '%s'" +
+        String query = String.format("UPDATE %s SET status = '%s', retryTime = '%s'" +
+                        " WHERE notiId = '%s' AND clientId = '%s'" +
                         " AND companyId = '%s' AND username = '%s'",
-                tableName, model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
+                tableName, model.getStatus(), model.getRetryTime(),
+                model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
 
-        return jdbcTemplate.queryForObject(query, new NotificationLogRowMapper());
+        jdbcTemplate.update(query);
+    }
+
+    private NotificationLogEntity getOneNotification(String notiId, int clientId, String companyId, String username) {
+        try {
+            String month     = notiId.substring(0, 6);
+            String tableName = String.format("%s%s", TABLE_LOG, month);
+
+            String query = String.format("SELECT * FROM %s WHERE notiId = '%s' AND clientId = '%s'" +
+                    " AND companyId = '%s' AND username = '%s'", tableName, notiId, clientId, companyId, username);
+
+            return jdbcTemplate.queryForObject(query, new NotificationLogRowMapper());
+        } catch (IncorrectResultSizeDataAccessException ignored){
+        } catch (Exception e) {
+            log.error(String.format("[getOneNotification] [%s-%s-%s-%s] ex ", notiId, clientId, companyId, username), e);
+        }
+        return null;
     }
 
     private LogCounter createNonReadLogCounter(int clientId, String companyId, String username) {

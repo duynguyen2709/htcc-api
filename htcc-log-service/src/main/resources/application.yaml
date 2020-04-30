@@ -96,6 +96,12 @@ kafka:
     eventReadNotification:
       topicName: EVENT-READ-NOTIFICATION
       groupId: EVENT-READ-NOTIFICATION
+    eventChangeLogInStatus:
+      topicName: EVENT-CHANGE-LOGIN-STATUS
+      groupId: EVENT-CHANGE-LOGIN-STATUS
+    eventPushNotification:
+      topicName: EVENT-PUSH-NOTIFICATION
+      groupId: EVENT-PUSH-NOTIFICATION
 
 ################## Mail Buz Config ##################
 mail:

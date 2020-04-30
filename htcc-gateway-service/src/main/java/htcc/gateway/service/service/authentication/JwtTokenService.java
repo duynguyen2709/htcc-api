@@ -59,7 +59,7 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 			if (isLoginDashboard) {
 				req = StringUtil.fromJsonString(object, LoginRequest.class);
 			} else {
-				req = new LoginRequest(0, "", object, "");
+				req = new LoginRequest(0, "", object, "", "");
 			}
 		} catch (Exception e){
 			String err = String.format("loadUserByUsername ex, raw Request [%s]", object);
@@ -93,7 +93,7 @@ public class JwtTokenService implements UserDetailsService, Serializable {
 		String companyId = StringUtil.valueOf(getClaim(token, c -> c.get(Constant.COMPANY_ID)));
 		String username = getUsername(token);
 
-		return new LoginRequest(clientId, companyId, username, "");
+		return new LoginRequest(clientId, companyId, username, "", "");
 	}
 
 	private <T> T getClaim(String token, Function<Claims, T> claimsResolver) {

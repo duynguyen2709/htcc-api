@@ -77,7 +77,7 @@ public class AuthenticationService {
     }
 
     public BaseUser getUser(ChangePasswordRequest req) {
-        LoginRequest entity = new LoginRequest(req.clientId, req.companyId, req.username, req.oldPassword);
+        LoginRequest entity = new LoginRequest(req.clientId, req.companyId, req.username, req.oldPassword, "");
         return getUser(entity);
     }
 

@@ -1,10 +1,15 @@
 package htcc.employee.service.controller.notification;
 
+import htcc.common.component.LoggingConfiguration;
 import htcc.common.constant.ClientSystemEnum;
+import htcc.common.constant.NotificationStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.notification.CreateNotificationRequest;
+import htcc.common.entity.notification.NotificationModel;
 import htcc.common.entity.notification.NotificationResponse;
 import htcc.common.entity.notification.UpdateNotificationReadStatusModel;
+import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.NotificationService;
 import io.swagger.annotations.Api;
@@ -82,4 +87,65 @@ public class NotificationController {
         return response;
     }
 
+
+
+    // TODO : DELETE THIS METHOD AFTER TESTING
+    @ApiOperation(value = "Tạo noti mới", response = BaseResponse.class)
+    @PostMapping("/notifications")
+    public BaseResponse createNoti(@ApiParam(name = "request", value = "[Body] Thông tin noti mới", required = true)
+                                                        @RequestBody CreateNotificationRequest request) {
+        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        try {
+            long now = System.currentTimeMillis();
+            NotificationModel model = new NotificationModel();
+            model.setClientId(ClientSystemEnum.MOBILE.getValue());
+            model.setRequestId(LoggingConfiguration.getTraceId());
+            model.setCompanyId(request.getCompanyId());
+            model.setUsername(request.getUsername());
+            model.setSendTime(now);
+            model.setRetryTime(0);
+            model.setTitle(request.getTitle());
+            model.setContent(request.getContent());
+            model.setStatus(NotificationStatusEnum.INIT.getValue());
+            model.setHasRead(false);
+            model.setScreenId(request.getScreenId());
+            model.setNotiId(DateTimeUtil.parseTimestampToString(now, "yyyyMMdd") + "-" + now);
+            switch (model.getScreenId()){
+                case 1:
+                    model.setIconId("checkin");
+                    model.setIconUrl("https://drive.google.com/uc?export=view&id=13VkeHpPGGQPIqSPylQHX1FBGaLpJ6kM3");
+                    break;
+                case 7:
+                    model.setIconId("complaint");
+                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1bAZ6NAfVxFb1jPWqT8wIkPGaZ9ZObi3a");
+                    break;
+                case 2:
+                    model.setIconId("leaving");
+                    model.setIconUrl("https://drive.google.com/uc?export=view&id=181Xuew9SGy17KJ2x6wHeLJaRTBFkNHZg");
+                    break;
+                case 6:
+                    model.setIconId("payroll");
+                    model.setIconUrl("https://drive.google.com/uc?export=view&id=14zSFk6qYhBHLINARDzWbv8IWG8_q8KAU");
+                    break;
+                case 4:
+                    model.setIconId("personal");
+                    model.setIconUrl("https://drive.google.com/uc?export=view&id=15q22GGIOOPY6wFgKumH-M88VDQ7sKUru");
+                    break;
+                case 3:
+                    model.setIconId("statistics");
+                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1ASCBAWzpW2Gxr74Y2dNvkocaxKkxJ_iv");
+                    break;
+                default:
+                    model.setIconId("noti");
+                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1lwV3OFqdTDH3cFHt-cAruMVGN4SV6yTi");
+                    break;
+            }
+
+            notiService.sendNotification(model);
+        } catch (Exception e){
+            log.error("[createNoti] request = {}, ex", StringUtil.toJsonString(request), e);
+            response = new BaseResponse(e);
+        }
+        return response;
+    }
 }

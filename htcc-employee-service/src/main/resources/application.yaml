@@ -119,3 +119,6 @@ kafka:
     eventReadNotification:
       topicName: EVENT-READ-NOTIFICATION
       groupId: EVENT-READ-NOTIFICATION
+    eventPushNotification:
+      topicName: EVENT-PUSH-NOTIFICATION
+      groupId: EVENT-PUSH-NOTIFICATION

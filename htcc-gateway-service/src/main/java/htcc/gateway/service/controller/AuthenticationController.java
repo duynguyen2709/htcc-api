@@ -1,8 +1,10 @@
 package htcc.gateway.service.controller;
 
+import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.notification.NotificationBuz;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.entity.request.LoginRequest;
 import htcc.gateway.service.entity.response.LoginResponse;
@@ -43,6 +45,9 @@ public class AuthenticationController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private KafkaProducerService kafka;
     //</editor-fold>
 
     @ApiOperation(value = "Đăng nhập")
@@ -61,15 +66,24 @@ public class AuthenticationController {
         } catch (BadCredentialsException e) {
             // wrong password
             response = new BaseResponse<>(ReturnCodeEnum.WRONG_USERNAME_OR_PASSWORD);
-
         } catch (LockedException e) {
             // account is locked
             log.warn(String.format("[login] Account Locked [%s-%s-%s]", request.clientId, request.companyId, request.username));
             response = new BaseResponse<>(ReturnCodeEnum.ACCOUNT_LOCKED);
-
         } catch (Exception e) {
             log.error("[login] ex", e);
             response = new BaseResponse<>(e);
+        } finally {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+                NotificationBuz notiEntity = new NotificationBuz();
+                notiEntity.setClientId(request.getClientId());
+                notiEntity.setCompanyId(StringUtil.valueOf(request.getCompanyId()));
+                notiEntity.setUsername(request.getUsername());
+                notiEntity.setTokens(StringUtil.valueOf(request.getTokenPush()));
+                notiEntity.setIsLoggedIn(1);
+
+                kafka.sendMessage(kafka.getBuzConfig().getEventChangeLogInStatus().getTopicName(), notiEntity);
+            }
         }
 
         return response;
@@ -100,9 +114,6 @@ public class AuthenticationController {
             throw new Exception("response = [null]");
         } catch (Exception e) {
             throw new Exception("[getUserInfo] ex " + e.getMessage());
-        } finally {
-                log.info("Call GetUserInfo, URL [{}] with request [{}] -> response [{}]",
-                    url, StringUtil.toJsonString(request), StringUtil.toJsonString(response));
         }
     }
 }

@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,7 @@ import java.util.Map;
 @Log4j2
 @Configuration
 @ComponentScan(basePackages = {"htcc.common.component", "htcc.log.service"})
+@EntityScan(basePackages = {"htcc.common.entity", "htcc.log.service.entity"})
 public class Main {
 
 	public static void main(String[] args) {

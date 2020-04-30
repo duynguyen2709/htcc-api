@@ -2,9 +2,10 @@ package htcc.common.constant;
 
 public class Constant {
 
+    public static final long   ONE_DAY_MILLISECONDS = 24 * 60 * 60 * 1000L;
+
     public static final String REQUEST_TIME = "requestTime";
 
-    public static final String APPLICATION_JSON    = "application/json";
     public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
     public static final String AUTHORIZATION = "Authorization";

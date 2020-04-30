@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -68,5 +70,19 @@ public class NotificationResponse {
         this.iconId = model.iconId;
         this.iconUrl = model.iconUrl;
         this.hasRead = model.hasRead;
+    }
+
+    public Map<String, String> toMap(){
+        Map<String, String> map = new HashMap<>();
+        map.put("notiId", this.notiId);
+        map.put("screenId", this.screenId + "");
+        map.put("title", this.title);
+        map.put("content", this.notiId);
+        map.put("date", this.date);
+        map.put("time", this.time);
+        map.put("iconId", this.iconId + "");
+        map.put("iconUrl", this.iconUrl);
+        map.put("hasRead", this.hasRead ? "true" : "false");
+        return map;
     }
 }

@@ -49,4 +49,8 @@ public class NotificationService {
     public void updateNotificationHasReadStatus(UpdateNotificationReadStatusModel model){
         kafka.sendMessage(kafka.getBuzConfig().getEventReadNotification().getTopicName(), model);
     }
+
+    public void sendNotification(NotificationModel model){
+        kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
+    }
 }

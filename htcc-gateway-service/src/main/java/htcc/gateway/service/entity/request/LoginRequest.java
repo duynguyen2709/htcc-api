@@ -21,20 +21,24 @@ public class LoginRequest {
                                 " công ty | 3 - Web quản trị hệ thống",
                       example = "1")
     @Min(1)
-    public int clientId;
+    public int clientId = 1;
 
     @ApiModelProperty(notes = "Mã công ty (null đối với web admin)",
                       example = "VNG")
-    public String companyId;
+    public String companyId = "";
 
     @ApiModelProperty(notes = "Tên đăng nhập",
                       example = "admin")
     @NotEmpty
-    public String username;
+    public String username = "";
 
     @ApiModelProperty(notes = "Mật khẩu",
                       example = "123")
     @NotEmpty
-    public String password;
+    public String password = "";
 
+    @ApiModelProperty(notes = "Token push notification FCM",
+                      example = "xyz")
+    @NotEmpty
+    public String tokenPush = "";
 }
