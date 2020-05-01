@@ -3,6 +3,7 @@ package htcc.log.service.service.notification;
 import com.google.firebase.messaging.*;
 import com.google.gson.reflect.TypeToken;
 import htcc.common.component.redis.RedisService;
+import htcc.common.constant.Constant;
 import htcc.common.entity.notification.NotificationBuz;
 import htcc.common.entity.notification.NotificationModel;
 import htcc.common.entity.notification.NotificationResponse;
@@ -24,12 +25,12 @@ public class NotificationService {
     @Autowired
     private RedisService redis;
 
+    @Autowired
+    private TokenPushService tokenPushService;
+
     public boolean sendNotify(NotificationModel model){
         try {
-            List<String> tokens = model.getTokenPush().stream().filter(t -> !t.isEmpty()).collect(Collectors.toList());
-            if (tokens.isEmpty()){
-                throw new Exception(String.format("Token Push for user [%s - %s] is empty", model.getCompanyId(), model.getUsername()));
-            }
+            List<String> tokens = model.getTokenPush();
 
             Notification noti = Notification.builder()
                     .setTitle(model.getTitle())
@@ -46,16 +47,38 @@ public class NotificationService {
 
             BatchResponse allResponse = FirebaseMessaging.getInstance().sendMulticast(message);
 
-            for (SendResponse response : allResponse.getResponses()) {
-                if (response.isSuccessful()) {
-                    log.info("Send Noti Succeed, Id = [{}]", response.getMessageId());
+            List<SendResponse> responseList = allResponse.getResponses();
+            List<String> oldTokens = new ArrayList<>();
+            for (int i = 0; i < responseList.size(); i++) {
+                if (responseList.get(i).isSuccessful()) {
+                    log.info("Send Noti Succeed, Id = [{}]", responseList.get(i).getMessageId());
                 } else {
-                    log.error("Send Noti Failed, Id = [{}], ex = {}",
-                            response.getMessageId(), response.getException());
+                    log.error("Send Noti Failed, Id = [{}], Ex = [{}], Error = [{}]",
+                            responseList.get(i).getMessageId(), responseList.get(i).getException(),
+                            responseList.get(i).getException().getErrorCode());
 
-                    // TODO : remove token
+                    if (responseList.get(i).getException().getErrorCode()
+                            .equals(Constant.ERROR_FCM_TOKEN_NOT_REGISTERED)){
+                        oldTokens.add(tokens.get(i));
+                    }
                 }
             }
+
+            if (!oldTokens.isEmpty()) {
+                log.info("...Removing Old Tokens For User [{} - {}], Values = {}",
+                        model.getCompanyId(), model.getUsername(), StringUtil.toJsonString(oldTokens));
+
+                tokens.removeAll(oldTokens);
+
+                NotificationBuz buz = new NotificationBuz();
+                buz.setClientId(model.getClientId());
+                buz.setCompanyId(model.getCompanyId());
+                buz.setUsername(model.getUsername());
+                buz.setTokens(StringUtil.toJsonString(tokens));
+
+                tokenPushService.removeOldTokens(buz);
+            }
+
             return (allResponse.getSuccessCount() > 0);
         } catch (Exception e){
             log.error("[sendNotify] {} ex", StringUtil.toJsonString(model), e);
@@ -101,5 +124,13 @@ public class NotificationService {
             log.error("[getPendingNotification] [{} - {} - {}]", clientId, companyId, username, e);
         }
         return null;
+    }
+
+    public void deletePendingNotification(int clientId, String companyId, String username) {
+        try {
+            redis.delete(redis.buzConfig.notificationFormat, clientId, companyId, username);
+        } catch (Exception e){
+            log.error("[deletePendingNotification] [{} - {} - {}]", clientId, companyId, username, e);
+        }
     }
 }

@@ -228,3 +228,7 @@
 30-04-2020:
  + Version 1.7.3:
     - [All] Add Notification for mobile
+
+01-05-2020:
+ + Version 1.7.4:
+    - [Log] Fix some bug on notifications, delete old tokens

@@ -74,7 +74,11 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
 
                 LogCounter logCounter = logCounterService.findById(new LogCounter.Key(TABLE_LOG, month, params));
                 if (logCounter == null) {
-                    break;
+                    if (isCurrentMonth(month)) {
+                        logCounter = createLogCounter(clientId, companyId, username, month);
+                    } else {
+                        break;
+                    }
                 }
 
                 if (startIndex >= logCounter.getCount()) {
@@ -84,7 +88,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
                 }
 
                 String query = String.format("SELECT * FROM %s%s WHERE clientId = '%s' AND companyId = '%s' " +
-                        "AND username = '%s' ORDER BY sendTime ASC LIMIT %s,%s",
+                        "AND username = '%s' ORDER BY ymd DESC, sendTime DESC LIMIT %s,%s",
                         TABLE_LOG, month, clientId,
                         companyId, username, startIndex, size);
 
@@ -112,6 +116,11 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
         }
 
         return res;
+    }
+
+    private boolean isCurrentMonth(String month) {
+        String thisMonth = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMM");
+        return thisMonth.equals(month);
     }
 
     @Override
@@ -305,8 +314,8 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
         String tableName = String.format("%s%s", TABLE_LOG, yyyyMM);
 
         String query = String.format(
-                "SELECT count(*) FROM %s WHERE clientId = '%s' AND companyId = '%s' AND username = " +
-                        "'%s'", tableName, clientId, companyId, username);
+                "SELECT count(*) FROM %s WHERE clientId = '%s' AND companyId = '%s' AND username = '%s'",
+                tableName, clientId, companyId, username);
 
         Integer count = jdbcTemplate.queryForObject(query, Integer.class);
         if (count != null) {

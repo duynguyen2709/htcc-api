@@ -90,11 +90,16 @@ public class EventChangeLogInStatusListener extends BaseKafkaConsumer<Notificati
 
             log.info("...Started resendPendingNotification for NotificationBuz: " + StringUtil.toJsonString(buz));
             for (NotificationModel model : pendingNotis) {
+                log.info("### Send pending notification: " + StringUtil.toJsonString(model));
                 kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
                 Thread.sleep(1000);
             }
+            log.info("End resendPendingNotification for NotificationBuz: " + StringUtil.toJsonString(buz));
+
         } catch (Exception e) {
             log.error("[resendPendingNotification] {} ex", StringUtil.toJsonString(buz), e);
+        } finally {
+            notificationService.deletePendingNotification(buz.getClientId(), buz.getCompanyId(), buz.getUsername());
         }
     }
 

@@ -80,6 +80,13 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
                 model.setTokenPush(StringUtil.json2Collection(buzEntity.getTokens(),
                         StringUtil.LIST_STRING_TYPE));
 
+                if (model.getTokenPush().isEmpty()){
+                    model.setStatus(NotificationStatusEnum.FAILED.getValue());
+                    repository.saveNotification(model);
+                    throw new Exception(String.format("Token Push For User [%s - %s] Is Empty",
+                            model.getCompanyId(), model.getUsername()));
+                }
+
                 boolean sendNotiResponse = notificationService.sendNotify(model);
                 if (sendNotiResponse){
                     model.setStatus(NotificationStatusEnum.SUCCESS.getValue());

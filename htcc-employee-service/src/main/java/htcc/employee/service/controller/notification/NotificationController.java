@@ -19,6 +19,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,8 +51,18 @@ public class NotificationController {
 
             int startIndex = size * index;
 
-            List<NotificationResponse> notificationList = notiService
-                    .getListNotification(companyId, username, startIndex, size)
+            List<NotificationModel> models = notiService
+                    .getListNotification(companyId, username, startIndex, size);
+
+            models.sort(new Comparator<NotificationModel>() {
+
+                @Override
+                public int compare(NotificationModel o1, NotificationModel o2) {
+                    return Long.compare(o2.getSendTime(), o1.getSendTime());
+                }
+            });
+
+            List<NotificationResponse> notificationList = models
                     .stream()
                     .map(NotificationResponse::new)
                     .collect(Collectors.toList());

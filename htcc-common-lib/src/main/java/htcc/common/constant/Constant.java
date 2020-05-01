@@ -39,4 +39,6 @@ public class Constant {
     public static final String CATEGORY_LIST         = "categoryList";
     public static final String DAY_OFF_BY_LEVEL      = "dayOffByLevel";
     public static final float  DEFAULT_TOTAL_DAY_OFF = 10.0f;
+
+    public static final String ERROR_FCM_TOKEN_NOT_REGISTERED = "registration-token-not-registered";
 }
