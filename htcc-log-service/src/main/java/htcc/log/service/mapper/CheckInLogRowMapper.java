@@ -12,6 +12,7 @@ public class CheckInLogRowMapper implements RowMapper<CheckInLogEntity> {
     public CheckInLogEntity mapRow(ResultSet rs, int i) throws SQLException {
         CheckInLogEntity entity = new CheckInLogEntity();
         entity.requestId = rs.getString("requestId");
+        entity.checkInId = rs.getString("checkInId");
         entity.subType = rs.getInt("subType");
         entity.companyId = rs.getString("companyId");
         entity.officeId = rs.getString("officeId");

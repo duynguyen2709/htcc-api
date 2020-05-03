@@ -214,7 +214,8 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
                 getOneNotification(model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
 
         if (logEntity == null) {
-            handleCreateNewNoti(model);
+            createNewNotification(model);
+            return;
         }
 
         String month     = model.getNotiId().substring(0, 6);
@@ -229,7 +230,8 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
         jdbcTemplate.update(query);
     }
 
-    private void handleCreateNewNoti(NotificationModel model) {
+    @Override
+    public void createNewNotification(NotificationModel model) {
         NotificationLogEntity logEntity = new NotificationLogEntity(model);
         baseLogDAO.insertLog(logEntity);
 

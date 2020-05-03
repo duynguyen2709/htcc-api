@@ -17,4 +17,6 @@ public interface NotificationLogRepository {
     int countUnreadNotifications(int clientId, String companyId, String username);
 
     void saveNotification(NotificationModel model);
+
+    void createNewNotification(NotificationModel model);
 }

@@ -232,3 +232,7 @@
 01-05-2020:
  + Version 1.7.4:
     - [Log] Fix some bug on notifications, delete old tokens
+
+03-05-2020:
+ + Version 1.7.5:
+    - [Employee] Add CheckInId, add Gender; Check Half day-off on Checking In

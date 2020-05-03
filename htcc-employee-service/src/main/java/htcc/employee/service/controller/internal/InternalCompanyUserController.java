@@ -53,6 +53,7 @@ public class InternalCompanyUserController {
             employee.setTitle(StringUtil.EMPTY);
             employee.setLevel(0.0f);
             employee.setFullName(StringUtil.EMPTY);
+            employee.setGender(1);
             employee.birthDate = new Date(0);
             employee.setIdentityCardNo(StringUtil.EMPTY);
             employee.setAddress(StringUtil.EMPTY);

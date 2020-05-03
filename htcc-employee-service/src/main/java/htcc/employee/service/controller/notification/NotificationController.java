@@ -120,7 +120,9 @@ public class NotificationController {
             model.setStatus(NotificationStatusEnum.INIT.getValue());
             model.setHasRead(false);
             model.setScreenId(request.getScreenId());
-            model.setNotiId(DateTimeUtil.parseTimestampToString(now, "yyyyMMdd") + "-" + now);
+            model.setNotiId(String.format("%s-%s-%s-%s-%s",
+                    DateTimeUtil.parseTimestampToString(now, "yyyyMMdd"),
+                    model.getClientId(), model.getCompanyId(), model.getUsername(), now));
             switch (model.getScreenId()){
                 case 1:
                     model.setIconId("checkin");

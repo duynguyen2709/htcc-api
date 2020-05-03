@@ -77,6 +77,11 @@ public class EmployeeInfo extends BaseJPAEntity {
     public String fullName = "";
 
     @Column
+    @ApiModelProperty(notes = "Giới tính",
+                      example = "1")
+    public int gender;
+
+    @Column
     @ApiModelProperty(notes = "Ngày sinh, định dạng (yyyy-MM-dd)",
                       example = "1998-09-27")
     public Date birthDate;
@@ -114,6 +119,10 @@ public class EmployeeInfo extends BaseJPAEntity {
 
         if (StringUtil.isEmpty(address)) {
             return "Địa chỉ không được rỗng";
+        }
+
+        if (gender != 0 && gender != 1) {
+            return "Giới tính phải là 0 (Nữ) hoặc 1 (Nam)";
         }
 
         if (birthDate == null) {

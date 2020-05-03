@@ -1,22 +1,26 @@
 package htcc.employee.service.service.checkin;
 
-import htcc.common.constant.CheckinSubTypeEnum;
-import htcc.common.constant.CheckinTypeEnum;
-import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.constant.*;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.Office;
+import htcc.common.entity.jpa.WorkingDay;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.LocationUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.service.CheckInService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.WorkingDayService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -29,6 +33,9 @@ public class CheckInBuzService {
 
     @Autowired
     private EmployeeInfoService employeeService;
+
+    @Autowired
+    private WorkingDayService workingDayService;
 
     public BaseResponse doCheckInBuz(CheckinModel model) throws Exception {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
@@ -140,10 +147,44 @@ public class CheckInBuzService {
         }
         // TODO : Check ShiftTime
 
-        // TODO : if today is working half-day, then canCheckin = true
-        // need to check if checkin on wrong session
-        // example : off morning, then can not checkin on morning
+        if (subType != CheckinSubTypeEnum.FORCE) {
+            if (isOffThisSession(request)) {
+                return String.format("Hôm nay là ngày nghỉ của chi nhánh %s. Vui lòng thử lại sau.", request.getOfficeId());
+            }
+        }
 
         return StringUtil.EMPTY;
+    }
+
+    private boolean isOffThisSession(CheckinModel request) {
+        int session = 0;
+        LocalDateTime midDay = LocalDate.now().atTime(12, 0, 0, 0);
+        long time = Timestamp.valueOf(midDay).getTime();
+        String yyyyMMdd = DateTimeUtil.parseTimestampToString(request.getClientTime(), "yyyyMMdd");
+
+        if (request.getClientTime() <= time) {
+            session = SessionEnum.MORNING.getValue();
+        } else {
+            session = SessionEnum.AFTERNOON.getValue();
+        }
+
+        List<WorkingDay> workingDays = workingDayService.findByCompanyIdAndOfficeId(request.getCompanyId(), request.getOfficeId());
+
+        for (WorkingDay day : workingDays) {
+            if (day.getSession() == session && !day.getIsWorking()){
+                if (day.getType() == WorkingDayTypeEnum.SPECIAL.getValue()){
+                    if (day.getDate().equals(yyyyMMdd)) {
+                        return true;
+                    }
+                }
+                else {
+                    int weekDay = DateTimeUtil.getWeekDayInt(yyyyMMdd);
+                    if (day.getWeekDay() == weekDay){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

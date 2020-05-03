@@ -5,10 +5,13 @@ import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.Constant;
 import htcc.common.constant.NotificationStatusEnum;
 import htcc.common.entity.notification.NotificationBuz;
+import htcc.common.entity.notification.NotificationLogEntity;
 import htcc.common.entity.notification.NotificationModel;
 import htcc.common.service.kafka.BaseKafkaConsumer;
+import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.log.service.config.NotificationConfig;
+import htcc.log.service.repository.BaseLogDAO;
 import htcc.log.service.repository.NotificationBuzRepository;
 import htcc.log.service.repository.NotificationLogRepository;
 import htcc.log.service.service.notification.NotificationRetryTask;
@@ -20,6 +23,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 @Component
@@ -47,16 +51,23 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
 
     @Autowired
     private KafkaProducerService kafka;
+
     //</editor-fold>
 
     @Override
     public void process(NotificationModel model) {
-        // TODO : Check other clientId
-        if (model.getClientId() != ClientSystemEnum.MOBILE.getValue()){
-            return;
-        }
-
         try {
+
+            if (model.getClientId() != ClientSystemEnum.MOBILE.getValue()){
+                model.setStatus(NotificationStatusEnum.SUCCESS.getValue());
+                model.setHasRead(false);
+                model.setRetryTime(0L);
+                model.setTokenPush(new ArrayList<>());
+
+                repository.createNewNotification(model);
+                return;
+            }
+
             if (System.currentTimeMillis() - model.getSendTime() > Constant.ONE_DAY_MILLISECONDS){
                 log.warn("Discard Notification {} after 24 hours", StringUtil.toJsonString(model));
                 model.setStatus(NotificationStatusEnum.FAILED.getValue());
@@ -106,7 +117,7 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
         if (notificationConfig.isAllowRetryOnFail()) {
             model.setNumRetries(model.getNumRetries() + 1);
             if (model.getNumRetries() > notificationConfig.getMaxRetries()) {
-                log.warn("Send Noti Failed & Max Retried, NotiId = [{}]", model.getNotiId());
+                log.warn("Send Noti [{}] Failed & Max Retried", model.getNotiId());
                 model.setStatus(NotificationStatusEnum.FAILED.getValue());
                 repository.saveNotification(model);
             }
@@ -116,7 +127,9 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
                 model.setRetryTime(retryTime);
                 model.setStatus(NotificationStatusEnum.FAILED_RETRYING.getValue());
 
-                log.info("...Send Notify Failed...Waiting For Retry...NotiId = [{}]", model.getNotiId());
+                log.info("...Send Notify [{}] Failed...Waiting For Retry at [{}]...", model.getNotiId(),
+                        DateTimeUtil.parseTimestampToDateString(retryTime));
+
                 taskScheduler.schedule(
                         new NotificationRetryTask(model, kafka),
                         new Date(retryTime)

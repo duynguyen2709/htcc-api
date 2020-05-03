@@ -16,6 +16,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
 
     private static final String TABLE_NAME = "CheckOutLog";
 
+    public String  checkInId        = "";
     public int     subType          = 1;
     public String  companyId        = "";
     public String  officeId         = "";
@@ -35,6 +36,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
 
     public CheckOutLogEntity(CheckinModel model) {
         this.requestId = model.getRequestId();
+        this.checkInId = model.checkInId;
         this.subType = model.subType;
         this.companyId = model.companyId;
         this.officeId = model.officeId;

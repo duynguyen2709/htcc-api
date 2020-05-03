@@ -25,6 +25,9 @@ public class CheckinModel implements Serializable {
     private String requestId = LoggingConfiguration.getTraceId();
 
     @NotEmpty
+    public String checkInId = "";
+
+    @NotEmpty
     public String companyId;
 
     @NotEmpty
@@ -127,10 +130,15 @@ public class CheckinModel implements Serializable {
         this.image = StringUtil.EMPTY;
         this.serverTime = serverTime;
         this.date = DateTimeUtil.parseTimestampToString(this.clientTime,"yyyyMMdd");
+
+        this.checkInId = String.format("%s-%s-%s-%s-%s",
+                (this.type == CheckinTypeEnum.CHECKIN.getValue() ? "CheckIn" : "CheckOut"),
+                this.companyId, this.officeId, this.username, this.clientTime);
     }
 
     public CheckinModel(CheckInLogEntity model) {
         this.requestId = model.requestId;
+        this.checkInId = model.checkInId;
         this.subType = model.subType;
         this.companyId = model.companyId;
         this.officeId = model.officeId;
@@ -153,6 +161,7 @@ public class CheckinModel implements Serializable {
 
     public CheckinModel(CheckOutLogEntity model) {
         this.requestId = model.requestId;
+        this.checkInId = model.checkInId;
         this.subType = model.subType;
         this.companyId = model.companyId;
         this.officeId = model.officeId;

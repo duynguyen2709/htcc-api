@@ -51,10 +51,11 @@ public class NotificationService {
             List<String> oldTokens = new ArrayList<>();
             for (int i = 0; i < responseList.size(); i++) {
                 if (responseList.get(i).isSuccessful()) {
-                    log.info("Send Noti Succeed, Id = [{}]", responseList.get(i).getMessageId());
+                    log.info("Send Noti [{}] Succeed, MessageId = [{}]", model.getNotiId(),
+                            responseList.get(i).getMessageId());
                 } else {
-                    log.error("Send Noti Failed, Id = [{}], Ex = [{}], Error = [{}]",
-                            responseList.get(i).getMessageId(), responseList.get(i).getException(),
+                    log.error("Send Noti [{}] Failed, Ex = [{}], Error = [{}]",
+                            model.getNotiId(), responseList.get(i).getException(),
                             responseList.get(i).getException().getErrorCode());
 
                     if (responseList.get(i).getException().getErrorCode()
