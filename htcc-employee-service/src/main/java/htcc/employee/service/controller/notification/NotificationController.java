@@ -109,6 +109,7 @@ public class NotificationController {
         try {
             long now = System.currentTimeMillis();
             NotificationModel model = new NotificationModel();
+            model.setClick_action(request.getClick_action());
             model.setClientId(ClientSystemEnum.MOBILE.getValue());
             model.setRequestId(LoggingConfiguration.getTraceId());
             model.setCompanyId(request.getCompanyId());

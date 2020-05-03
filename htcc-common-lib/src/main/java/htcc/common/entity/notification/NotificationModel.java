@@ -15,6 +15,7 @@ public class NotificationModel {
 
     // TODO : get screenId, icon, tokenPush from config
     // notiId must have format "yyyyMM..."
+    public String click_action = "FLUTTER_NOTIFICATION_CLICK";
 
     public String       requestId = "";
     public int          clientId  = 1;
