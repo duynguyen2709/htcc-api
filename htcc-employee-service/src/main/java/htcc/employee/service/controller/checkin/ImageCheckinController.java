@@ -2,13 +2,11 @@ package htcc.employee.service.controller.checkin;
 
 import htcc.common.constant.*;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.base.RequestWrapper;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.checkin.CheckinRequest;
 import htcc.common.entity.log.RequestLogEntity;
-import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.CheckInService;
+import htcc.employee.service.service.checkin.CheckInService;
 import htcc.employee.service.service.GoogleDriveService;
 import htcc.employee.service.service.checkin.CheckInBuzService;
 import io.swagger.annotations.Api;
@@ -25,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Api(tags = "API điểm danh",
      description = "API điểm danh của nhân viên")

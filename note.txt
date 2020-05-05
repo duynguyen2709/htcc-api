@@ -235,4 +235,5 @@
 
 03-05-2020:
  + Version 1.7.5:
-    - [Employee] Add CheckInId, add Gender; Check Half day-off on Checking In
+    - [Employee] Add CheckInId, add Gender; Check Half day-off on Checking In;
+    Add officeName to CheckInLog (with officeId)

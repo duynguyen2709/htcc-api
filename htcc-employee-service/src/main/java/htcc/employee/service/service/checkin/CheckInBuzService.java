@@ -10,7 +10,6 @@ import htcc.common.util.DateTimeUtil;
 import htcc.common.util.LocationUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
-import htcc.employee.service.service.CheckInService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.WorkingDayService;
 import lombok.extern.log4j.Log4j2;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -98,6 +96,7 @@ public class CheckInBuzService {
      */
     private void setValidTimeAndLocation(CheckinModel model) {
         Office office = DbStaticConfigMap.OFFICE_MAP.get(model.getCompanyId() + "_" + model.getOfficeId());
+        model.setOfficeId(String.format("%s - %s", office.getOfficeId(), office.getOfficeName()));
         model.setValidLatitude(office.getLatitude());
         model.setValidLongitude(office.getLongitude());
         model.setMaxAllowDistance(office.getMaxAllowDistance());
@@ -119,10 +118,9 @@ public class CheckInBuzService {
             return String.format("Không tìm thấy nhân viên %s", request.getUsername());
         }
 
-        String officeId = request.getOfficeId();
-        Office officeInfo = DbStaticConfigMap.OFFICE_MAP.get(request.getCompanyId() + "_" + officeId);
-        if (officeInfo == null){
-            return String.format("Không tìm thấy địa điểm điểm danh hợp lệ cho nhân viên %s", request.getUsername());
+        Office officeInfo = DbStaticConfigMap.OFFICE_MAP.get(request.getCompanyId() + "_" + request.getOfficeId());
+        if (officeInfo == null) {
+            return String.format("Không tìm thấy chi nhánh %s", request.getOfficeId());
         }
 
         CheckinSubTypeEnum subType = CheckinSubTypeEnum.fromInt(request.getSubType());

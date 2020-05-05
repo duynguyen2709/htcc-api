@@ -1,4 +1,4 @@
-package htcc.employee.service.service;
+package htcc.employee.service.service.checkin;
 
 import com.google.gson.reflect.TypeToken;
 import htcc.common.component.kafka.KafkaProducerService;
@@ -7,6 +7,7 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
+import htcc.employee.service.service.LogService;
 import htcc.employee.service.service.redis.RedisCheckinService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

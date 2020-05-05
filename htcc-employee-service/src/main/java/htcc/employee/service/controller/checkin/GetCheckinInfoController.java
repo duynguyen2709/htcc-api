@@ -12,7 +12,7 @@ import htcc.common.entity.jpa.WorkingDay;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
-import htcc.employee.service.service.CheckInService;
+import htcc.employee.service.service.checkin.CheckInService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.WorkingDayService;
 import io.swagger.annotations.Api;

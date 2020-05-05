@@ -98,6 +98,7 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
                             model.getCompanyId(), model.getUsername()));
                 }
 
+                model.setRetryTime(System.currentTimeMillis());
                 boolean sendNotiResponse = notificationService.sendNotify(model);
                 if (sendNotiResponse){
                     model.setStatus(NotificationStatusEnum.SUCCESS.getValue());
