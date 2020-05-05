@@ -22,6 +22,8 @@ public class RedisBuzConfig {
     // => save which user was blocked before company is blocked
     public String statusBlockUserFormat = "STATUS-BLOCK-%s"; // companyId : save list user
 
+    public String notificationFormat = "NOTIFICATION-%s-%s-%s"; // clientId-companyId-username
+
     @Value("${security.jwt.expireSecond:86400}")
     public long jwtTTL;
 }

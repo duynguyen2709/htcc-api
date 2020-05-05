@@ -1,10 +1,12 @@
 package htcc.gateway.service.controller;
 
+import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.component.redis.RedisService;
 import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.notification.NotificationBuz;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.common.entity.base.BaseUser;
@@ -44,16 +46,21 @@ public class PrivateController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private KafkaProducerService kafka;
     //</editor-fold>
 
     @ApiOperation(value = "API Logout")
     @PostMapping("/logout")
-    public BaseResponse logout(@RequestHeader("Authorization") String authorization) {
+    public BaseResponse logout(@RequestHeader("Authorization") String authorization,
+                               @RequestParam(required = false) String tokenPush) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         String token = authorization.substring(Constant.BEARER.length());
-        LoginRequest loginInfo = tokenService.getLoginInfo(token);
+        LoginRequest loginInfo = null;
         try {
             loginInfo = tokenService.getLoginInfo(token);
+            loginInfo.setTokenPush(StringUtil.valueOf(tokenPush));
 
             redis.delete(redis.buzConfig.tokenFormat,
                     loginInfo.clientId,
@@ -66,30 +73,43 @@ public class PrivateController {
         } finally {
             // blacklist token
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
-                long ttl = 0;
-                if (loginInfo.clientId != ClientSystemEnum.MOBILE.getValue()) {
-                    ttl = securityConfig.jwt.expireSecond;
-                } else {
-                    ttl = securityConfig.jwt.expireSecond * 7;
+                if (loginInfo != null) {
+
+                    blackListToken(token, loginInfo);
+
+                    sendKafkaLogOut(loginInfo);
                 }
-
-                redis.set(token, ttl, redis.buzConfig.blacklistTokenFormat,
-                        loginInfo.clientId,
-                        StringUtil.valueOf(loginInfo.companyId),
-                        loginInfo.username);
-
-                // delete old token
-                redis.delete(redis.buzConfig.tokenFormat,
-                        loginInfo.clientId,
-                        StringUtil.valueOf(loginInfo.companyId),
-                        loginInfo.username);
             }
         }
         return response;
     }
 
+    private void sendKafkaLogOut(LoginRequest loginInfo) {
+        NotificationBuz notiEntity = new NotificationBuz();
+        notiEntity.setClientId(loginInfo.getClientId());
+        notiEntity.setCompanyId(StringUtil.valueOf(loginInfo.getCompanyId()));
+        notiEntity.setUsername(loginInfo.getUsername());
+        notiEntity.setTokens(loginInfo.getTokenPush());
+        notiEntity.setIsLoggedIn(0);
 
+        kafka.sendMessage(kafka.getBuzConfig().getEventChangeLogInStatus().getTopicName(), notiEntity);
+    }
 
+    private void blackListToken(String token, LoginRequest loginInfo) {
+        long ttl = 0;
+        if (loginInfo.clientId != ClientSystemEnum.MOBILE.getValue()) {
+            ttl = securityConfig.jwt.expireSecond;
+        } else {
+            ttl = securityConfig.jwt.expireSecond * 7;
+        }
+
+        redis.set(token, ttl, redis.buzConfig.blacklistTokenFormat,
+                loginInfo.clientId, StringUtil.valueOf(loginInfo.companyId), loginInfo.username);
+
+        // delete old token
+        redis.delete(redis.buzConfig.tokenFormat,
+                loginInfo.clientId, StringUtil.valueOf(loginInfo.companyId), loginInfo.username);
+    }
 
     @ApiOperation(value = "API ChangePassword")
     @PutMapping("/changepassword/{clientId}")

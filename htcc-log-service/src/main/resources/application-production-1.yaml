@@ -21,6 +21,10 @@ service:
     monitorLevel: "OFF"
     address: 10.25.96.3
     port: 5703
+  notification:
+    allowRetryOnFail: true
+    retryDelaySecond: 3600
+    maxRetries: 3
 
 spring:
   datasource:

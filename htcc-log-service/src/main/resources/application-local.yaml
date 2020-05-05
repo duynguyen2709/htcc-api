@@ -21,6 +21,10 @@ service:
     monitorLevel: "OFF"
     address: 127.0.0.1
     port: 5703
+  notification:
+    allowRetryOnFail: true
+    retryDelaySecond: 20
+    maxRetries: 2
 
 spring:
   datasource:
@@ -34,6 +38,6 @@ redis:
   nodeAddresses: 127.0.0.1:6379
 
 kafka:
-  enableProducer: false
+  enableProducer: true
   enableConsumer: true
   bootstrapAddress: 127.0.0.1:9092

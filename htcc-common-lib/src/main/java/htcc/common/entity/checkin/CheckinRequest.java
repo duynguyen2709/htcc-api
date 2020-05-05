@@ -22,11 +22,22 @@ public class CheckinRequest implements Serializable {
     @Min(1)
     @Max(2)
     public int type;
+//
+//    @ApiModelProperty(notes = "Cách thức điểm danh (1: Tọa độ/ 2: Hình ảnh/ 3: QR/ 4: Form)",
+//                      example = "1")
+//    @Min(1)
+//    @Max(4)
+//    public int subType;
 
     @ApiModelProperty(notes = "Mã công ty",
                       example = "VNG")
     @NotEmpty
     public String companyId;
+
+    @ApiModelProperty(notes = "Mã chi nhánh đã chọn",
+                      example = "CAMPUS")
+    @NotEmpty
+    public String officeId;
 
     @ApiModelProperty(notes = "Tên đăng nhập",
                       example = "admin")

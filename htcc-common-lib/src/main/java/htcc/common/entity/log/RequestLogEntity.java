@@ -12,7 +12,9 @@ import lombok.extern.log4j.Log4j2;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -70,7 +72,17 @@ public class RequestLogEntity extends BaseLogEntity {
             this.ip = request.getRemoteAddr();
         }
         else if (this.ip.contains(",")) {
-            this.ip = this.ip.split(",")[0];
+            String[] ipList = this.ip.split(",");
+            for (String ip : ipList){
+                if (StringUtil.isIPAddress(ip)){
+                    this.ip = ip;
+                    break;
+                }
+            }
+        }
+
+        if (!StringUtil.isIPAddress(this.ip)) {
+            this.ip = StringUtil.EMPTY;
         }
     }
 

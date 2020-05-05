@@ -57,7 +57,7 @@ public class Office extends BaseJPAEntity {
     @Column
     @ApiModelProperty(notes = "Khoảng cách tối đa cho phép điểm danh (tính theo m)",
                       example = "10")
-    public long maxAllowDistance = 10;
+    public int maxAllowDistance = 10;
 
     @Column
     @ApiModelProperty(notes = "SĐT liên hệ chi nhánh",

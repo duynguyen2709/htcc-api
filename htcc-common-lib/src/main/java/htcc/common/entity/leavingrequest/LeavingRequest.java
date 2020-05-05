@@ -1,17 +1,13 @@
 package htcc.common.entity.leavingrequest;
 
-import htcc.common.comparator.DateComparator;
-import htcc.common.constant.LeavingRequestSessionEnum;
+import htcc.common.constant.SessionEnum;
 import htcc.common.entity.jpa.BaseJPAEntity;
 import htcc.common.util.DateTimeUtil;
-import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
@@ -59,7 +55,7 @@ public class LeavingRequest extends BaseJPAEntity {
         }
 
         if (StringUtil.isEmpty(username)) {
-            return "Username không được rỗng";
+            return "Tên người dùng không được rỗng";
         }
 
         if (StringUtil.isEmpty(companyId)) {
@@ -75,7 +71,7 @@ public class LeavingRequest extends BaseJPAEntity {
         }
 
         for (LeavingDayDetail d : detail) {
-            if (DateTimeUtil.isRightFormat(d.date, "yyyyMMdd") == false) {
+            if (!DateTimeUtil.isRightFormat(d.date, "yyyyMMdd")) {
                 return String.format("Ngày %s không phù hợp định dạng yyyyMMdd", d.date);
             }
 
@@ -83,7 +79,7 @@ public class LeavingRequest extends BaseJPAEntity {
                 return "Không được đăng ký ngày trước hôm nay";
             }
 
-            if (LeavingRequestSessionEnum.fromInt(d.session) == null) {
+            if (SessionEnum.fromInt(d.session) == null) {
                 return String.format("Buổi %s không hợp lệ", d.session);
             }
         }

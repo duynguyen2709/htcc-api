@@ -17,7 +17,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
   datasource:
-    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8
+    options: useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8&useServerPrepStmts=false&rewriteBatchedStatements=true
     url: jdbc:mysql://${spring.datasource.server}/${spring.datasource.schemaName}?${spring.datasource.options}
     username: ${security.user.name}
     password: ${security.user.password}
@@ -93,9 +93,22 @@ kafka:
     eventCreateUser:
       topicName: EVENT-CREATE-USER
       groupId: EVENT-CREATE-USER
+    eventReadNotification:
+      topicName: EVENT-READ-NOTIFICATION
+      groupId: EVENT-READ-NOTIFICATION
+    eventChangeLogInStatus:
+      topicName: EVENT-CHANGE-LOGIN-STATUS
+      groupId: EVENT-CHANGE-LOGIN-STATUS
+    eventPushNotification:
+      topicName: EVENT-PUSH-NOTIFICATION
+      groupId: EVENT-PUSH-NOTIFICATION
 
 ################## Mail Buz Config ##################
 mail:
   buz:
     subject:
       createNewUserMail: "Thông tin tài khoản mới trên hệ thống HTCC"
+
+firebase:
+  databaseURL: "https://checkinapp-9eac2.firebaseio.com"
+  serviceAccountFile: "FireBase_AdminSDK.json"

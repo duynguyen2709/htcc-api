@@ -1,11 +1,14 @@
 package htcc.employee.service.controller.complaint;
 
+import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.constant.ServiceSystemEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintModel;
 import htcc.common.entity.complaint.ComplaintRequest;
 import htcc.common.entity.complaint.ComplaintResponse;
 import htcc.common.entity.complaint.ResubmitComplaintModel;
+import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.ComplaintService;
@@ -15,12 +18,13 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Api(tags = "API phản hồi/ khiếu nại",
@@ -52,11 +56,18 @@ public class ComplaintController {
                                  @ApiParam(value = "Nội dung phản hồi/ khiếu nại", required = true, example = "Abc")
                                     @RequestParam String content,
                                  @ApiParam(value = "Hình ảnh mô tả (tối đa 3 ảnh)",name = "images[]", required = false)
-                                    @RequestParam(name = "images[]", required = false) MultipartFile images[]) {
+                                    @RequestParam(name = "images[]", required = false) MultipartFile images[],
+                                 @ApiParam(hidden = true) HttpServletRequest httpServletRequest) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Gửi phản hồi thành công");
         ComplaintRequest request = null;
         ComplaintModel model = null;
+
+        long now = System.currentTimeMillis();
+        Object requestTime = httpServletRequest.getAttribute(Constant.REQUEST_TIME);
+        if (requestTime != null){
+            now = (long)requestTime;
+        }
         try {
             if (images.length > 3) {
                 response = new BaseResponse(ReturnCodeEnum.MAXIMUM_FILES_EXCEED);
@@ -82,11 +93,30 @@ public class ComplaintController {
                 service.handleUploadImage(Arrays.asList(images), model);
             }
 
-            if (model != null) {
-                log.info(StringUtil.toJsonString(model));
-            }
+            printRequestLogEntity(httpServletRequest, response, model, now);
         }
         return response;
+    }
+
+    private void printRequestLogEntity(HttpServletRequest request, BaseResponse response, ComplaintModel model, long requestTime){
+        RequestLogEntity logEnt = new RequestLogEntity();
+        try {
+            logEnt.setRequestTime(requestTime);
+            logEnt.setResponseTime(System.currentTimeMillis());
+            logEnt.setMethod(request.getMethod());
+            logEnt.setPath(request.getRequestURI());
+            logEnt.setParams(request.getParameterMap());
+            logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
+            logEnt.setServiceId(ServiceSystemEnum.getServiceFromUri(logEnt.path));
+            logEnt.setIp(request);
+            logEnt.body = StringUtil.toJsonString(model);
+            logEnt.setResponse(StringUtil.toJsonString(response));
+        } catch (Exception e) {
+            log.warn("printRequestLogEntity ex {}", e.getMessage(), e);
+        } finally {
+            log.info(String.format("%s , Total Time : %sms\n",
+                    StringUtil.toJsonString(logEnt), (logEnt.responseTime - logEnt.requestTime)));
+        }
     }
 
 
@@ -98,7 +128,7 @@ public class ComplaintController {
                                               @RequestBody ResubmitComplaintModel request) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
-            if (DateTimeUtil.isRightFormat(request.getYyyyMM(), "yyyyMM") == false) {
+            if (!DateTimeUtil.isRightFormat(request.getYyyyMM(), "yyyyMM")) {
                 return new BaseResponse(ReturnCodeEnum.DATE_WRONG_FORMAT, String.format("Tháng %s không phù hợp định dạng yyyyMM", request.getYyyyMM()));
             }
 
@@ -124,7 +154,7 @@ public class ComplaintController {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             String yyyyMM = StringUtil.valueOf(month);
-            if (DateTimeUtil.isRightFormat(yyyyMM, "yyyyMM") == false) {
+            if (!DateTimeUtil.isRightFormat(yyyyMM, "yyyyMM")) {
                 return new BaseResponse<>(ReturnCodeEnum.DATE_WRONG_FORMAT, String.format("Tháng %s không phù hợp định dạng yyyyMM", month));
             }
 

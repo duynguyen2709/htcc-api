@@ -11,6 +11,8 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @Log4j2
 public class CheckInLogRepositoryImpl implements CheckInLogRepository {
@@ -19,7 +21,7 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public CheckInLogEntity getCheckInLog(String companyId, String username, String ymd) {
+    public List<CheckInLogEntity> getCheckInLog(String companyId, String username, String ymd) {
         try {
             String tableName = "CheckInLog" + ymd.substring(0, 6);
 
@@ -27,7 +29,7 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
                             "AND username='%s' AND ymd='%s'",
                     tableName, companyId, username, ymd);
 
-            return jdbcTemplate.queryForObject(query, new CheckInLogRowMapper());
+            return jdbcTemplate.query(query, new CheckInLogRowMapper());
 
         } catch (IncorrectResultSizeDataAccessException ignored){
         } catch (Exception e) {
@@ -37,7 +39,7 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
     }
 
     @Override
-    public CheckOutLogEntity getCheckOutLog(String companyId, String username, String ymd) {
+    public List<CheckOutLogEntity> getCheckOutLog(String companyId, String username, String ymd) {
         try {
             String tableName = "CheckOutLog" + ymd.substring(0, 6);
 
@@ -45,9 +47,9 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
                             "AND username='%s' AND ymd='%s'",
                     tableName, companyId, username, ymd);
 
-            return jdbcTemplate.queryForObject(query, new CheckOutLogRowMapper());
+            return jdbcTemplate.query(query, new CheckOutLogRowMapper());
 
-        }  catch (IncorrectResultSizeDataAccessException ignored){
+        } catch (IncorrectResultSizeDataAccessException ignored){
         } catch (Exception e) {
             log.error(String.format("[getCheckOutLog] [%s-%s-%s] ex ", companyId, username, ymd), e);
         }

@@ -20,5 +20,6 @@ public class GoogleDriveBuzConfig {
         public String errorImage;
         public String complaintImageFolder;
         public String avatarImageFolder;
+        public String checkInImageFolder;
     }
 }

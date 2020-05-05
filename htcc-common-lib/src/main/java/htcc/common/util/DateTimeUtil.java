@@ -57,6 +57,14 @@ public class DateTimeUtil {
         }
     }
 
+    public static int getWeekDayInt(String yyyyMMdd){
+        Date d = parseStringToDate(yyyyMMdd, "yyyyMMdd");
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        return dayOfWeek;
+    }
+
     private static String getWeekDayString(int dayOfWeek) {
         if (dayOfWeek == Calendar.SUNDAY) {
             return "CN";
@@ -72,6 +80,13 @@ public class DateTimeUtil {
             log.warn("parseDateToString {}, format {}, ex {}", dt, format, e.getMessage());
             return "";
         }
+    }
+
+    public static String subtractMonthFromDate(Date dt, int month){
+        Calendar c = Calendar.getInstance();
+        c.setTime(dt);
+        c.add(Calendar.MONTH, month * (-1));
+        return parseDateToString(c.getTime(), "yyyyMM");
     }
 
     public static String parseDateToString(Date dt) {
@@ -109,7 +124,7 @@ public class DateTimeUtil {
             String HHmm = parseTimestampToString(time, HHMM_FORMAT);
             Date   dt   = parseStringToDate(HHmm, HHMM_FORMAT);
             Date   dt2  = parseStringToDate(validTime, HHMM_FORMAT);
-            return dt.compareTo(dt2) <= 0;
+            return dt.before(dt2);
         } catch (Exception e){
             log.warn("isBefore time: {} - validTime {} ex", time, validTime, e);
             return false;
@@ -121,7 +136,7 @@ public class DateTimeUtil {
             String HHmm = parseTimestampToString(time, HHMM_FORMAT);
             Date   dt   = parseStringToDate(HHmm, HHMM_FORMAT);
             Date   dt2  = parseStringToDate(validTime, HHMM_FORMAT);
-            return dt.compareTo(dt2) >= 0;
+            return dt.after(dt2);
         } catch (Exception e){
             log.warn("isAfter time: {} - validTime {} ex {}", time, validTime, e.getMessage());
             return false;

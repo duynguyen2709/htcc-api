@@ -195,3 +195,45 @@
     - [Employee] GetCheckinInfo with Office's info; load Office with Hazelcast;
     Delete Employee's office info on delete office; Office Check already has headquarter;
     load Department with Hazelcast; Delete Employee's department info on delete department;
+
+17-04-2020:
+ + Version 1.6.2:
+    - [Employee] refactor LeavingRequestController
+
+17-04-2020:
+ + Version 1.6.3:
+    - [Employee] Change DayOffByLevel from Map to List
+
+24-04-2020:
+ + Version 1.6.4:
+    - [Employee] Add WorkingDay & ShiftTime handler;
+    Remove non-working days in leaving request;
+    Reject duplicate inserting/updating WorkingDay
+
+26-04-2020:
+ + Version 1.7.0:
+    - [Employee] Change new model CheckIn,
+    add officeId & image to request, add list office to response.
+
+28-04-2020:
+ + Version 1.7.1:
+    - [Employee & Log] Add Notification History controller;
+    Add api Home for Employee
+
+29-04-2020:
+ + Version 1.7.2:
+    - [Employee & Log] Fix missing column subType in CheckInLog in database;
+    fix missing subType & image in logEntity; add log request for multipart controllers
+
+30-04-2020:
+ + Version 1.7.3:
+    - [All] Add Notification for mobile
+
+01-05-2020:
+ + Version 1.7.4:
+    - [Log] Fix some bug on notifications, delete old tokens
+
+03-05-2020:
+ + Version 1.7.5:
+    - [Employee] Add CheckInId, add Gender; Check Half day-off on Checking In;
+    Add officeName to CheckInLog (with officeId)

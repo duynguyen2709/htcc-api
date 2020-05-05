@@ -10,6 +10,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @Log4j2
 @RequestMapping("/internal/logs")
@@ -24,14 +27,16 @@ public class CheckInLogController {
                                       @PathVariable String yyyyMMdd){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         try {
-            CheckInLogEntity data = repo.getCheckInLog(companyId, username, yyyyMMdd);
+            List<CheckInLogEntity> data = repo.getCheckInLog(companyId, username, yyyyMMdd);
             if (data == null) {
                 return new BaseResponse(ReturnCodeEnum.LOG_NOT_FOUND);
             }
 
-            CheckinModel model = new CheckinModel(data);
-            response.data = model;
+            List<CheckinModel> dataResponse = data.stream()
+                    .map(CheckinModel::new)
+                    .collect(Collectors.toList());
 
+            response.setData(dataResponse);
         } catch (Exception e) {
             log.error(String.format("[getCheckInLog] [%s-%s-%s] ex", companyId, username, yyyyMMdd), e);
             return new BaseResponse(e);
@@ -45,13 +50,16 @@ public class CheckInLogController {
                                       @PathVariable String yyyyMMdd){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         try {
-            CheckOutLogEntity data = repo.getCheckOutLog(companyId, username, yyyyMMdd);
+            List<CheckOutLogEntity> data = repo.getCheckOutLog(companyId, username, yyyyMMdd);
             if (data == null) {
                 return new BaseResponse(ReturnCodeEnum.LOG_NOT_FOUND);
             }
 
-            CheckinModel model = new CheckinModel(data);
-            response.data = model;
+            List<CheckinModel> dataResponse = data.stream()
+                    .map(CheckinModel::new)
+                    .collect(Collectors.toList());
+
+            response.setData(dataResponse);
 
         } catch (Exception e) {
             log.error(String.format("[getCheckOutLog] [%s-%s-%s] ex", companyId, username, yyyyMMdd), e);

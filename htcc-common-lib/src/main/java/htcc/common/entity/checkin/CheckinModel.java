@@ -1,6 +1,7 @@
 package htcc.common.entity.checkin;
 
 import htcc.common.component.LoggingConfiguration;
+import htcc.common.constant.CheckinSubTypeEnum;
 import htcc.common.constant.CheckinTypeEnum;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
@@ -24,7 +25,13 @@ public class CheckinModel implements Serializable {
     private String requestId = LoggingConfiguration.getTraceId();
 
     @NotEmpty
+    public String checkInId = "";
+
+    @NotEmpty
     public String companyId;
+
+    @NotEmpty
+    public String officeId;
 
     @NotEmpty
     public String username;
@@ -32,6 +39,10 @@ public class CheckinModel implements Serializable {
     @Min(1)
     @Max(2)
     public int type;
+
+    @Min(1)
+    @Max(4)
+    public int subType;
 
     @Min(0)
     public long clientTime;
@@ -41,6 +52,8 @@ public class CheckinModel implements Serializable {
 
     @NotEmpty
     public String validTime = "";
+
+    public boolean isOnTime = true;
 
     @Min(0)
     public float latitude;
@@ -61,19 +74,37 @@ public class CheckinModel implements Serializable {
 
     public String ip = "";
 
+    public String image = "";
+
     @NotEmpty
     @Size(min = 8, max = 8)
     public String date;
 
     @Transient
     public String isValid(){
-        if (StringUtil.valueOf(date).isEmpty()) {
-            return String.format("Thời gian gửi request {%s} không hợp lệ", this.clientTime);
+
+        if (StringUtil.isEmpty(companyId)) {
+            return "Mã công ty không được rỗng";
         }
 
-        if (type != CheckinTypeEnum.CHECKIN.getValue() &&
-                type != CheckinTypeEnum.CHECKOUT.getValue()) {
+        if (StringUtil.isEmpty(officeId)) {
+            return "Mã chi nhánh không được rỗng";
+        }
+
+        if (StringUtil.isEmpty(username)) {
+            return "Tên người dùng không được rỗng";
+        }
+
+        if (StringUtil.valueOf(date).isEmpty()) {
+            return String.format("Thời gian gửi request [%s] không hợp lệ", this.clientTime);
+        }
+
+        if (CheckinTypeEnum.fromInt(type) == null) {
             return "Loại điểm danh không hợp lệ";
+        }
+
+        if (CheckinSubTypeEnum.fromInt(subType) == null){
+            return "Cách thức điểm danh không hợp lệ";
         }
 
         if (usedWifi && !StringUtil.isIPAddress(StringUtil.valueOf(ip))) {
@@ -84,57 +115,69 @@ public class CheckinModel implements Serializable {
     }
 
 
-    public CheckinModel(CheckinRequest request) {
+    public CheckinModel(CheckinRequest request, long serverTime) {
         this.requestId = LoggingConfiguration.getTraceId();
 
         this.companyId = request.companyId;
+        this.officeId = request.officeId;
         this.username = request.username;
         this.type = request.type;
         this.clientTime = request.clientTime;
         this.latitude = request.latitude;
         this.longitude = request.longitude;
-//        this.validTime = request.validTime;
-//        this.validLatitude = request.validLatitude;
-//        this.validLongitude = request.validLongitude;
-//        this.maxAllowDistance = request.maxAllowDistance;
         this.usedWifi = request.usedWifi;
         this.ip = request.ip;
-        this.serverTime = System.currentTimeMillis();
+        this.image = StringUtil.EMPTY;
+        this.serverTime = serverTime;
         this.date = DateTimeUtil.parseTimestampToString(this.clientTime,"yyyyMMdd");
+
+        this.checkInId = String.format("%s-%s-%s-%s-%s",
+                (this.type == CheckinTypeEnum.CHECKIN.getValue() ? "CheckIn" : "CheckOut"),
+                this.companyId, this.officeId, this.username, this.clientTime);
     }
 
     public CheckinModel(CheckInLogEntity model) {
         this.requestId = model.requestId;
+        this.checkInId = model.checkInId;
+        this.subType = model.subType;
         this.companyId = model.companyId;
+        this.officeId = model.officeId;
         this.username = model.username;
         this.type = CheckinTypeEnum.CHECKIN.getValue();
         this.clientTime = model.clientTime;
         this.latitude = model.latitude;
         this.longitude = model.longitude;
         this.validTime = model.validTime;
+        this.isOnTime = model.isOnTime;
         this.validLatitude = model.validLatitude;
         this.validLongitude = model.validLongitude;
         this.maxAllowDistance = model.maxAllowDistance;
         this.usedWifi = model.usedWifi;
         this.ip = model.ip;
+        this.image = model.image;
         this.serverTime = model.serverTime;
         this.date = DateTimeUtil.parseTimestampToString(this.clientTime,"yyyyMMdd");
     }
 
     public CheckinModel(CheckOutLogEntity model) {
         this.requestId = model.requestId;
+        this.checkInId = model.checkInId;
+        this.subType = model.subType;
         this.companyId = model.companyId;
+        this.officeId = model.officeId;
         this.username = model.username;
         this.type = CheckinTypeEnum.CHECKOUT.getValue();
         this.clientTime = model.clientTime;
         this.latitude = model.latitude;
         this.longitude = model.longitude;
         this.validTime = model.validTime;
+        this.isOnTime = model.isOnTime;
         this.validLatitude = model.validLatitude;
         this.validLongitude = model.validLongitude;
         this.maxAllowDistance = model.maxAllowDistance;
         this.usedWifi = model.usedWifi;
         this.ip = model.ip;
+        this.image = model.image;
         this.serverTime = model.serverTime;
         this.date = DateTimeUtil.parseTimestampToString(this.clientTime,"yyyyMMdd");
     }

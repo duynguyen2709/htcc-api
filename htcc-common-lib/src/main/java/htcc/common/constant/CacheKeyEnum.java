@@ -7,6 +7,8 @@ public enum CacheKeyEnum {
     DEPARTMENT,
     BUZ_CONFIG,
     COMPANY_DAY_OFF,
+    WORKING_DAY,
+    SHIFT_TIME,
     ALL;
 
     public static CacheKeyEnum getKey(String type){

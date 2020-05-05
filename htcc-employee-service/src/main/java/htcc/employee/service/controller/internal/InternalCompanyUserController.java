@@ -1,20 +1,21 @@
 package htcc.employee.service.controller.internal;
 
+import htcc.common.comparator.EmployeeIdComparator;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.companyuser.CompanyUserModel;
-import htcc.common.entity.jpa.Company;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.jpa.CompanyService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +36,10 @@ public class InternalCompanyUserController {
         BaseResponse<EmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             List<EmployeeInfo> listEmployeeByCompany = service.findByCompanyId(model.getCompanyId());
-            int newId = listEmployeeByCompany.size() + 1;
+            listEmployeeByCompany.sort(new EmployeeIdComparator());
+            String lastId = listEmployeeByCompany.get(listEmployeeByCompany.size() - 1).getEmployeeId();
+
+            int newId = Integer.parseInt(lastId.substring(lastId.length() - 5)) + 1;
             String employeeId = StringUtil.genEmployeeId(model.getCompanyId(), newId);
 
             EmployeeInfo employee = new EmployeeInfo();
@@ -49,6 +53,7 @@ public class InternalCompanyUserController {
             employee.setTitle(StringUtil.EMPTY);
             employee.setLevel(0.0f);
             employee.setFullName(StringUtil.EMPTY);
+            employee.setGender(1);
             employee.birthDate = new Date(0);
             employee.setIdentityCardNo(StringUtil.EMPTY);
             employee.setAddress(StringUtil.EMPTY);

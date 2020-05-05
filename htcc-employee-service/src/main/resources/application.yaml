@@ -93,6 +93,7 @@ drive:
     errorImage: "https://drive.google.com/uc?export=view&id=1FegKvZI8zJC29v8o1G3ybCozFcae0F9l"
     complaintImageFolder: "1F1kuTmYLs2Ch_dPkUOK_nKkveC3n1l-t"
     avatarImageFolder: "1dPURbxh3Xbv0AHwRufGrbKy1W_DNzRtw"
+    checkInImageFolder: "1tjDEVZhupm-eDkHYD208q2dkHwxSiCiV"
 
 ################## Kafka Config ##################
 kafka:
@@ -115,3 +116,9 @@ kafka:
     eventUpdateEmployeeInfo:
       topicName: EVENT-UPDATE-EMPLOYEE-INFO
       groupId: EVENT-UPDATE-EMPLOYEE-INFO
+    eventReadNotification:
+      topicName: EVENT-READ-NOTIFICATION
+      groupId: EVENT-READ-NOTIFICATION
+    eventPushNotification:
+      topicName: EVENT-PUSH-NOTIFICATION
+      groupId: EVENT-PUSH-NOTIFICATION

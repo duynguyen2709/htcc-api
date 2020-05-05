@@ -2,8 +2,9 @@ package htcc.common.constant;
 
 import java.util.HashMap;
 
-public enum LeavingRequestSessionEnum {
+public enum SessionEnum {
 
+//    NIGHT(3),
     AFTERNOON(2),
     MORNING(1),
     FULL_DAY (0)
@@ -11,9 +12,9 @@ public enum LeavingRequestSessionEnum {
 
     private final int value;
 
-    private static final HashMap<Integer, LeavingRequestSessionEnum> map = new HashMap<>();
+    private static final HashMap<Integer, SessionEnum> map = new HashMap<>();
 
-    LeavingRequestSessionEnum(int value) {
+    SessionEnum(int value) {
         this.value = value;
     }
 
@@ -21,7 +22,7 @@ public enum LeavingRequestSessionEnum {
         return this.value;
     }
 
-    public static LeavingRequestSessionEnum fromInt(int iValue) {
+    public static SessionEnum fromInt(int iValue) {
         return map.get(iValue);
     }
 
@@ -30,9 +31,9 @@ public enum LeavingRequestSessionEnum {
     }
 
     static {
-        LeavingRequestSessionEnum[] var0 = values();
+        SessionEnum[] var0 = values();
 
-        for (LeavingRequestSessionEnum errorCodeEnum : var0) {
+        for (SessionEnum errorCodeEnum : var0) {
             map.put(errorCodeEnum.value, errorCodeEnum);
         }
 

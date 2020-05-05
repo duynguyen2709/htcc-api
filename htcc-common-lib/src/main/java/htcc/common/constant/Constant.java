@@ -2,9 +2,10 @@ package htcc.common.constant;
 
 public class Constant {
 
+    public static final long   ONE_DAY_MILLISECONDS = 24 * 60 * 60 * 1000L;
+
     public static final String REQUEST_TIME = "requestTime";
 
-    public static final String APPLICATION_JSON    = "application/json";
     public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
     public static final String AUTHORIZATION = "Authorization";
@@ -32,9 +33,12 @@ public class Constant {
     public static final String HTCC_GATEWAY_SERVICE  = "htcc-gateway-service";
 
     // Buz Config - Day Off Info
-    public static final String DAY_OFF_INFO         = "DAY_OFF_INFO";
-    public static final String ALLOW_CANCEL_REQUEST = "allowCancelRequest";
-    public static final String MAX_DAY_ALLOW_CANCEL = "maxDayAllowCancel";
-    public static final String CATEGORY_LIST        = "categoryList";
-    public static final String DAY_OFF_BY_LEVEL     = "dayOffByLevel";
+    public static final String DAY_OFF_INFO          = "DAY_OFF_INFO";
+    public static final String ALLOW_CANCEL_REQUEST  = "allowCancelRequest";
+    public static final String MAX_DAY_ALLOW_CANCEL  = "maxDayAllowCancel";
+    public static final String CATEGORY_LIST         = "categoryList";
+    public static final String DAY_OFF_BY_LEVEL      = "dayOffByLevel";
+    public static final float  DEFAULT_TOTAL_DAY_OFF = 10.0f;
+
+    public static final String ERROR_FCM_TOKEN_NOT_REGISTERED = "registration-token-not-registered";
 }

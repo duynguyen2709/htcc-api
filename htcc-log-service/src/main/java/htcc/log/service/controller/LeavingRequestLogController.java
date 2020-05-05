@@ -156,12 +156,6 @@ public class LeavingRequestLogController {
         } catch (Exception e){
             log.error(String.format("[updateLeavingRequestStatus] [%s] ex", StringUtil.toJsonString(request)), e);
             response = new BaseResponse(e);
-        } finally {
-            if (response.getReturnCode() ==  ReturnCodeEnum.SUCCESS.getValue()){
-                if (result == 1 && request.getStatus() == ComplaintStatusEnum.REJECTED.getValue()) {
-                    // TODO : Increase employee's available off day due to rejected request
-                }
-            }
         }
 
         return response;

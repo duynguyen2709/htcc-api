@@ -16,7 +16,10 @@ public class CheckInLogEntity extends BaseLogEntity {
 
     private static final String TABLE_NAME = "CheckInLog";
 
+    public String  checkInId        = "";
+    public int     subType          = 1;
     public String  companyId        = "";
+    public String  officeId         = "";
     public String  username         = "";
     public long    clientTime       = 0L;
     public long    serverTime       = 0L;
@@ -29,16 +32,19 @@ public class CheckInLogEntity extends BaseLogEntity {
     public int     maxAllowDistance = 0;
     public boolean usedWifi         = false;
     public String  ip               = "";
+    public String  image            = "";
 
     public CheckInLogEntity(CheckinModel model) {
         this.requestId = model.getRequestId();
+        this.checkInId = model.checkInId;
+        this.subType = model.subType;
         this.companyId = model.companyId;
+        this.officeId = model.officeId;
         this.username = model.username;
         this.clientTime = model.clientTime;
         this.serverTime = model.serverTime;
-        this.validTime = "08:30";
-        //this.validTime = model.validTime;
-        this.isOnTime = DateTimeUtil.isBefore(this.clientTime + 2 * 60 * 1000, this.validTime);
+        this.validTime = model.validTime;
+        this.isOnTime = model.isOnTime;
         this.validLatitude = model.validLatitude;
         this.validLongitude = model.validLongitude;
         this.latitude = model.latitude;
@@ -46,25 +52,30 @@ public class CheckInLogEntity extends BaseLogEntity {
         this.maxAllowDistance = model.maxAllowDistance;
         this.usedWifi = model.usedWifi;
         this.ip = model.ip;
+        this.image = model.image;
     }
 
     @Override
     public Map<String, Object> getParamsMap() {
         Map<String, Object> params = new HashMap<>();
         params.put("requestId", this.requestId);
+        params.put("checkInId", this.checkInId);
+        params.put("subType", this.subType);
         params.put("companyId", this.companyId);
+        params.put("officeId", this.officeId);
         params.put("username", this.username);
         params.put("clientTime", this.clientTime);
         params.put("serverTime", this.serverTime);
         params.put("validTime", this.validTime);
-        params.put("isOnTime", this.isOnTime);
+        params.put("isOnTime", this.isOnTime ? 1 : 0);
         params.put("validLatitude", this.validLatitude);
         params.put("validLongitude", this.validLongitude);
         params.put("latitude", this.latitude);
         params.put("longitude", this.longitude);
         params.put("maxAllowDistance", this.maxAllowDistance);
-        params.put("usedWifi", this.usedWifi);
+        params.put("usedWifi", this.usedWifi ? 1 : 0);
         params.put("ip", this.ip);
+        params.put("image", this.image);
         return params;
     }
 

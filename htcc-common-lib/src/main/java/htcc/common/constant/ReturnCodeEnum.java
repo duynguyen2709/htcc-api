@@ -21,7 +21,7 @@ public enum ReturnCodeEnum {
     TOKEN_EXPIRED(-8, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại"),
     CHECKIN_ALREADY(-9, "Đã thực hiện điểm danh vào hôm nay"),
     CHECKOUT_ALREADY(-10, "Đã thực hiện điểm danh ra hôm nay"),
-    NOT_CHECKIN(-11, "Chưa thực hiện điểm danh vào hôm nay"),
+    NOT_CHECKIN(-11, "Chưa thực hiện điểm danh vào trước khi điểm danh ra"),
     CHECKIN_TIME_NOT_VALID(-12, "Thời gian điểm danh không hợp lệ"),
     LOG_NOT_FOUND(-13, "Không tìm thấy dữ liệu"),
     DATE_WRONG_FORMAT(-14, "Định dạng ngày tháng không hợp lệ"),
@@ -30,6 +30,8 @@ public enum ReturnCodeEnum {
     DATA_NOT_FOUND(-17, "Không tìm thấy dữ liệu"),
     DATA_ALREADY_EXISTED(-18, "Dữ liệu đã tồn tại"),
     NOT_ALLOW_CANCEL_LEAVING_REQUEST(-19, "Không cho phép hủy đơn nghỉ phép"),
+    DAY_OFF_CONFLICT_REMOVED(-20, "Ngày bạn đăng ký là ngày nghỉ của chi nhánh. Vui lòng kiểm tra lại"),
+    NOT_CHECKOUT(-21, "Chưa thực hiện điểm danh ra trước khi điểm danh vào"),
     ;
 
     private final int value;
