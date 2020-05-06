@@ -80,7 +80,7 @@ public class NotificationResponse {
         map.put("notiId", this.notiId);
         map.put("screenId", this.screenId + "");
         map.put("title", this.title);
-        map.put("content", this.notiId);
+        map.put("content", this.content);
         map.put("date", this.date);
         map.put("time", this.time);
         map.put("iconId", this.iconId + "");
