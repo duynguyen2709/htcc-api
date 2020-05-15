@@ -86,7 +86,7 @@ public class OfficeRestController {
             return StringUtil.EMPTY;
         }
 
-        List<Office> officeList = DbStaticConfigMap.findOfficeByCompanyId(office.getCompanyId());
+        List<Office> officeList = officeService.findByCompanyId(office.getCompanyId());
 
         for (Office o : officeList) {
             if (o.getIsHeadquarter() && !o.getOfficeId().equals(office.getOfficeId())){

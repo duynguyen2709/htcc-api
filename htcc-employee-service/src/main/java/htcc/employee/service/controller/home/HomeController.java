@@ -9,6 +9,7 @@ import htcc.common.util.DateTimeUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.service.ComplaintService;
 import htcc.employee.service.service.LeavingRequestService;
+import htcc.employee.service.service.jpa.OfficeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -35,29 +36,9 @@ public class HomeController {
     @Autowired
     private LeavingRequestService leavingRequestService;
 
+    @Autowired
+    private OfficeService officeService;
 
-    // TODO : delete this method
-    @ApiOperation(value = "API Home", response = HomeResponse.class)
-    @GetMapping("/home/{companyId}")
-    public BaseResponse home(@ApiParam(value = "[Path] Mã công ty", required = true)
-                                                  @PathVariable String companyId,
-                             @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String username) {
-        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
-        try {
-            String yyyyMM = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMM");
-
-            HomeResponse data = new HomeResponse();
-            countPendingComplaint(data, companyId);
-            countPendingLeavingRequest(data, companyId);
-            setCanManageOffices(data, companyId, username);
-            response.data = data;
-
-        } catch (Exception e) {
-            log.error(String.format("home [%s] ex", companyId), e);
-            response = new BaseResponse<>(e);
-        }
-        return response;
-    }
 
     @ApiOperation(value = "API Home", response = HomeResponse.class)
     @GetMapping("/home/manager/{companyId}/{username}")
@@ -87,12 +68,12 @@ public class HomeController {
         try {
             // TODO : get can manage offices based on role
             if (companyId.equals("VNG")){
-                data.getCanManageOffices().addAll(DbStaticConfigMap.findOfficeByCompanyId(companyId)
+                data.getCanManageOffices().addAll(officeService.findByCompanyId(companyId)
                         .stream()
                         .map(Office::getOfficeId)
                         .collect(Collectors.toList()));
             } else if (companyId.equals("HCMUS")){
-                List<String> offices = DbStaticConfigMap.findOfficeByCompanyId(companyId)
+                List<String> offices = officeService.findByCompanyId(companyId)
                         .stream()
                         .map(Office::getOfficeId)
                         .collect(Collectors.toList());

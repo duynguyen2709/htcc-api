@@ -6,6 +6,8 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ResubmitComplaintModel;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
+import htcc.common.entity.shift.ShiftArrangementModel;
+import htcc.common.entity.shift.ShiftTime;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -97,7 +99,6 @@ public class LogService {
         return callGet(method);
     }
 
-
     public BaseResponse getCheckOutLog(String companyId, String username, String yyyyMMdd) {
         String method = String.format("/checkout/%s/%s/%s", companyId, username, yyyyMMdd);
         return callGet(method);
@@ -117,6 +118,48 @@ public class LogService {
                 ClientSystemEnum.MOBILE.getValue(), companyId, username);
         return callGet(method);
     }
+
+    /*
+    ##################### Shift Arrangement Section #####################
+     */
+    public BaseResponse getShiftArrangementLog(String companyId, int week) {
+        String method = String.format("/shifts/%s/%s", companyId, week);
+        return callGet(method);
+    }
+
+    public BaseResponse deleteShiftArrangement(String arrangementId) {
+        try {
+            HttpEntity<Object> request = new HttpEntity<>(null);
+            String method = String.format("/shifts/delete/%s", arrangementId);
+            return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
+        } catch (Exception e) {
+            log.error(e);
+            return new BaseResponse(e);
+        }
+    }
+
+    public BaseResponse deleteShiftArrangement(ShiftTime entity) {
+        try {
+            HttpEntity<ShiftTime> request = new HttpEntity<>(entity);
+            String method = "/shifts/delete";
+            return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
+        } catch (Exception e) {
+            log.error(e);
+            return new BaseResponse(e);
+        }
+    }
+
+    public BaseResponse insertShiftArrangement(ShiftArrangementModel entity) {
+        try {
+            HttpEntity<ShiftArrangementModel> request = new HttpEntity<>(entity);
+            String method = "/shifts";
+            return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
+        } catch (Exception e) {
+            log.error(e);
+            return new BaseResponse(e);
+        }
+    }
+
     /*
     ##################### Common #####################
      */

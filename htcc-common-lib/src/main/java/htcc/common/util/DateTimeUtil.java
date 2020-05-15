@@ -5,6 +5,9 @@ import lombok.extern.log4j.Log4j2;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.IsoFields;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -61,8 +64,14 @@ public class DateTimeUtil {
         Date d = parseStringToDate(yyyyMMdd, "yyyyMMdd");
         Calendar c = Calendar.getInstance();
         c.setTime(d);
-        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-        return dayOfWeek;
+        return c.get(Calendar.DAY_OF_WEEK);
+    }
+
+    public static int getWeekNum(String yyyyMMdd) {
+        Date d = parseStringToDate(yyyyMMdd, "yyyyMMdd");
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        return c.get(Calendar.WEEK_OF_YEAR);
     }
 
     private static String getWeekDayString(int dayOfWeek) {
@@ -100,6 +109,23 @@ public class DateTimeUtil {
             log.warn("parseStringToDate {} - {}", str, format);
             return null;
         }
+    }
+
+    public static String getDateStringFromWeekDayAndWeekAndYear(int weekDay, int week, int year, String format) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.WEEK_OF_YEAR, week);
+        cal.set(Calendar.DAY_OF_WEEK, weekDay);
+        return parseDateToString(cal.getTime(), "yyyyMMdd");
+    }
+
+    public static String getDateStringFromWeek(int week, String format) {
+        LocalDate desiredDate = LocalDate.now()
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, week)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        String formattedDate = desiredDate.format(DateTimeFormatter.ofPattern(format));
+        return formattedDate;
     }
 
     public static Date parseStringToDate(String str){

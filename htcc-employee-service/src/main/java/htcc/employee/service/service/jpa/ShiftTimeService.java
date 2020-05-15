@@ -1,6 +1,6 @@
 package htcc.employee.service.service.jpa;
 
-import htcc.common.entity.jpa.ShiftTime;
+import htcc.common.entity.shift.ShiftTime;
 import htcc.common.service.BaseJPAService;
 import htcc.employee.service.component.hazelcast.HazelcastLoader;
 import htcc.employee.service.config.DbStaticConfigMap;
@@ -39,7 +39,7 @@ public class ShiftTimeService extends BaseJPAService<ShiftTime, ShiftTime.Key> {
             for (ShiftTime shift : shiftTimes){
                 if (shift.getCompanyId().equals(key.getCompanyId()) &&
                         shift.getOfficeId().equals(key.getOfficeId()) &&
-                        shift.getShiftId() == key.getShiftId()
+                        shift.getShiftId().equals(key.getShiftId())
                 ) {
                     return shift;
                 }
@@ -58,7 +58,7 @@ public class ShiftTimeService extends BaseJPAService<ShiftTime, ShiftTime.Key> {
     public ShiftTime create(ShiftTime entity) {
         ShiftTime newCompany = repo.save(entity);
         hazelcastLoader.loadShiftTimeMap();
-        return entity;
+        return newCompany;
     }
 
     @Override

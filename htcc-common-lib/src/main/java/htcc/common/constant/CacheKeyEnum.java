@@ -9,6 +9,7 @@ public enum CacheKeyEnum {
     COMPANY_DAY_OFF,
     WORKING_DAY,
     SHIFT_TIME,
+    FIXED_SHIFT,
     ALL;
 
     public static CacheKeyEnum getKey(String type){

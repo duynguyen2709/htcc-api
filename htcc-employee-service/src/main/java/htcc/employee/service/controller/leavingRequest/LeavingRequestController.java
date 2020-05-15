@@ -10,7 +10,7 @@ import htcc.common.constant.WorkingDayTypeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.jpa.EmployeeInfo;
-import htcc.common.entity.jpa.WorkingDay;
+import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.entity.leavingrequest.*;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;

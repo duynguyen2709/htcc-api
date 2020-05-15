@@ -3,10 +3,12 @@ package htcc.employee.service.controller.shifttime;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.Office;
-import htcc.common.entity.jpa.ShiftTime;
+import htcc.common.entity.shift.ShiftTime;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
+import htcc.employee.service.service.jpa.OfficeService;
 import htcc.employee.service.service.jpa.ShiftTimeService;
+import htcc.employee.service.service.shiftarrangement.ShiftArrangementService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,13 +28,19 @@ public class ShiftTimeController {
     @Autowired
     private ShiftTimeService shiftTimeService;
 
+    @Autowired
+    private OfficeService officeService;
+
+    @Autowired
+    private ShiftArrangementService shiftArrangementService;
+
     @ApiOperation(value = "Lấy thông tin ca làm việc", response = ShiftTime.class)
     @GetMapping("/shifttime/{companyId}/{officeId}")
     public BaseResponse getShiftTimeInfo(@ApiParam(name = "companyId", value = "[Path] Mã công ty", defaultValue = "VNG", required = true)
                                               @PathVariable String companyId,
                                               @ApiParam(name = "officeId", value = "[Path] Mã chi nhánh", defaultValue = "CAMPUS", required = true)
                                               @PathVariable String officeId) {
-        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        BaseResponse<List<ShiftTime>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             List<ShiftTime> shiftTimes = shiftTimeService.findByCompanyIdAndOfficeId(companyId, officeId);
             response.setData(shiftTimes);
@@ -82,7 +90,7 @@ public class ShiftTimeController {
                                             @PathVariable String officeId,
                                         @ApiParam(name = "shiftId", value = "[Path] Id ca làm việc",
                                                   defaultValue = "1", required = true)
-                                             @PathVariable int shiftId,
+                                             @PathVariable String shiftId,
                                          @ApiParam(value = "[Body] Thông tin ca làm việc mới cần cập nhật")
                                          @RequestBody ShiftTime request) {
         BaseResponse<ShiftTime> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
@@ -129,14 +137,15 @@ public class ShiftTimeController {
                                             @PathVariable String officeId,
                                         @ApiParam(name = "shiftId", value = "[Path] Id ca làm việc",
                                                   defaultValue = "1", required = true)
-                                            @PathVariable int shiftId) {
+                                            @PathVariable String shiftId) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        ShiftTime shift = null;
         try {
             ShiftTime.Key key = new ShiftTime.Key(companyId, officeId, shiftId);
-            ShiftTime shift = shiftTimeService.findById(key);
+            shift = shiftTimeService.findById(key);
             if (shift == null) {
                 response = new BaseResponse<>(ReturnCodeEnum.DATA_NOT_FOUND);
-                response.setReturnMessage("Không tìm thấy thông tin ngày làm việc có id " + shiftId);
+                response.setReturnMessage("Không tìm thấy thông tin ca làm việc");
                 return response;
             }
 
@@ -144,6 +153,10 @@ public class ShiftTimeController {
         } catch (Exception e){
             log.error("[deleteShiftTime] [{} - {} - {}] ex", companyId, officeId, shiftId, e);
             response = new BaseResponse<>(e);
+        } finally {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
+                shiftArrangementService.onEventDeleteShiftTime(shift);
+            }
         }
 
         return response;
@@ -159,9 +172,10 @@ public class ShiftTimeController {
                                                @ApiParam(name = "officeId", value = "[Path] Mã chi nhánh", defaultValue = "CAMPUS", required = true)
                                                    @PathVariable String officeId) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        List<ShiftTime> shiftTimes = null;
         try {
 
-            Office headquarter = DbStaticConfigMap.findHeadquarter(companyId);
+            Office headquarter = officeService.findHeadquarter(companyId);
             if (headquarter == null){
                 response = new BaseResponse(ReturnCodeEnum.DATA_NOT_FOUND);
                 response.setReturnMessage("Công ty chưa cấu hình trụ sở chính. Vui lòng kiểm tra lại.");
@@ -181,7 +195,7 @@ public class ShiftTimeController {
                 return response;
             }
 
-            List<ShiftTime> shiftTimes = shiftTimeService.findByCompanyIdAndOfficeId(companyId, officeId);
+            shiftTimes = shiftTimeService.findByCompanyIdAndOfficeId(companyId, officeId);
 
             // delete all in db to insert new data
             shiftTimeService.batchDelete(shiftTimes);
@@ -197,6 +211,12 @@ public class ShiftTimeController {
         } catch (Exception e){
             log.error("[applySameAsHeadquarter] [{} - {}] ex", companyId, officeId, e);
             response = new BaseResponse(e);
+        } finally {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue() && shiftTimes != null) {
+                for (ShiftTime shift : shiftTimes) {
+                    shiftArrangementService.onEventDeleteShiftTime(shift);
+                }
+            }
         }
 
         return response;

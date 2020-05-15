@@ -23,14 +23,13 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
     @Override
     public List<CheckInLogEntity> getCheckInLog(String companyId, String username, String ymd) {
         try {
-            String tableName = "CheckInLog" + ymd.substring(0, 6);
+            final String tableName = "CheckInLog" + ymd.substring(0, 6);
 
-            String query = String.format("SELECT * FROM %s WHERE companyId='%s' " +
-                            "AND username='%s' AND ymd='%s'",
-                    tableName, companyId, username, ymd);
+            final String query = String.format("SELECT * FROM %s WHERE companyId = ? " +
+                            "AND username = ? AND ymd = ?", tableName);
 
-            return jdbcTemplate.query(query, new CheckInLogRowMapper());
-
+            return jdbcTemplate.query(query, new Object[] {companyId, username, ymd},
+                    new CheckInLogRowMapper());
         } catch (IncorrectResultSizeDataAccessException ignored){
         } catch (Exception e) {
             log.error(String.format("[getCheckInLog] [%s-%s-%s] ex ", companyId, username, ymd), e);
@@ -41,14 +40,13 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
     @Override
     public List<CheckOutLogEntity> getCheckOutLog(String companyId, String username, String ymd) {
         try {
-            String tableName = "CheckOutLog" + ymd.substring(0, 6);
+            final String tableName = "CheckOutLog" + ymd.substring(0, 6);
 
-            String query = String.format("SELECT * FROM %s WHERE companyId='%s' " +
-                            "AND username='%s' AND ymd='%s'",
-                    tableName, companyId, username, ymd);
+            final String query = String.format("SELECT * FROM %s WHERE companyId = ? " +
+                    "AND username = ? AND ymd = ?", tableName);
 
-            return jdbcTemplate.query(query, new CheckOutLogRowMapper());
-
+            return jdbcTemplate.query(query, new Object[] {companyId, username, ymd},
+                    new CheckOutLogRowMapper());
         } catch (IncorrectResultSizeDataAccessException ignored){
         } catch (Exception e) {
             log.error(String.format("[getCheckOutLog] [%s-%s-%s] ex ", companyId, username, ymd), e);

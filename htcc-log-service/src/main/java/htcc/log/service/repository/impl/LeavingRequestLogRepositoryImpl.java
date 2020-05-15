@@ -44,10 +44,9 @@ public class LeavingRequestLogRepositoryImpl implements LeavingRequestLogReposit
 
         for (String table : tableNames) {
             try {
-                String query =
-                        String.format("SELECT * FROM %s WHERE companyId='%s' AND username='%s'", table, companyId,
-                                username);
-                result.addAll(jdbcTemplate.query(query, new LeavingRequestLogRowMapper()));
+                final String query = String.format("SELECT * FROM %s WHERE companyId = ? AND username = ?", table);
+                result.addAll(jdbcTemplate.query(query, new Object[] {companyId, username},
+                        new LeavingRequestLogRowMapper()));
             } catch (Exception e) {
                 log.error("[getLeavingRequestLog] [{}-{}-{}]", table, companyId, username, e);
             }
@@ -59,8 +58,9 @@ public class LeavingRequestLogRepositoryImpl implements LeavingRequestLogReposit
     public List<LeavingRequestLogEntity> getListLeavingRequestLogByCompany(String companyId, String yyyyMM) {
         try {
             final String table = TABLE_PREFIX + yyyyMM;
-            String query = String.format("SELECT * FROM %s WHERE companyId='%s'", table, companyId );
-            return jdbcTemplate.query(query, new LeavingRequestLogRowMapper());
+            final String query = String.format("SELECT * FROM %s WHERE companyId = ?", table);
+            return jdbcTemplate.query(query, new Object[]{companyId},
+                    new LeavingRequestLogRowMapper());
         } catch (Exception e) {
             log.error("[getListLeavingRequestLogByCompany] [{}-{}]", companyId, yyyyMM, e);
             return null;
@@ -72,7 +72,7 @@ public class LeavingRequestLogRepositoryImpl implements LeavingRequestLogReposit
     public int updateLeavingRequestLogStatus(UpdateLeavingRequestStatusModel model) {
         final String tableName = TABLE_PREFIX + model.getYyyyMM();
 
-        String query = String.format("UPDATE %s SET status = ?, response = ?, approver = ? WHERE leavingRequestId='%s'",
+        final String query = String.format("UPDATE %s SET status = ?, response = ?, approver = ? WHERE leavingRequestId='%s'",
                 tableName, model.getLeavingRequestId());
 
         int rowAffected = jdbcTemplate.update(query, model.getStatus(), model.getResponse(), model.getApprover());
@@ -119,7 +119,7 @@ public class LeavingRequestLogRepositoryImpl implements LeavingRequestLogReposit
         try {
             final String tableName = TABLE_PREFIX + model.getYyyyMM();
 
-            String query = String.format("SELECT * FROM %s WHERE leavingRequestId='%s'",
+            String query = String.format("SELECT * FROM %s WHERE leavingRequestId = '%s'",
                     tableName, model.getLeavingRequestId());
 
             return jdbcTemplate.queryForObject(query, new LeavingRequestLogRowMapper());

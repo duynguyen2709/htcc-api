@@ -1,14 +1,17 @@
-package htcc.common.entity.jpa;
+package htcc.common.entity.shift;
 
+import htcc.common.entity.jpa.BaseJPAEntity;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -34,7 +37,12 @@ public class ShiftTime extends BaseJPAEntity {
     @Id
     @ApiModelProperty(notes = "Mã ca",
                       example = "1")
-    public int shiftId;
+    public String shiftId;
+
+    @Column
+    @ApiModelProperty(notes = "Tên ca",
+                      example = "abc")
+    public String shiftName = "";
 
     @Column
     @ApiModelProperty(notes = "Giờ vào ca (HH:mm)",
@@ -45,6 +53,16 @@ public class ShiftTime extends BaseJPAEntity {
     @ApiModelProperty(notes = "Giờ kết thúc ca (HH:mm)",
                       example = "17:30")
     public String endTime = "";
+
+    @Column
+    @ApiModelProperty(notes = "Số ngày công để chấm công",
+                      example = "1")
+    public float dayCount = 0;
+
+    @Column
+    @ApiModelProperty(notes = "Cho phép điểm danh đủ ca không cần đúng giờ",
+                      example = "false")
+    public boolean allowDiffTime = false;
 
     @Column
     @ApiModelProperty(notes = "Số phút cho phép điểm danh trễ/ sớm",
@@ -61,6 +79,14 @@ public class ShiftTime extends BaseJPAEntity {
             return "Mã chi nhánh không được rỗng";
         }
 
+        if (StringUtil.isEmpty(shiftId)) {
+            return "Mã ca không được rỗng";
+        }
+
+        if (StringUtil.isEmpty(shiftName)) {
+            return "Tên ca không được rỗng";
+        }
+
         if (!DateTimeUtil.isRightFormat(startTime, "HH:mm")){
             return String.format("Giờ vào ca %s không phù hợp định dạng HH:mm", startTime);
         }
@@ -73,6 +99,10 @@ public class ShiftTime extends BaseJPAEntity {
             return "Số phút cho phép điểm danh trễ/ sớm không được nhỏ hơn 0";
         }
 
+        if (dayCount <= 0) {
+            return "Số ngày công phải lớn hơn 0";
+        }
+
         return StringUtil.EMPTY;
     }
 
@@ -81,8 +111,11 @@ public class ShiftTime extends BaseJPAEntity {
         entity.companyId = this.companyId;
         entity.officeId = this.officeId;
         entity.shiftId = this.shiftId;
+        entity.shiftName = this.shiftName;
         entity.startTime = this.startTime;
+        entity.dayCount = this.dayCount;
         entity.endTime = this.endTime;
+        entity.allowDiffTime = this.allowDiffTime;
         entity.allowLateMinutes = this.allowLateMinutes;
         return entity;
     }
@@ -94,14 +127,14 @@ public class ShiftTime extends BaseJPAEntity {
 
         public String companyId;
         public String officeId;
-        public int shiftId;
+        public String shiftId;
 
         public Key(String key) {
             String[] val = key.split("_");
 
             this.companyId = val[0];
             this.officeId = val[1];
-            this.shiftId = Integer.parseInt(val[2]);
+            this.shiftId = val[2];
         }
 
         @Override
@@ -113,8 +146,9 @@ public class ShiftTime extends BaseJPAEntity {
                 return false;
             }
             ShiftTime.Key that = (ShiftTime.Key) o;
-            return (companyId.equalsIgnoreCase(that.companyId) && officeId.equalsIgnoreCase(that.officeId) &&
-                    shiftId == that.shiftId);
+            return (companyId.equalsIgnoreCase(that.companyId) &&
+                    officeId.equalsIgnoreCase(that.officeId) &&
+                    shiftId.equalsIgnoreCase(that.shiftId));
         }
 
         @Override

@@ -2,6 +2,9 @@ package htcc.employee.service.config;
 
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.jpa.*;
+import htcc.common.entity.shift.FixedShiftArrangement;
+import htcc.common.entity.shift.ShiftTime;
+import htcc.common.entity.workingday.WorkingDay;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,24 +27,14 @@ public class DbStaticConfigMap {
 
     public static Map<String, List<ShiftTime>> SHIFT_TIME_MAP = new HashMap<>();
 
-    public static List<Office> findOfficeByCompanyId(String companyId){
-        return OFFICE_MAP.values()
-                .stream()
-                .filter(o -> o.getCompanyId().equals(companyId))
-                .collect(Collectors.toList());
-    }
+    // key = companyId
+    // List Fixed Shift for 1 company
+    public static Map<String, List<FixedShiftArrangement>> FIXED_SHIFT_MAP = new HashMap<>();
 
     public static List<Department> findDepartmentByCompanyId(String companyId){
         return DEPARTMENT_MAP.values()
                 .stream()
                 .filter(o -> o.getCompanyId().equals(companyId))
                 .collect(Collectors.toList());
-    }
-
-    public static Office findHeadquarter(String companyId){
-        return OFFICE_MAP.values()
-                .stream()
-                .filter(o -> o.getCompanyId().equals(companyId) && o.isHeadquarter)
-                .findFirst().orElse(null);
     }
 }

@@ -53,6 +53,9 @@ public class ComplaintResponse implements Serializable {
                       example = "ẨN DANH")
     public String sender = "";
 
+    public transient String companyId = "";
+    public transient String username  = "";
+
     @ApiModelProperty(notes = "Loại phản hồi/ khiếu nại",
                       example = "Phản hồi về phiếu lương")
     @NotEmpty
@@ -95,5 +98,8 @@ public class ComplaintResponse implements Serializable {
         } else {
             this.sender = String.format("%s - %s", model.companyId, model.username);
         }
+
+        this.companyId = model.companyId;
+        this.username = model.username;
     }
 }

@@ -1,8 +1,9 @@
-package htcc.common.entity.jpa;
+package htcc.common.entity.workingday;
 
 import htcc.common.constant.SessionEnum;
 import htcc.common.constant.WeekDayEnum;
 import htcc.common.constant.WorkingDayTypeEnum;
+import htcc.common.entity.jpa.BaseJPAEntity;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.ApiModel;

@@ -25,7 +25,7 @@ import java.util.Date;
 @Configuration
 @ComponentScan(basePackages = {"htcc.common.component",
                                "htcc.employee.service"})
-@EntityScan(basePackages = {"htcc.common.entity.jpa"})
+@EntityScan(basePackages = {"htcc.common.entity"})
 public class ApplicationReady {
 
     @Autowired

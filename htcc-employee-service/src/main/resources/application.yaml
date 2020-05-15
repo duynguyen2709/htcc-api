@@ -44,6 +44,12 @@ ribbon:
   ReadTimeout: 30000
   ConnectTimeout: 30000
   ServerListRefreshInterval: 2000
+#    eventDeleteShiftArrangement:
+#      topicName: EVENT-DELETE-SHIFT-ARRANGEMENT
+#      groupId: EVENT-DELETE-SHIFT-ARRANGEMENT
+#    eventCreateShiftArrangement:
+#      topicName: EVENT-CREATE-SHIFT-ARRANGEMENT
+#      groupId: EVENT-CREATE-SHIFT-ARRANGEMENT
   eager-load:
     enabled: true
     clients: htcc-log-service
@@ -68,6 +74,8 @@ service:
   debugMode: false
   allowDeleteCheckin: false
   maxFileSize: 10000000
+  schedule:
+    fixedShiftArrangement: 1 0 0 * * *
 
 ################## Redis Config ##################
 redis:

@@ -5,7 +5,7 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.Office;
-import htcc.common.entity.jpa.WorkingDay;
+import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.LocationUtil;
 import htcc.common.util.StringUtil;
@@ -60,6 +60,8 @@ public class CheckInBuzService {
 
         // get valid checkin time by office
         setValidTimeAndLocation(model);
+
+        //TODO: Set dayCount & allowDiffTime from ShiftTime
 
         return response;
     }

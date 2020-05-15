@@ -1,11 +1,9 @@
 package htcc.common.entity.workingday;
 
-import htcc.common.entity.jpa.WorkingDay;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -87,12 +87,12 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
                     continue;
                 }
 
-                String query = String.format("SELECT * FROM %s%s WHERE clientId = '%s' AND companyId = '%s' " +
-                        "AND username = '%s' ORDER BY ymd DESC, sendTime DESC LIMIT %s,%s",
-                        TABLE_LOG, month, clientId,
-                        companyId, username, startIndex, size);
+                String query = String.format("SELECT * FROM %s%s WHERE clientId = ? AND companyId = ? " +
+                        "AND username = ? ORDER BY ymd DESC, sendTime DESC LIMIT %s,%s",
+                        TABLE_LOG, month, startIndex, size);
 
-                List<NotificationLogEntity> temp = jdbcTemplate.query(query, new NotificationLogRowMapper());
+                List<NotificationLogEntity> temp = jdbcTemplate.query(query,
+                        new Object[] {clientId, companyId, username}, new NotificationLogRowMapper());
 
                 // [!important - DO NOT DELETE THIS LINE]
                 // if reach start index, then set it to 0 to prevent skipping on next loop
@@ -263,10 +263,10 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
 
     private NotificationLogEntity getOneNotification(String notiId, int clientId, String companyId, String username) {
         try {
-            String month     = notiId.substring(0, 6);
-            String tableName = String.format("%s%s", TABLE_LOG, month);
+            final String month     = notiId.substring(0, 6);
+            final String tableName = String.format("%s%s", TABLE_LOG, month);
 
-            String query = String.format("SELECT * FROM %s WHERE notiId = '%s' AND clientId = '%s'" +
+            final String query = String.format("SELECT * FROM %s WHERE notiId = '%s' AND clientId = '%s'" +
                     " AND companyId = '%s' AND username = '%s'", tableName, notiId, clientId, companyId, username);
 
             return jdbcTemplate.queryForObject(query, new NotificationLogRowMapper());
