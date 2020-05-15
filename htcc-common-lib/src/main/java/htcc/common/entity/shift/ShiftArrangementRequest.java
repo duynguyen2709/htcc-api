@@ -7,6 +7,9 @@ import htcc.common.util.StringUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.Period;
+
 @Data
 @NoArgsConstructor
 public class ShiftArrangementRequest extends BaseJPAEntity {
@@ -50,6 +53,18 @@ public class ShiftArrangementRequest extends BaseJPAEntity {
             if (!DateTimeUtil.isRightFormat(arrangeDate, "yyyyMMdd")) {
                 return String.format("Ngày xếp ca %s không phù hợp định dạng yyyyMMdd", arrangeDate);
             }
+
+            if (DateTimeUtil.isBeforeToday(arrangeDate)) {
+                return "Không thể xếp ca trước ngày hôm nay";
+            }
+
+            String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+            int monthDiff = DateTimeUtil.calcMonthDiff(arrangeDate, today, "yyyyMMdd");
+
+            if (monthDiff > 1) {
+                return "Chỉ có thể xếp ca trước 1 tháng";
+            }
+
         }
 
         if (type == 1) {

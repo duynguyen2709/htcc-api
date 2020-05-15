@@ -128,6 +128,15 @@ public class DateTimeUtil {
         return formattedDate;
     }
 
+    public static int calcMonthDiff(String from, String to, String format) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        Period diff = Period.between(
+                LocalDate.parse(from, formatter).withDayOfMonth(1),
+                LocalDate.parse(to, formatter).withDayOfMonth(1));
+
+        return diff.getMonths();
+    }
+
     public static Date parseStringToDate(String str){
         return parseStringToDate(str, DATE_FORMAT);
     }
