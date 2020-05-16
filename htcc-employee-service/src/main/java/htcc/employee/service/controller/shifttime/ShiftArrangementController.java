@@ -49,7 +49,6 @@ public class ShiftArrangementController {
     @Autowired
     private EmployeePermissionRepository permissionRepo;
 
-    @ApiOperation(value = "Lấy thông tin ca làm việc", response = ShiftArrangementResponse.class)
     @GetMapping("/shifts/{companyId}/{year}/{week}")
     public BaseResponse getShiftTimeInfo(@PathVariable String companyId,
                                          @PathVariable int year,
@@ -121,6 +120,7 @@ public class ShiftArrangementController {
                     ShiftArrangementResponse.ShiftDetail shiftDetail = new ShiftArrangementResponse.ShiftDetail();
                     shiftDetail.setShiftId(shiftTime.getShiftId());
                     shiftDetail.setShiftTime(String.format("%s - %s", shiftTime.getStartTime(), shiftTime.getEndTime()));
+                    shiftDetail.setShiftName(shiftTime.getShiftName());
                     shiftDetail.setDetailList(new ArrayList<>());
 
                     // add date & list employee

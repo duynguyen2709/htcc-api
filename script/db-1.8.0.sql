@@ -722,7 +722,6 @@ CREATE TABLE `ShiftArrangementLog202005` (
 
 LOCK TABLES `ShiftArrangementLog202005` WRITE;
 /*!40000 ALTER TABLE `ShiftArrangementLog202005` DISABLE KEYS */;
-INSERT INTO `ShiftArrangementLog202005` VALUES (6,20200515,'23533fd',1589439060030,'20200514-VNG-CAMPUS-2-admin1-1',20,'20200515','VNG','CAMPUS','admin1','2','08:30','12:00',0.0,1,'admin1','2020-05-15 04:17:00');
 /*!40000 ALTER TABLE `ShiftArrangementLog202005` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -813,7 +812,7 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-05-15 15:22:20
+-- Dump completed on 2020-05-15 15:52:03
 CREATE DATABASE  IF NOT EXISTS `HTCC_Company` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `HTCC_Company`;
 -- MySQL dump 10.13  Distrib 5.7.20, for Linux (x86_64)
@@ -988,6 +987,35 @@ INSERT INTO `EmployeeInfo` VALUES ('HCMUS','autth','HCMUS-00002','LT','React','F
 UNLOCK TABLES;
 
 --
+-- Table structure for table `FixedShiftArrangement`
+--
+
+DROP TABLE IF EXISTS `FixedShiftArrangement`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `FixedShiftArrangement` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `companyId` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
+  `officeId` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
+  `username` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
+  `shiftId` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
+  `weekDay` int NOT NULL DEFAULT '0',
+  `actor` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
+  `updDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `FixedShiftArrangement`
+--
+
+LOCK TABLES `FixedShiftArrangement` WRITE;
+/*!40000 ALTER TABLE `FixedShiftArrangement` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FixedShiftArrangement` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `Office`
 --
 
@@ -1031,11 +1059,14 @@ DROP TABLE IF EXISTS `ShiftTime`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ShiftTime` (
-  `companyId` varchar(32) COLLATE utf8mb4_general_ci NOT NULL,
-  `officeId` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
-  `shiftId` int NOT NULL,
-  `startTime` varchar(8) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '00:00',
-  `endTime` varchar(8) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '00:00',
+  `companyId` varchar(32) NOT NULL,
+  `officeId` varchar(45) NOT NULL,
+  `shiftId` varchar(32) NOT NULL,
+  `shiftName` varchar(256) NOT NULL DEFAULT '',
+  `startTime` varchar(8) NOT NULL DEFAULT '00:00',
+  `endTime` varchar(8) NOT NULL DEFAULT '00:00',
+  `dayCount` decimal(10,1) NOT NULL DEFAULT '0.0',
+  `allowDiffTime` tinyint(1) NOT NULL DEFAULT '0',
   `allowLateMinutes` int NOT NULL DEFAULT '0',
   `updDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`companyId`,`officeId`,`shiftId`)
@@ -1048,7 +1079,7 @@ CREATE TABLE `ShiftTime` (
 
 LOCK TABLES `ShiftTime` WRITE;
 /*!40000 ALTER TABLE `ShiftTime` DISABLE KEYS */;
-INSERT INTO `ShiftTime` VALUES ('HCMUS','LT',1,'06:30','17:30',10,'2020-04-24 14:38:41'),('HCMUS','LT',2,'06:30','12:00',10,'2020-04-24 14:38:41'),('HCMUS','LT',3,'12:30','17:30',10,'2020-04-24 14:38:41'),('HCMUS','NVC',1,'06:30','17:30',10,'2020-04-24 14:38:50'),('HCMUS','NVC',2,'06:30','12:00',10,'2020-04-24 14:38:50'),('HCMUS','NVC',3,'12:30','17:30',10,'2020-04-24 14:38:50'),('VNG','CAMPUS',1,'08:30','17:30',30,'2020-04-24 14:36:45'),('VNG','CAMPUS',2,'08:30','12:00',5,'2020-04-29 00:57:39'),('VNG','CAMPUS',3,'07:00','11:30',10,'2020-04-29 00:59:44'),('VNG','CAMPUS',4,'08:00','17:00',10,'2020-04-29 01:00:14'),('VNG','CAMPUS',5,'07:05','12:00',5,'2020-04-29 00:33:06'),('VNG','HCM',1,'08:30','17:30',30,'2020-05-01 08:14:53'),('VNG','HCM',2,'08:30','12:00',5,'2020-05-01 08:14:53'),('VNG','HCM',3,'07:00','11:30',10,'2020-05-01 08:14:53');
+INSERT INTO `ShiftTime` VALUES ('HCMUS','LT','1','Ca 1 Linh Trung','06:30','17:30',1.0,0,10,'2020-05-15 08:06:34'),('HCMUS','LT','2','Ca 2 Linh Trung','06:30','12:00',0.5,0,10,'2020-05-15 08:06:35'),('HCMUS','LT','3','Ca 3 Linh Trung','12:30','17:30',0.5,0,10,'2020-05-15 08:06:35'),('HCMUS','NVC','1','Ca 1 Nguyễn Văn Cừ','06:30','17:30',1.0,0,10,'2020-05-15 08:06:35'),('HCMUS','NVC','2','Ca 2 Nguyễn Văn Cừ','06:30','12:00',0.5,0,10,'2020-05-15 08:06:35'),('HCMUS','NVC','3','Ca 3 Nguyễn Văn Cừ','12:30','17:30',0.5,0,10,'2020-05-15 08:06:35'),('VNG','CAMPUS','2','Ca 2 Campus','08:30','12:00',0.5,0,5,'2020-05-15 08:06:35'),('VNG','CAMPUS','3','Ca 3 Campus','07:00','11:30',0.5,0,10,'2020-05-15 08:06:35'),('VNG','CAMPUS','4','Ca 4 Campus','08:00','17:00',1.0,0,10,'2020-05-15 08:06:35'),('VNG','CAMPUS','5','Ca 5 Campus','07:30','12:00',0.5,0,15,'2020-05-15 08:06:35'),('VNG','HCM','2','Ca 2 HCM','08:30','12:00',0.5,0,5,'2020-05-15 08:06:35'),('VNG','HCM','3','Ca 3 HCM','07:00','11:30',0.5,0,10,'2020-05-15 08:06:35'),('VNG','HCM','4','Ca 4 HCM','08:00','17:00',1.0,0,10,'2020-05-15 08:06:35'),('VNG','HCM','5','Ca 5 HCM','07:30','12:00',0.5,0,15,'2020-05-15 08:06:35');
 /*!40000 ALTER TABLE `ShiftTime` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1093,7 +1124,7 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-05-15 15:22:25
+-- Dump completed on 2020-05-15 15:52:08
 CREATE DATABASE  IF NOT EXISTS `HTCC_Admin` /*!40100 DEFAULT CHARACTER SET latin1 */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `HTCC_Admin`;
 -- MySQL dump 10.13  Distrib 5.7.20, for Linux (x86_64)
@@ -1153,4 +1184,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-05-15 15:22:27
+-- Dump completed on 2020-05-15 15:52:10

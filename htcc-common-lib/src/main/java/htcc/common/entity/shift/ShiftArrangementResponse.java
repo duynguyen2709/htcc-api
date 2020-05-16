@@ -66,6 +66,7 @@ public class ShiftArrangementResponse implements Serializable {
             for (ShiftDetail shiftDetail : this.shiftDetailList) {
                 ShiftDetail cloneShiftDetail = new ShiftDetail();
                 cloneShiftDetail.shiftId = shiftDetail.shiftId;
+                cloneShiftDetail.shiftName = shiftDetail.shiftName;
                 cloneShiftDetail.shiftTime = shiftDetail.shiftTime;
                 cloneShiftDetail.detailList = new ArrayList<>();
 
@@ -93,6 +94,7 @@ public class ShiftArrangementResponse implements Serializable {
     public static class ShiftDetail implements Serializable {
         private static final long serialVersionUID = 19263258350808L;
         public String shiftId = "";
+        public String shiftName = "";
         public String shiftTime = "";
         public List<ShiftByDayDetail> detailList= new ArrayList<>();
 

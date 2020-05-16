@@ -1,5 +1,6 @@
 package htcc.log.service.repository.impl;
 
+import com.zaxxer.hikari.HikariDataSource;
 import htcc.common.entity.shift.ShiftArrangementLogEntity;
 import htcc.common.entity.shift.ShiftTime;
 import htcc.common.util.DateTimeUtil;
@@ -12,7 +13,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @Log4j2
@@ -21,7 +29,27 @@ public class ShiftArrangementLogRepositoryImpl implements ShiftArrangementLogRep
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private HikariDataSource dataSource;
+
     private static final String TABLE_PREFIX = "ShiftArrangementLog";
+
+    private static final Map<String, String> MAP_TABLE_LOG = new HashMap<>();
+
+    @PostConstruct
+    private void initListTableLog() {
+        try (Connection conn = dataSource.getConnection()) {
+            DatabaseMetaData md = conn.getMetaData();
+            ResultSet rs = md.getTables(null, null,
+                    TABLE_PREFIX + "%", null);
+
+            while (rs.next()) {
+                MAP_TABLE_LOG.put(rs.getString("TABLE_NAME"), "");
+            }
+        } catch (Exception e) {
+            log.error("[initListTableLog]", e);
+        }
+    }
 
     @Override
     public List<ShiftArrangementLogEntity> getListShiftArrangementLog(String companyId, int week) {
@@ -29,6 +57,11 @@ public class ShiftArrangementLogRepositoryImpl implements ShiftArrangementLogRep
             final String yyyyMM    = DateTimeUtil.getDateStringFromWeek(week, "yyyyMM");
             final String tableName = String.format("%s%s", TABLE_PREFIX, yyyyMM);
             final String query     = String.format("SELECT * FROM %s WHERE companyId = ? AND week = ?", tableName);
+
+            if (!MAP_TABLE_LOG.containsKey(tableName)) {
+                log.warn("Table {} does not exist", tableName);
+                return new ArrayList<>();
+            }
 
             return jdbcTemplate.query(query, new Object[] {companyId, week},
                     new ShiftArrangementLogRowMapper());
