@@ -128,7 +128,11 @@ public class ShiftArrangementController {
                     for (int plusDay = 0; plusDay < 7 ; plusDay++) {
                         String yyyyMMdd = DateTimeUtil.getDateStringFromWeek(plusDay, week, year, "yyyyMMdd");
                         ShiftArrangementResponse.ShiftByDayDetail shiftByDayDetail = new ShiftArrangementResponse.ShiftByDayDetail();
-                        shiftByDayDetail.setWeekDay(plusDay + 1);
+                        // [important] week start from Monday and value = 2
+                        shiftByDayDetail.setWeekDay(plusDay + 2);
+                        if (shiftByDayDetail.getWeekDay() == WeekDayEnum.SUNDAY.getValue()) {
+                            shiftByDayDetail.setWeekDay(WeekDayEnum.SUNDAY_LAST_WEEK.getValue());
+                        }
                         shiftByDayDetail.setDate(yyyyMMdd);
                         shiftByDayDetail.setEmployeeList(new ArrayList<>());
 
