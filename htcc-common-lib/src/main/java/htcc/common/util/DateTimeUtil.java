@@ -10,6 +10,7 @@ import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 @Log4j2
 public class DateTimeUtil {
@@ -44,42 +45,18 @@ public class DateTimeUtil {
         }
     }
 
-    public static String parseTimestampToFullDateString(long timestamp){
-        try {
-            Calendar c = Calendar.getInstance();
-            c.setTime(new Date(timestamp));
-            int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-
-            String weekDay = getWeekDayString(dayOfWeek);
-            String date = parseTimestampToString(timestamp, "dd/MM/yyyy HH:mm");
-
-            return String.format("%s %s", weekDay, date);
-        } catch (Exception e){
-            log.warn("parseTimestampToFullDateString {} ex : {}", timestamp, e.getMessage());
-            return "T4 01/01/2020 00:00";
-        }
-    }
-
     public static int getWeekDayInt(String yyyyMMdd){
         Date d = parseStringToDate(yyyyMMdd, "yyyyMMdd");
-        Calendar c = Calendar.getInstance();
+        Calendar c = Calendar.getInstance(new Locale("vi","VN"));
         c.setTime(d);
         return c.get(Calendar.DAY_OF_WEEK);
     }
 
     public static int getWeekNum(String yyyyMMdd) {
         Date d = parseStringToDate(yyyyMMdd, "yyyyMMdd");
-        Calendar c = Calendar.getInstance();
+        Calendar c = Calendar.getInstance(new Locale("vi","VN"));
         c.setTime(d);
         return c.get(Calendar.WEEK_OF_YEAR);
-    }
-
-    private static String getWeekDayString(int dayOfWeek) {
-        if (dayOfWeek == Calendar.SUNDAY) {
-            return "CN";
-        }
-
-        return String.format("T%s", dayOfWeek);
     }
 
     public static String parseDateToString(Date dt, String format) {
@@ -92,7 +69,7 @@ public class DateTimeUtil {
     }
 
     public static String subtractMonthFromDate(Date dt, int month){
-        Calendar c = Calendar.getInstance();
+        Calendar c = Calendar.getInstance(new Locale("vi","VN"));
         c.setTime(dt);
         c.add(Calendar.MONTH, month * (-1));
         return parseDateToString(c.getTime(), "yyyyMM");
@@ -111,12 +88,14 @@ public class DateTimeUtil {
         }
     }
 
-    public static String getDateStringFromWeekDayAndWeekAndYear(int weekDay, int week, int year, String format) {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, year);
-        cal.set(Calendar.WEEK_OF_YEAR, week);
-        cal.set(Calendar.DAY_OF_WEEK, weekDay);
-        return parseDateToString(cal.getTime(), "yyyyMMdd");
+    public static String getDateStringFromWeek(int plusDay, int week, int year, String format) {
+        LocalDate desiredDate = LocalDate.ofYearDay(year, 1)
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, week)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                .plusDays(plusDay);
+
+        String formattedDate = desiredDate.format(DateTimeFormatter.ofPattern(format));
+        return formattedDate;
     }
 
     public static String getDateStringFromWeek(int week, String format) {

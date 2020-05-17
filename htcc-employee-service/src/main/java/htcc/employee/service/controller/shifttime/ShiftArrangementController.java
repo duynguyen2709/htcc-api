@@ -3,6 +3,7 @@ package htcc.employee.service.controller.shifttime;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.constant.ShiftArrangementTypeEnum;
+import htcc.common.constant.WeekDayEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.Office;
@@ -124,10 +125,10 @@ public class ShiftArrangementController {
                     shiftDetail.setDetailList(new ArrayList<>());
 
                     // add date & list employee
-                    for (int weekDay = 1 ; weekDay <= 7 ; weekDay++) {
-                        String yyyyMMdd = DateTimeUtil.getDateStringFromWeekDayAndWeekAndYear(weekDay, week, year, "yyyyMMdd");
+                    for (int plusDay = 0; plusDay < 7 ; plusDay++) {
+                        String yyyyMMdd = DateTimeUtil.getDateStringFromWeek(plusDay, week, year, "yyyyMMdd");
                         ShiftArrangementResponse.ShiftByDayDetail shiftByDayDetail = new ShiftArrangementResponse.ShiftByDayDetail();
-                        shiftByDayDetail.setWeekDay(weekDay);
+                        shiftByDayDetail.setWeekDay(plusDay + 1);
                         shiftByDayDetail.setDate(yyyyMMdd);
                         shiftByDayDetail.setEmployeeList(new ArrayList<>());
 

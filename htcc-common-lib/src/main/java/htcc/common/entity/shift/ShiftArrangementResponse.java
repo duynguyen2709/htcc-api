@@ -1,5 +1,6 @@
 package htcc.common.entity.shift;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import htcc.common.entity.jpa.EmployeeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,6 +22,8 @@ public class ShiftArrangementResponse implements Serializable {
     public List<OfficeShiftInfo> shiftByDateList = new ArrayList<>();
     public List<OfficeShiftInfo> fixedShiftList = new ArrayList<>();
     public List<EmployeeInfo> canManageEmployees = new ArrayList<>();
+
+    @JsonIgnore
     public transient Map<String, EmployeeInfo> canManageEmployeesMap = new HashMap<>();
 
     public OfficeShiftInfo findOfficeShiftInfo(String officeId, boolean isFixed) {

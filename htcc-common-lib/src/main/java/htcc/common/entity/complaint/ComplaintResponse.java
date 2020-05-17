@@ -87,10 +87,8 @@ public class ComplaintResponse implements Serializable {
         this.images = model.images;
         this.status = model.status;
         this.response = model.response;
-        // format "Tx dd/MM/yyyy HH:mm"
-        String fullDateTime = DateTimeUtil.parseTimestampToFullDateString(model.clientTime);
-        this.date = fullDateTime.substring(0, 13);
-        this.time = fullDateTime.substring(14);
+        this.date = DateTimeUtil.parseTimestampToString(model.clientTime, "EEE dd/MM/yyyy");
+        this.time = DateTimeUtil.parseTimestampToString(model.clientTime, "HH:mm");
         this.images = model.images;
 
         if (this.isAnonymous == 1) {

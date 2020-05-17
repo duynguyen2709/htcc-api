@@ -4,13 +4,14 @@ import java.util.HashMap;
 
 public enum WeekDayEnum {
     DEFAULT(0),
-    SUNDAY(1),
+    SUNDAY_LAST_WEEK(1),
     MONDAY (2),
     TUESDAY (3),
     WEDNESDAY (4),
     THURSDAY (5),
     FRIDAY (6),
     SATURDAY (7),
+    SUNDAY(8),
     ;
 
     private final int value;
