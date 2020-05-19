@@ -109,8 +109,7 @@ public class NotificationController {
         try {
             long now = System.currentTimeMillis();
             NotificationModel model = new NotificationModel();
-            model.setClick_action(request.getClick_action());
-            model.setClientId(ClientSystemEnum.MOBILE.getValue());
+            model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
             model.setRequestId(LoggingConfiguration.getTraceId());
             model.setCompanyId(request.getCompanyId());
             model.setUsername(request.getUsername());
@@ -123,7 +122,7 @@ public class NotificationController {
             model.setScreenId(request.getScreenId());
             model.setNotiId(String.format("%s-%s-%s-%s-%s",
                     DateTimeUtil.parseTimestampToString(now, "yyyyMMdd"),
-                    model.getClientId(), model.getCompanyId(), model.getUsername(), now));
+                    model.getTargetClientId(), model.getCompanyId(), model.getUsername(), now));
             switch (model.getScreenId()){
                 case 1:
                     model.setIconId("checkin");

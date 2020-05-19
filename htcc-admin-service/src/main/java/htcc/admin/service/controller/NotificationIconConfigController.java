@@ -41,7 +41,7 @@ public class NotificationIconConfigController {
         BaseResponse<IconResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             IconResponse dataResponse = new IconResponse();
-            dataResponse.setNotiIconList(notiIconService.findAll());
+            dataResponse.setIconList(notiIconService.findAll());
             dataResponse.setScreenList(new ArrayList<>());
             Arrays.stream(ScreenEnum.values()).forEach(c -> {
                 dataResponse.getScreenList().add(new IconResponse.ScreenInfo(c.getValue(), c.getScreenDescription()));

@@ -15,7 +15,7 @@ public class IconResponse implements Serializable {
 
     private static final long serialVersionUID = 13269111150807L;
 
-    public List<NotificationIconConfig> notiIconList = new ArrayList<>();
+    public List<NotificationIconConfig> iconList = new ArrayList<>();
 
     public List<ScreenInfo> screenList = new ArrayList<>();
 

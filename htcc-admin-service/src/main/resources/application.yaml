@@ -103,3 +103,6 @@ kafka:
     eventCreateUser:
       topicName: EVENT-CREATE-USER
       groupId: EVENT-CREATE-USER
+    eventAdminSendNotification:
+      topicName: EVENT-ADMIN-SEND-NOTIFICATION
+      groupId: EVENT-ADMIN-SEND-NOTIFICATION

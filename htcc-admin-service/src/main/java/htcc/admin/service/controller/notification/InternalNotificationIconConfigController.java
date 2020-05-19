@@ -1,4 +1,4 @@
-package htcc.admin.service.controller;
+package htcc.admin.service.controller.notification;
 
 import htcc.admin.service.service.jpa.NotificationIconConfigService;
 import htcc.common.constant.ReturnCodeEnum;

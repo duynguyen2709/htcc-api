@@ -16,8 +16,7 @@ public class KafkaBuzConfig {
     public KafkaTopicConfig eventReadNotification;
     public KafkaTopicConfig eventChangeLogInStatus;
     public KafkaTopicConfig eventPushNotification;
-//    public KafkaTopicConfig eventDeleteShiftArrangement;
-//    public KafkaTopicConfig eventCreateShiftArrangement;
+    public KafkaTopicConfig eventAdminSendNotification;
 
     @Data
     public static class KafkaTopicConfig {

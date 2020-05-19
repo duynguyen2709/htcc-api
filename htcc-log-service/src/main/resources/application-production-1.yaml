@@ -39,6 +39,6 @@ redis:
   nodeAddresses: 10.25.96.4:6379
 
 kafka:
-  enableProducer: false
+  enableProducer: true
   enableConsumer: true
   bootstrapAddress: 127.0.0.1:9092,10.25.96.4:9092

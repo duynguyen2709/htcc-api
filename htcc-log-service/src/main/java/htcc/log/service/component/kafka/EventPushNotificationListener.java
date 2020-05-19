@@ -5,16 +5,14 @@ import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.Constant;
 import htcc.common.constant.NotificationStatusEnum;
 import htcc.common.entity.notification.NotificationBuz;
-import htcc.common.entity.notification.NotificationLogEntity;
 import htcc.common.entity.notification.NotificationModel;
 import htcc.common.service.kafka.BaseKafkaConsumer;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.log.service.config.NotificationConfig;
-import htcc.log.service.repository.BaseLogDAO;
-import htcc.log.service.repository.NotificationBuzRepository;
 import htcc.log.service.repository.NotificationLogRepository;
 import htcc.log.service.service.icon.IconService;
+import htcc.log.service.service.jpa.NotificationBuzService;
 import htcc.log.service.service.notification.NotificationRetryTask;
 import htcc.log.service.service.notification.NotificationService;
 import lombok.extern.log4j.Log4j2;
@@ -36,7 +34,7 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
 
     //<editor-fold defaultstate="collapsed" desc="Autowired">
     @Autowired
-    private NotificationBuzRepository notificationBuzRepository;
+    private NotificationBuzService notificationBuzService;
 
     @Autowired
     private NotificationConfig notificationConfig;
@@ -61,8 +59,7 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
     @Override
     public void process(NotificationModel model) {
         try {
-
-            if (model.getClientId() != ClientSystemEnum.MOBILE.getValue()){
+            if (model.getTargetClientId() != ClientSystemEnum.MOBILE.getValue()){
                 model.setStatus(NotificationStatusEnum.SUCCESS.getValue());
                 model.setHasRead(false);
                 model.setRetryTime(0L);
@@ -79,8 +76,8 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
                 return;
             }
 
-            NotificationBuz.Key key = new NotificationBuz.Key(model.getClientId(), model.getCompanyId(), model.getUsername());
-            NotificationBuz buzEntity = notificationBuzRepository.findById(key).orElse(null);
+            NotificationBuz.Key key = new NotificationBuz.Key(model.getTargetClientId(), model.getCompanyId(), model.getUsername());
+            NotificationBuz buzEntity = notificationBuzService.findById(key);
             if (buzEntity == null) {
                 throw new Exception("Can not find NotificationBuz: " + StringUtil.toJsonString(key));
             }

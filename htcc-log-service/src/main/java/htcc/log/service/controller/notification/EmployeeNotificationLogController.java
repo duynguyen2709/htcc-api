@@ -1,4 +1,4 @@
-package htcc.log.service.controller;
+package htcc.log.service.controller.notification;
 
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @RestController
 @Log4j2
 @RequestMapping("/internal/logs")
-public class NotificationLogController {
+public class EmployeeNotificationLogController {
 
     @Autowired
     private NotificationLogRepository repo;
