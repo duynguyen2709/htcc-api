@@ -127,31 +127,31 @@ public class NotificationController {
             switch (model.getScreenId()){
                 case 1:
                     model.setIconId("checkin");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=13VkeHpPGGQPIqSPylQHX1FBGaLpJ6kM3");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=13VkeHpPGGQPIqSPylQHX1FBGaLpJ6kM3");
                     break;
                 case 7:
                     model.setIconId("complaint");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1bAZ6NAfVxFb1jPWqT8wIkPGaZ9ZObi3a");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1bAZ6NAfVxFb1jPWqT8wIkPGaZ9ZObi3a");
                     break;
                 case 2:
                     model.setIconId("leaving");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=181Xuew9SGy17KJ2x6wHeLJaRTBFkNHZg");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=181Xuew9SGy17KJ2x6wHeLJaRTBFkNHZg");
                     break;
                 case 6:
                     model.setIconId("payroll");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=14zSFk6qYhBHLINARDzWbv8IWG8_q8KAU");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=14zSFk6qYhBHLINARDzWbv8IWG8_q8KAU");
                     break;
                 case 4:
                     model.setIconId("personal");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=15q22GGIOOPY6wFgKumH-M88VDQ7sKUru");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=15q22GGIOOPY6wFgKumH-M88VDQ7sKUru");
                     break;
                 case 3:
                     model.setIconId("statistics");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1ASCBAWzpW2Gxr74Y2dNvkocaxKkxJ_iv");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1ASCBAWzpW2Gxr74Y2dNvkocaxKkxJ_iv");
                     break;
                 default:
                     model.setIconId("noti");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1lwV3OFqdTDH3cFHt-cAruMVGN4SV6yTi");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1lwV3OFqdTDH3cFHt-cAruMVGN4SV6yTi");
                     break;
             }
 

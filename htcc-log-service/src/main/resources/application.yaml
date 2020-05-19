@@ -56,6 +56,28 @@ logging:
 service:
   debugMode: false
 
+################## Ribbon Config ##################
+ribbon:
+  eureka:
+    enabled: true
+  ReadTimeout: 30000
+  ConnectTimeout: 30000
+  ServerListRefreshInterval: 2000
+  eager-load:
+    enabled: true
+    clients: htcc-admin-service
+
+htcc-admin-service:
+  ribbon:
+    eureka:
+      enabled: true
+    MaxAutoRetries: 2
+    MaxAutoRetriesNextServer: 2
+    OkToRetryOnAllOperations: true
+    ReadTimeout: 30000
+    ConnectTimeout: 30000
+    ServerListRefreshInterval: 2000
+
 ################## Redis Config ##################
 redis:
   delimiterAddress: ;

@@ -12,6 +12,7 @@ public enum ScreenEnum {
     CONTACT_LIST(5, "Màn hình Danh bạ"),
     PAYCHECK(6, "Màn hình Bảng lương"),
     COMPLAINT(7, "Màn hình Khiếu nại"),
+    HOME(8, "Màn hình chính"),
     ;
 
     private final int value;

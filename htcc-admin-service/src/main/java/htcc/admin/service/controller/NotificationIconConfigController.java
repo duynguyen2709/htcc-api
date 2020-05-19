@@ -59,7 +59,6 @@ public class NotificationIconConfigController {
     @DeleteMapping("/icons/{iconId}")
     public BaseResponse deleteIcon(@PathVariable String iconId) {
         BaseResponse<BaseResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
-        String oldIcon = "";
         try {
             NotificationIconConfig entity = notiIconService.findById(iconId);
             if (entity == null) {
@@ -68,21 +67,11 @@ public class NotificationIconConfigController {
                 return response;
             }
 
-            oldIcon = entity.getIconURL();
-
             notiIconService.delete(iconId);
 
         } catch (Exception e){
             log.error("[deleteIcon] id = [{}] ex", iconId, e);
             response = new BaseResponse<>(e);
-        } finally {
-            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
-                // delete old file on gg drive
-                String fileId = StringUtil.getFileIdFromImage(oldIcon);
-                if (!fileId.isEmpty()) {
-                    driveService.deleteFile(fileId);
-                }
-            }
         }
 
         return response;
@@ -103,7 +92,7 @@ public class NotificationIconConfigController {
         try {
             entity = new NotificationIconConfig(iconId, iconURL, screenId);
             if (iconImage != null) {
-                String URL = driveService.uploadNotiIcon(iconImage, iconId);
+                String URL = driveService.uploadNotiIcon(iconImage, String.format("%s_%s", iconId, System.currentTimeMillis()));
                 entity.setIconURL(URL);
             }
 

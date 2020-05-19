@@ -14,6 +14,7 @@ import htcc.log.service.config.NotificationConfig;
 import htcc.log.service.repository.BaseLogDAO;
 import htcc.log.service.repository.NotificationBuzRepository;
 import htcc.log.service.repository.NotificationLogRepository;
+import htcc.log.service.service.icon.IconService;
 import htcc.log.service.service.notification.NotificationRetryTask;
 import htcc.log.service.service.notification.NotificationService;
 import lombok.extern.log4j.Log4j2;
@@ -52,6 +53,9 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
     @Autowired
     private KafkaProducerService kafka;
 
+    @Autowired
+    private IconService iconService;
+
     //</editor-fold>
 
     @Override
@@ -87,6 +91,7 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
                 notificationService.savePendingNotification(model);
                 repository.saveNotification(model);
             } else {
+                iconService.setIconInfo(model);
                 // send noti
                 model.setTokenPush(StringUtil.json2Collection(buzEntity.getTokens(),
                         StringUtil.LIST_STRING_TYPE));

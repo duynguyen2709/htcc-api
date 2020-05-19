@@ -31,6 +31,7 @@ public class Constant {
     public static final String HTCC_LOG_SERVICE      = "htcc-log-service";
     public static final String HTCC_EMPLOYEE_SERVICE = "htcc-employee-service";
     public static final String HTCC_GATEWAY_SERVICE  = "htcc-gateway-service";
+    public static final String HTCC_ADMIN_SERVICE    = "htcc-admin-service";
 
     // Buz Config - Day Off Info
     public static final String DAY_OFF_INFO          = "DAY_OFF_INFO";
@@ -41,4 +42,7 @@ public class Constant {
     public static final float  DEFAULT_TOTAL_DAY_OFF = 10.0f;
 
     public static final String ERROR_FCM_TOKEN_NOT_REGISTERED = "registration-token-not-registered";
+
+    public static final String DEFAULT_ICON_ID  = "noti";
+    public static final String DEFAULT_ICON_URL = "https://drive.google.com/uc?export=view&id=1lwV3OFqdTDH3cFHt-cAruMVGN4SV6yTi";
 }
