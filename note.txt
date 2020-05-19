@@ -241,3 +241,7 @@
 15-05-2020:
  + Version 1.8.0:
     - [Employee] New flow Shift Arrangement
+
+19-05-2020:
+ + Version 1.9.0:
+    - [Admin] Add CRUD Api for Icon

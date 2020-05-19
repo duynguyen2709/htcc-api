@@ -16,7 +16,7 @@ import javax.annotation.PreDestroy;
 @Log4j2
 @Configuration
 @ComponentScan(basePackages = {"htcc.common.component", "htcc.admin.service"})
-@EntityScan(basePackages = {"htcc.common.entity.jpa"})
+@EntityScan(basePackages = {"htcc.common.entity"})
 public class ApplicationReady {
 
     @Autowired
