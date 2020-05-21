@@ -124,6 +124,4 @@ kafka:
     eventPushNotification:
       topicName: EVENT-PUSH-NOTIFICATION
       groupId: EVENT-PUSH-NOTIFICATION
-    eventLoadIcon:
-      topicName: EVENT-LOAD-ICON
-      groupId: EVENT-LOAD-ICON-EMPLOYEE
+

@@ -38,3 +38,7 @@ kafka:
   enableProducer: true
   enableConsumer: true
   bootstrapAddress: 127.0.0.1:9092
+  buz:
+    eventLoadIcon:
+      topicName: EVENT-LOAD-ICON
+      groupId: EVENT-LOAD-ICON-EMPLOYEE-LOCAL

@@ -105,9 +105,6 @@ kafka:
     eventAdminSendNotification:
       topicName: EVENT-ADMIN-SEND-NOTIFICATION
       groupId: EVENT-ADMIN-SEND-NOTIFICATION
-    eventLoadIcon:
-      topicName: EVENT-LOAD-ICON
-      groupId: EVENT-LOAD-ICON
 
 ################## Mail Buz Config ##################
 mail:

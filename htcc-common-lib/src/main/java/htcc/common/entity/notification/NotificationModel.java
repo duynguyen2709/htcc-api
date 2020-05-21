@@ -16,9 +16,6 @@ public class NotificationModel {
 
     private static final long serialVersionUID = 986270983005150708L;
 
-    // TODO : get screenId, icon, tokenPush from config
-    // notiId must have format "yyyyMM..."
-
     public String       requestId = "";
     public String       notiId    = "";
     public int          sourceClientId  = 1;
