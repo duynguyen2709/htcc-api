@@ -2,11 +2,19 @@ package htcc.admin.service.component.hazelcast;
 
 import htcc.admin.service.jpa.NotificationIconConfigRepository;
 import htcc.common.component.HazelcastService;
+import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.CacheKeyEnum;
 import htcc.common.entity.icon.NotificationIconConfig;
 import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -16,6 +24,8 @@ import java.util.Map;
 import static htcc.admin.service.config.DbStaticConfigMap.*;
 
 @Component
+@Order(Ordered.LOWEST_PRECEDENCE)
+@ComponentScan(basePackages = {"htcc.common.component.kafka"})
 @Log4j2
 public class HazelcastLoader {
 
@@ -25,7 +35,12 @@ public class HazelcastLoader {
     @Autowired
     private NotificationIconConfigRepository notiIconRepo;
 
-    @PostConstruct
+    @Autowired
+    private KafkaProducerService kafka;
+
+    // [important] must init after kafka initialization, otherwise kafka is null
+    @Bean
+    @DependsOn({"kafkaProducerService"})
     public void loadAllStaticMap() throws Exception {
         log.info("####### Started Loading Static Config Map ########\n");
 
@@ -41,5 +56,8 @@ public class HazelcastLoader {
 
         NOTI_ICON_MAP = hazelcastService.reload(map, CacheKeyEnum.NOTI_ICON);
         log.info("[loadNotiIconConfigMap] NOTI_ICON_MAP loaded succeed [{}]", StringUtil.toJsonString(NOTI_ICON_MAP));
+
+        // send kafka message here for employee & log service to get list icon
+        kafka.sendMessage(kafka.getBuzConfig().getEventLoadIcon().getTopicName(), StringUtil.toJsonString(NOTI_ICON_MAP));
     }
 }

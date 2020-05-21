@@ -42,6 +42,11 @@ public class NotificationIconConfigController {
         try {
             IconResponse dataResponse = new IconResponse();
             dataResponse.setIconList(notiIconService.findAll());
+            dataResponse.getIconList().forEach(c -> {
+                String description = ScreenEnum.fromInt(c.getScreenId()).getScreenDescription();
+                c.setScreenDescription(description);
+            });
+
             dataResponse.setScreenList(new ArrayList<>());
             Arrays.stream(ScreenEnum.values()).forEach(c -> {
                 dataResponse.getScreenList().add(new IconResponse.ScreenInfo(c.getValue(), c.getScreenDescription()));
@@ -90,7 +95,8 @@ public class NotificationIconConfigController {
         response.setReturnMessage("Thêm icon mới thành công");
         NotificationIconConfig entity = null;
         try {
-            entity = new NotificationIconConfig(iconId, iconURL, screenId);
+            String description = ScreenEnum.fromInt(screenId).getScreenDescription();
+            entity = new NotificationIconConfig(iconId, iconURL, screenId, description);
             if (iconImage != null) {
                 String URL = driveService.uploadNotiIcon(iconImage, String.format("%s_%s", iconId, System.currentTimeMillis()));
                 entity.setIconURL(URL);

@@ -43,7 +43,6 @@ public class AdminSendToUserNotificationService implements AdminSendNotification
             model.setOfficeId(StringUtil.EMPTY);
             model.setUsername(notificationBuz.getUsername());
             model.setTargetClientId(notificationBuz.getClientId());
-            model.setReceiverType(request.getReceiverType());
             model.setSendTime(now);
             model.setNotiId(String.format("%s_%s", yyyyMMdd, now));
 

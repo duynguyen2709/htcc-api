@@ -21,10 +21,4 @@ public class ServletConfig {
     public DispatcherServlet dispatcherServlet() {
         return new RequestLoggingServlet();
     }
-
-    @LoadBalanced
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
 }

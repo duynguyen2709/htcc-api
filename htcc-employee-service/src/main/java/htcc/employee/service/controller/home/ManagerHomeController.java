@@ -1,15 +1,14 @@
 package htcc.employee.service.controller.home;
 
-import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.home.HomeResponse;
-import htcc.common.entity.jpa.Office;
+import htcc.common.entity.home.ManagerHomeResponse;
+import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.DateTimeUtil;
-import htcc.employee.service.config.DbStaticConfigMap;
-import htcc.employee.service.service.ComplaintService;
-import htcc.employee.service.service.LeavingRequestService;
-import htcc.employee.service.service.jpa.OfficeService;
+import htcc.employee.service.repository.EmployeePermissionRepository;
+import htcc.employee.service.service.complaint.ComplaintService;
+import htcc.employee.service.service.leavingrequest.LeavingRequestService;
+import htcc.employee.service.service.icon.IconService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,18 +16,15 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Api(tags = "API của quản lý",
      description = "API ở màn hình chính")
 @RestController
 @Log4j2
-public class HomeController {
+public class ManagerHomeController {
 
     @Autowired
     private ComplaintService complaintService;
@@ -37,24 +33,29 @@ public class HomeController {
     private LeavingRequestService leavingRequestService;
 
     @Autowired
-    private OfficeService officeService;
+    private IconService iconService;
 
+    @Autowired
+    private EmployeePermissionRepository permissionRepo;
 
-    @ApiOperation(value = "API Home", response = HomeResponse.class)
+    @ApiOperation(value = "API Home", response = ManagerHomeResponse.class)
     @GetMapping("/home/manager/{companyId}/{username}")
-    public BaseResponse home2(@ApiParam(value = "[Path] Mã công ty", required = true)
+    public BaseResponse home(@ApiParam(value = "[Path] Mã công ty", required = true)
                              @PathVariable String companyId,
                              @ApiParam(value = "[Path] Tên đăng nhập", defaultValue = "admin", required = true)
                              @PathVariable String username) {
-        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        BaseResponse<ManagerHomeResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             String yyyyMM = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMM");
 
-            HomeResponse data = new HomeResponse();
+            ManagerHomeResponse data = new ManagerHomeResponse();
             countPendingComplaint(data, companyId);
             countPendingLeavingRequest(data, companyId);
             setCanManageOffices(data, companyId, username);
-            response.data = data;
+            setCanManageEmployees(data, companyId, username);
+            setIsSuperAdmin(data, companyId, username);
+            setIconList(data);
+            response.setData(data);
 
         } catch (Exception e) {
             log.error(String.format("home [%s] ex", companyId), e);
@@ -63,35 +64,38 @@ public class HomeController {
         return response;
     }
 
-    private void setCanManageOffices(HomeResponse data, String companyId, String username) {
-        data.setCanManageOffices(new ArrayList<>());
+    private void setIconList(ManagerHomeResponse data) {
+        data.setIconList(iconService.getListIcon());
+    }
+
+    private void setIsSuperAdmin(ManagerHomeResponse data, String companyId, String username) {
         try {
-            // TODO : get can manage offices based on role
-            if (companyId.equals("VNG")){
-                data.getCanManageOffices().addAll(officeService.findByCompanyId(companyId)
-                        .stream()
-                        .map(Office::getOfficeId)
-                        .collect(Collectors.toList()));
-            } else if (companyId.equals("HCMUS")){
-                List<String> offices = officeService.findByCompanyId(companyId)
-                        .stream()
-                        .map(Office::getOfficeId)
-                        .collect(Collectors.toList());
+            boolean isSuperAdmin = permissionRepo.isSuperAdmin(companyId, username);
+            data.setSuperAdmin(isSuperAdmin);
+        } catch (Exception e){
+            log.error("[setIsSuperAdmin] [{} - {}]", companyId, username, e);
+        }
+    }
 
-                if (offices.isEmpty()){
-                    return;
-                }
-
-                if (username.equals("autth")){
-                    data.getCanManageOffices().add(offices.get(0));
-                }
-            }
+    private void setCanManageOffices(ManagerHomeResponse data, String companyId, String username) {
+        try {
+            List<String> officeList = permissionRepo.getCanManageOffices(companyId, username);
+            data.setCanManageOffices(officeList);
         } catch (Exception e){
             log.error("[setCanManageOffices] [{} - {}]", companyId, username, e);
         }
     }
 
-    private void countPendingComplaint(HomeResponse data, String companyId){
+    private void setCanManageEmployees(ManagerHomeResponse data, String companyId, String username) {
+        try {
+            List<EmployeeInfo> employeeInfoList = permissionRepo.getCanManageEmployees(companyId, username);
+            data.setCanManageEmployees(employeeInfoList);
+        } catch (Exception e){
+            log.error("[setCanManageEmployees] [{} - {}]", companyId, username, e);
+        }
+    }
+
+    private void countPendingComplaint(ManagerHomeResponse data, String companyId){
         int count = 0;
         try {
             BaseResponse response = complaintService.countPendingComplaint(companyId);
@@ -104,9 +108,7 @@ public class HomeController {
         data.setPendingComplaint(count);
     }
 
-
-
-    private void countPendingLeavingRequest(HomeResponse data, String companyId){
+    private void countPendingLeavingRequest(ManagerHomeResponse data, String companyId){
         int count = 0;
         try {
             BaseResponse response = leavingRequestService.countPendingLeavingRequest(companyId);

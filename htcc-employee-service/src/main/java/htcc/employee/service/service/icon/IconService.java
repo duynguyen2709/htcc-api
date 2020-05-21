@@ -1,15 +1,15 @@
-package htcc.log.service.service.icon;
+package htcc.employee.service.service.icon;
 
 import htcc.common.constant.Constant;
 import htcc.common.constant.ScreenEnum;
 import htcc.common.entity.icon.NotificationIconConfig;
-import htcc.common.entity.notification.NotificationModel;
-import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -30,25 +30,6 @@ public class IconService {
         notiIconMap.put(icon.getIconId(), icon);
     }
 
-    public void setIconInfo(NotificationModel model) {
-        try {
-            String iconId = model.getIconId();
-            if (StringUtil.isEmpty(iconId)) {
-                iconId = Constant.DEFAULT_ICON_ID;
-            }
-
-            NotificationIconConfig config = notiIconMap.getOrDefault(iconId,
-                    notiIconMap.get(Constant.DEFAULT_ICON_ID));
-
-            model.setIconId(config.getIconId());
-            model.setIconUrl(config.getIconURL());
-            model.setScreenId(config.getScreenId());
-
-        } catch (Exception e) {
-            log.error("[setIconInfo] ex", e);
-        }
-    }
-
     public void setNotiIconMap(Map<String, NotificationIconConfig> map) {
         if (map == null || map.isEmpty()) {
             this.initIconMap();
@@ -65,5 +46,19 @@ public class IconService {
         }
 
         this.notiIconMap = map;
+    }
+
+    public List<NotificationIconConfig> getListIcon() {
+        List<NotificationIconConfig> iconList = new ArrayList<>(notiIconMap.values());
+        iconList.forEach(c -> {
+            String desc = ScreenEnum.fromInt(c.getScreenId()).getScreenDescription();
+            c.setScreenDescription(desc);
+        });
+
+        return iconList;
+    }
+
+    public boolean containIcon(String iconId) {
+        return notiIconMap.containsKey(iconId);
     }
 }

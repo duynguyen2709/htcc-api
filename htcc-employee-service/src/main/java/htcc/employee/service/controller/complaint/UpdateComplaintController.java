@@ -8,7 +8,7 @@ import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.ComplaintService;
+import htcc.employee.service.service.complaint.ComplaintService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

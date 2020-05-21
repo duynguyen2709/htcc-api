@@ -36,7 +36,6 @@ public class AdminSendToAllNotificationService implements AdminSendNotificationS
                 model.setOfficeId(StringUtil.EMPTY);
                 model.setUsername(entity.getUsername());
                 model.setTargetClientId(entity.getClientId());
-                model.setReceiverType(request.getReceiverType());
                 model.setSendTime(now);
                 model.setNotiId(String.format("%s_%s", yyyyMMdd, now));
 

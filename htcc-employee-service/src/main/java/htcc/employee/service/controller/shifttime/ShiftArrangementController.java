@@ -42,9 +42,6 @@ public class ShiftArrangementController {
     private FixedShiftArrangementService fixedShiftArrangementService;
 
     @Autowired
-    private EmployeeInfoService employeeInfoService;
-
-    @Autowired
     private OfficeService officeService;
 
     @Autowired
@@ -62,12 +59,6 @@ public class ShiftArrangementController {
                 throw new Exception("shiftArrangementService.getShiftArrangementLog return null");
             }
 
-            EmployeeInfo currentUser = employeeInfoService.findById(new EmployeeInfo.Key(companyId, actor));
-            if (currentUser == null) {
-                throw new Exception(String.format("employeeInfoService.findById [%s - %s] " +
-                        "return null", companyId, actor));
-            }
-
             List<FixedShiftArrangement> fixedShiftArrangementList = fixedShiftArrangementService.findByCompanyId(companyId);
 
             ShiftArrangementResponse dataResponse = new ShiftArrangementResponse();
@@ -76,7 +67,7 @@ public class ShiftArrangementController {
 
             // !important! : don't change the order of these functions
             initShiftList(dataResponse, fixedShiftArrangementList, companyId, actor);
-            setCanManageEmployees(dataResponse, currentUser);
+            setCanManageEmployees(dataResponse, companyId, actor);
 
             setFixedShiftList(dataResponse, fixedShiftArrangementList);
             setShiftByDateList(dataResponse, logEntities);
@@ -97,17 +88,12 @@ public class ShiftArrangementController {
         Map<String, Boolean> canManageOfficesMap = new HashMap<>();
 
         List<Office> officeList = officeService.findByCompanyId(companyId);
-        EmployeeInfo employeeInfo = employeeInfoService.findById(new EmployeeInfo.Key(companyId, actor));
-        if (employeeInfo == null){
-            throw new Exception(String.format("employeeInfoService.findById [%s - %s] return null",
-                    companyId, actor));
-        }
 
         dataResponse.setFixedShiftList(new ArrayList<>());
         dataResponse.setShiftByDateList(new ArrayList<>());
 
         for (Office office : officeList) {
-            if (permissionRepo.canManageOffice(employeeInfo, office.getOfficeId())) {
+            if (permissionRepo.canManageOffice(companyId, actor, office.getOfficeId())) {
                 canManageOfficesMap.put(office.getOfficeId(), true);
                 // add office
                 ShiftArrangementResponse.OfficeShiftInfo officeShiftInfo = new ShiftArrangementResponse.OfficeShiftInfo();
@@ -209,9 +195,8 @@ public class ShiftArrangementController {
         }
     }
 
-    private void setCanManageEmployees(ShiftArrangementResponse dataResponse, EmployeeInfo currentUser) {
-        // TODO : get list can manage employees of current user
-        List<EmployeeInfo> employeeInfoList = employeeInfoService.findByCompanyId(currentUser.getCompanyId());
+    private void setCanManageEmployees(ShiftArrangementResponse dataResponse, String companyId, String actor) {
+        List<EmployeeInfo> employeeInfoList = permissionRepo.getCanManageEmployees(companyId, actor);
 
         Map<String, EmployeeInfo> map = new HashMap<>();
         employeeInfoList.forEach(c -> {
@@ -265,22 +250,11 @@ public class ShiftArrangementController {
                 return response;
             }
 
-            EmployeeInfo employee = employeeInfoService.findById(
-                    new EmployeeInfo.Key(request.getCompanyId(), request.getUsername()));
-
-            if (employee == null) {
-                response = new BaseResponse(ReturnCodeEnum.DATA_NOT_FOUND);
-                response.setReturnMessage(String.format("Không tìm thấy nhân viên %s", request.getUsername()));
-                return response;
-            }
-
-            if (!permissionRepo.canManageEmployee(request.getActor(), employee)) {
+            if (!permissionRepo.canManageEmployee(request.getCompanyId(), request.getActor(), request.getUsername())) {
                 response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
                 response.setReturnMessage(String.format("Nhân viên %s không thuộc quyền quản lý của bạn", request.getUsername()));
                 return response;
             }
-
-            // TODO : Check Conflict Shift Time
 
             response = shiftArrangementService.insertShiftArrangement(request);
         } catch (Exception e) {

@@ -74,4 +74,18 @@ public class NotificationModel {
         this.hasRead = false;
         this.status = NotificationStatusEnum.INIT.getValue();
     }
+
+    public NotificationModel(ManagerSendNotificationRequest request) {
+        this.requestId = LoggingConfiguration.getTraceId();
+        this.sourceClientId = ClientSystemEnum.MANAGER_WEB.getValue();
+        this.targetClientId = ClientSystemEnum.MOBILE.getValue();
+        this.receiverType = request.getReceiverType();
+        this.sender = request.getSender();
+        this.companyId = request.getCompanyId();
+        this.title = request.getTitle();
+        this.content = request.getContent();
+        this.iconId = request.getIconId();
+        this.hasRead = false;
+        this.status = NotificationStatusEnum.INIT.getValue();
+    }
 }

@@ -1,6 +1,8 @@
 package htcc.common.entity.home;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import htcc.common.entity.icon.NotificationIconConfig;
+import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.DateTimeUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,7 +20,7 @@ import java.util.Random;
 
 @Data
 @ApiModel(description = "Response API Home")
-public class HomeResponse implements Serializable {
+public class ManagerHomeResponse implements Serializable {
 
     private static final long serialVersionUID = 5912346685015150708L;
 
@@ -32,5 +34,14 @@ public class HomeResponse implements Serializable {
 
     @ApiModelProperty(notes = "Danh sách các chi nhánh được phép quản lý")
     public List<String> canManageOffices = new ArrayList<>();
+
+    @ApiModelProperty(notes = "Danh sách các nhân viên được phép quản lý")
+    public List<EmployeeInfo> canManageEmployees = new ArrayList<>();
+
+    @ApiModelProperty(notes = "Có phải quản lý tổng hay không")
+    public boolean isSuperAdmin = false;
+
+    @ApiModelProperty(notes = "Danh sách icon (cho notification)")
+    public List<NotificationIconConfig> iconList = new ArrayList<>();
 }
 

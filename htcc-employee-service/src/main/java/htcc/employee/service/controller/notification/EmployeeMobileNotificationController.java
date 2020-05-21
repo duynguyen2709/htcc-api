@@ -11,7 +11,7 @@ import htcc.common.entity.notification.NotificationResponse;
 import htcc.common.entity.notification.UpdateNotificationReadStatusModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.NotificationService;
+import htcc.employee.service.service.notification.NotificationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Api(tags = "API Get list notification")
 @RestController
 @Log4j2
-public class NotificationController {
+public class EmployeeMobileNotificationController {
 
     @Autowired
     private NotificationService notiService;
@@ -53,9 +53,11 @@ public class NotificationController {
 
             List<NotificationModel> models = notiService
                     .getListNotification(companyId, username, startIndex, size);
+            if (models == null) {
+                throw new Exception("notiService.getListNotification return null");
+            }
 
             models.sort(new Comparator<NotificationModel>() {
-
                 @Override
                 public int compare(NotificationModel o1, NotificationModel o2) {
                     return Long.compare(o2.getSendTime(), o1.getSendTime());
@@ -109,10 +111,12 @@ public class NotificationController {
         try {
             long now = System.currentTimeMillis();
             NotificationModel model = new NotificationModel();
+            model.setSourceClientId(ClientSystemEnum.MOBILE.getValue());
             model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
             model.setRequestId(LoggingConfiguration.getTraceId());
             model.setCompanyId(request.getCompanyId());
             model.setUsername(request.getUsername());
+            model.setSender(request.getUsername());
             model.setSendTime(now);
             model.setRetryTime(0);
             model.setTitle(request.getTitle());

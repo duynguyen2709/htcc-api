@@ -7,7 +7,7 @@ import htcc.common.entity.checkin.CheckinRequest;
 import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.checkin.CheckInService;
-import htcc.employee.service.service.GoogleDriveService;
+import htcc.employee.service.service.googledrive.GoogleDriveService;
 import htcc.employee.service.service.checkin.CheckInBuzService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

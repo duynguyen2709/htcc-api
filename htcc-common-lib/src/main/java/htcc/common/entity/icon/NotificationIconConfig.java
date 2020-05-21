@@ -1,22 +1,20 @@
 package htcc.common.entity.icon;
 
-import htcc.common.constant.AccountStatusEnum;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import htcc.common.constant.ScreenEnum;
 import htcc.common.entity.jpa.BaseJPAEntity;
-import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 
 @Entity
 @Data
@@ -42,6 +40,10 @@ public class NotificationIconConfig extends BaseJPAEntity {
                       example = "0")
     public int screenId = 0;
 
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public String screenDescription = "";
+
     @Override
     public String isValid() {
         if (StringUtil.isEmpty(iconId)) {
@@ -53,7 +55,7 @@ public class NotificationIconConfig extends BaseJPAEntity {
         }
 
         if (ScreenEnum.fromInt(screenId) == null) {
-            return String.format("Màn hình %s không hợp lệ", screenId);
+            return String.format("Không tìm thấy màn hình liên kết có id %s", screenId);
         }
 
         return StringUtil.EMPTY;

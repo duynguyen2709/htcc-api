@@ -25,7 +25,7 @@ import java.util.List;
      description = "API gửi thông báo")
 @RestController
 @Log4j2
-public class NotificationController {
+public class AdminSendNotificationController {
 
     @Autowired
     private KafkaProducerService kafka;

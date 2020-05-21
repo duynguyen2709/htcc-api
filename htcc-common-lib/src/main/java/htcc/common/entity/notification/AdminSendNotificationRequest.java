@@ -72,6 +72,13 @@ public class AdminSendNotificationRequest extends BaseJPAEntity {
             return "Nội dung thông báo không được rỗng";
         }
 
+        if (targetClientId == ClientSystemEnum.MOBILE.getValue() ||
+                targetClientId == ClientSystemEnum.MANAGER_WEB.getValue()) {
+            if (StringUtil.isEmpty(companyId)) {
+                return "Mã công ty không được rỗng";
+            }
+        }
+
         if (receiverType == NotificationReceiverSystemEnum.COMPANY.getValue()) {
             if (StringUtil.isEmpty(companyId)) {
                 return "Mã công ty không được rỗng";

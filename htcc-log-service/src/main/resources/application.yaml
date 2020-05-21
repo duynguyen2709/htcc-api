@@ -56,28 +56,6 @@ logging:
 service:
   debugMode: false
 
-################## Ribbon Config ##################
-ribbon:
-  eureka:
-    enabled: true
-  ReadTimeout: 30000
-  ConnectTimeout: 30000
-  ServerListRefreshInterval: 2000
-  eager-load:
-    enabled: true
-    clients: htcc-admin-service
-
-htcc-admin-service:
-  ribbon:
-    eureka:
-      enabled: true
-    MaxAutoRetries: 2
-    MaxAutoRetriesNextServer: 2
-    OkToRetryOnAllOperations: true
-    ReadTimeout: 30000
-    ConnectTimeout: 30000
-    ServerListRefreshInterval: 2000
-
 ################## Redis Config ##################
 redis:
   delimiterAddress: ;
@@ -127,6 +105,9 @@ kafka:
     eventAdminSendNotification:
       topicName: EVENT-ADMIN-SEND-NOTIFICATION
       groupId: EVENT-ADMIN-SEND-NOTIFICATION
+    eventLoadIcon:
+      topicName: EVENT-LOAD-ICON
+      groupId: EVENT-LOAD-ICON
 
 ################## Mail Buz Config ##################
 mail:

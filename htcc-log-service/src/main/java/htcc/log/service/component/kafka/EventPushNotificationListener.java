@@ -76,6 +76,10 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
                 return;
             }
 
+            if (model.getIconUrl().isEmpty()) {
+                iconService.setIconInfo(model);
+            }
+
             NotificationBuz.Key key = new NotificationBuz.Key(model.getTargetClientId(), model.getCompanyId(), model.getUsername());
             NotificationBuz buzEntity = notificationBuzService.findById(key);
             if (buzEntity == null) {
@@ -88,7 +92,6 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
                 notificationService.savePendingNotification(model);
                 repository.saveNotification(model);
             } else {
-                iconService.setIconInfo(model);
                 // send noti
                 model.setTokenPush(StringUtil.json2Collection(buzEntity.getTokens(),
                         StringUtil.LIST_STRING_TYPE));

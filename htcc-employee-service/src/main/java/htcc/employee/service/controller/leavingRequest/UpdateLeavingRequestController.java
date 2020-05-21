@@ -6,7 +6,7 @@ import htcc.common.entity.leavingrequest.LeavingRequestResponse;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.LeavingRequestService;
+import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

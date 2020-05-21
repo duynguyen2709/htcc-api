@@ -11,7 +11,7 @@ import htcc.common.entity.complaint.ResubmitComplaintModel;
 import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.ComplaintService;
+import htcc.employee.service.service.complaint.ComplaintService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
