@@ -18,7 +18,7 @@ public class NotificationResponse {
 
     private static final long serialVersionUID = 996270983005150708L;
 
-    public String click_action = "FLUTTER_NOTIFICATION_CLICK";
+    public static String click_action = "FLUTTER_NOTIFICATION_CLICK";
 
     @ApiModelProperty(notes = "Id noti",
                       example = "abcxyz")
@@ -76,7 +76,7 @@ public class NotificationResponse {
 
     public Map<String, String> toMap(){
         Map<String, String> map = new HashMap<>();
-        map.put("click_action", this.click_action);
+        map.put("click_action", click_action);
         map.put("notiId", this.notiId);
         map.put("screenId", this.screenId + "");
         map.put("title", this.title);

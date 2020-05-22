@@ -30,11 +30,4 @@ public class DbStaticConfigMap {
     // key = companyId
     // List Fixed Shift for 1 company
     public static Map<String, List<FixedShiftArrangement>> FIXED_SHIFT_MAP = new HashMap<>();
-
-    public static List<Department> findDepartmentByCompanyId(String companyId){
-        return DEPARTMENT_MAP.values()
-                .stream()
-                .filter(o -> o.getCompanyId().equals(companyId))
-                .collect(Collectors.toList());
-    }
 }

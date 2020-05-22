@@ -8,7 +8,13 @@ import java.util.List;
 
 public interface EmployeePermissionRepository {
 
-    boolean canManageOffice(EmployeeInfo actor, String officeId);
+    boolean canManageOffice(String companyId, String actor, String officeId);
 
-    boolean canManageEmployee(String actor, EmployeeInfo target);
+    boolean canManageEmployee(String companyId, String actor, String targetEmployee);
+
+    boolean isSuperAdmin(String companyId, String username);
+
+    List<String> getCanManageOffices(String companyId, String username);
+
+    List<EmployeeInfo> getCanManageEmployees(String companyId, String username);
 }

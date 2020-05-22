@@ -18,8 +18,8 @@ eureka:
 service:
   debugMode: true
   hazelcast:
-    useHazelcast: false
-    enableRest: true
+    useHazelcast: true
+    enableRest: false
     monitorLevel: "OFF"
     address: 127.0.0.1
     port: 5701
@@ -38,5 +38,5 @@ redis:
 
 kafka:
   enableProducer: true
-  enableConsumer: false
+  enableConsumer: true
   bootstrapAddress: 127.0.0.1:9092

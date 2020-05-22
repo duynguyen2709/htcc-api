@@ -119,6 +119,12 @@ public class LogService {
         return callGet(method);
     }
 
+    public BaseResponse getNotificationLogForManager(String companyId, String username, String yyyyMMdd) {
+        String method = String.format("/notifications/manager?companyId=%s&sender=%s&yyyyMMdd=%s",
+                companyId, username, yyyyMMdd);
+        return callGet(method);
+    }
+
     /*
     ##################### Shift Arrangement Section #####################
      */

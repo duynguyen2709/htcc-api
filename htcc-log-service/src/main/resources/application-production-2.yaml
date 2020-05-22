@@ -39,6 +39,10 @@ redis:
   nodeAddresses: 127.0.0.1:6379
 
 kafka:
-  enableProducer: false
+  enableProducer: true
   enableConsumer: true
   bootstrapAddress: 127.0.0.1:9092,10.25.96.3:9092
+  buz:
+    eventLoadIcon:
+      topicName: EVENT-LOAD-ICON
+      groupId: EVENT-LOAD-ICON-LOG-PRODUCTION-2

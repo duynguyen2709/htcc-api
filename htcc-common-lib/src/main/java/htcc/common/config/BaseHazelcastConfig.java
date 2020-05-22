@@ -11,7 +11,7 @@ public class BaseHazelcastConfig {
         config.getNetworkConfig().setPublicAddress(conf.address);
         config.getNetworkConfig().setPort(conf.port);
 
-        config.setProperty("hazelcast.rest.enabled", conf.enableRest + "");
+        config.setProperty("hazelcast.rest.enabled", "false");
         config.setProperty("hazelcast.health.monitoring.level", conf.monitorLevel);
 
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);

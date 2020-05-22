@@ -8,7 +8,7 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.GoogleDriveService;
+import htcc.employee.service.service.googledrive.GoogleDriveService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -203,6 +203,7 @@ public class EmployeeInfoController {
 
 
 
+    // TODO : DELETE THIS METHOD
     @ApiOperation(value = "Lấy thông tin của tất cả nhân viên (dành cho quản lý)", response = EmployeeInfo.class)
     @GetMapping("/users")
     public BaseResponse getAllUser() {

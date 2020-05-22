@@ -30,7 +30,7 @@ public class HazelcastService {
 
     private TransactionContext getTransactionContext() {
         TransactionOptions transOp = (new TransactionOptions())
-                .setTimeout(3L, TimeUnit.SECONDS)
+                .setTimeout(10L, TimeUnit.SECONDS)
                 .setTransactionType(TransactionOptions.TransactionType.ONE_PHASE);
 
         return hazelcastInstance.newTransactionContext(transOp);

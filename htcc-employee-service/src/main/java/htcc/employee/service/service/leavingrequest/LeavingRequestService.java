@@ -1,4 +1,4 @@
-package htcc.employee.service.service;
+package htcc.employee.service.service.leavingrequest;
 
 import com.google.gson.reflect.TypeToken;
 import htcc.common.constant.ReturnCodeEnum;
@@ -7,6 +7,7 @@ import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.leavingrequest.LeavingRequestResponse;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import htcc.common.util.StringUtil;
+import htcc.employee.service.service.LogService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;

@@ -16,7 +16,7 @@ import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.config.ServiceConfig;
-import htcc.employee.service.service.LeavingRequestService;
+import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.WorkingDayService;
 import io.swagger.annotations.Api;

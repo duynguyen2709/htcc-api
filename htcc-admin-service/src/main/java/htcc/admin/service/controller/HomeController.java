@@ -3,7 +3,7 @@ package htcc.admin.service.controller;
 import htcc.admin.service.service.ComplaintService;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.home.HomeResponse;
+import htcc.common.entity.home.AdminHomeResponse;
 import htcc.common.util.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,18 +20,16 @@ public class HomeController {
     @Autowired
     private ComplaintService complaintService;
 
-
-
-    @ApiOperation(value = "API ở màn hình Home", response = HomeResponse.class)
+    @ApiOperation(value = "API ở màn hình Home", response = AdminHomeResponse.class)
     @GetMapping("/home")
     public BaseResponse home() {
-        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        BaseResponse<AdminHomeResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             String yyyyMM = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMM");
 
-            HomeResponse data = new HomeResponse();
+            AdminHomeResponse data = new AdminHomeResponse();
             countPendingComplaint(data);
-            response.data = data;
+            response.setData(data);
 
         } catch (Exception e) {
             log.error("[home] ex", e);
@@ -40,9 +38,7 @@ public class HomeController {
         return response;
     }
 
-
-
-    private void countPendingComplaint(HomeResponse data){
+    private void countPendingComplaint(AdminHomeResponse data){
         int count = 0;
         try {
             BaseResponse response = complaintService.countPendingComplaint();

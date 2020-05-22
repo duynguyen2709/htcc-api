@@ -11,7 +11,7 @@ import htcc.common.entity.notification.NotificationResponse;
 import htcc.common.entity.notification.UpdateNotificationReadStatusModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.NotificationService;
+import htcc.employee.service.service.notification.NotificationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Api(tags = "API Get list notification")
 @RestController
 @Log4j2
-public class NotificationController {
+public class EmployeeMobileNotificationController {
 
     @Autowired
     private NotificationService notiService;
@@ -53,9 +53,11 @@ public class NotificationController {
 
             List<NotificationModel> models = notiService
                     .getListNotification(companyId, username, startIndex, size);
+            if (models == null) {
+                throw new Exception("notiService.getListNotification return null");
+            }
 
             models.sort(new Comparator<NotificationModel>() {
-
                 @Override
                 public int compare(NotificationModel o1, NotificationModel o2) {
                     return Long.compare(o2.getSendTime(), o1.getSendTime());
@@ -109,11 +111,12 @@ public class NotificationController {
         try {
             long now = System.currentTimeMillis();
             NotificationModel model = new NotificationModel();
-            model.setClick_action(request.getClick_action());
-            model.setClientId(ClientSystemEnum.MOBILE.getValue());
+            model.setSourceClientId(ClientSystemEnum.MOBILE.getValue());
+            model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
             model.setRequestId(LoggingConfiguration.getTraceId());
             model.setCompanyId(request.getCompanyId());
             model.setUsername(request.getUsername());
+            model.setSender(request.getUsername());
             model.setSendTime(now);
             model.setRetryTime(0);
             model.setTitle(request.getTitle());
@@ -123,35 +126,35 @@ public class NotificationController {
             model.setScreenId(request.getScreenId());
             model.setNotiId(String.format("%s-%s-%s-%s-%s",
                     DateTimeUtil.parseTimestampToString(now, "yyyyMMdd"),
-                    model.getClientId(), model.getCompanyId(), model.getUsername(), now));
+                    model.getTargetClientId(), model.getCompanyId(), model.getUsername(), now));
             switch (model.getScreenId()){
                 case 1:
                     model.setIconId("checkin");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=13VkeHpPGGQPIqSPylQHX1FBGaLpJ6kM3");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=13VkeHpPGGQPIqSPylQHX1FBGaLpJ6kM3");
                     break;
                 case 7:
                     model.setIconId("complaint");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1bAZ6NAfVxFb1jPWqT8wIkPGaZ9ZObi3a");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1bAZ6NAfVxFb1jPWqT8wIkPGaZ9ZObi3a");
                     break;
                 case 2:
                     model.setIconId("leaving");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=181Xuew9SGy17KJ2x6wHeLJaRTBFkNHZg");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=181Xuew9SGy17KJ2x6wHeLJaRTBFkNHZg");
                     break;
                 case 6:
                     model.setIconId("payroll");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=14zSFk6qYhBHLINARDzWbv8IWG8_q8KAU");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=14zSFk6qYhBHLINARDzWbv8IWG8_q8KAU");
                     break;
                 case 4:
                     model.setIconId("personal");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=15q22GGIOOPY6wFgKumH-M88VDQ7sKUru");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=15q22GGIOOPY6wFgKumH-M88VDQ7sKUru");
                     break;
                 case 3:
                     model.setIconId("statistics");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1ASCBAWzpW2Gxr74Y2dNvkocaxKkxJ_iv");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1ASCBAWzpW2Gxr74Y2dNvkocaxKkxJ_iv");
                     break;
                 default:
                     model.setIconId("noti");
-                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1lwV3OFqdTDH3cFHt-cAruMVGN4SV6yTi");
+//                    model.setIconUrl("https://drive.google.com/uc?export=view&id=1lwV3OFqdTDH3cFHt-cAruMVGN4SV6yTi");
                     break;
             }
 

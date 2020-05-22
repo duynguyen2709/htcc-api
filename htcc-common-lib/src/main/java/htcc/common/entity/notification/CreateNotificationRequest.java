@@ -14,7 +14,6 @@ import java.io.Serializable;
     public String companyId = "";
     public String username  = "";
     public int    screenId  = 0;
-    public String click_action = "FLUTTER_NOTIFICATION_CLICK";
     public String title     = "";
     public String content   = "";
 }

@@ -1,11 +1,12 @@
 package htcc.log.service.component.kafka;
 
 import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.entity.notification.NotificationBuz;
 import htcc.common.entity.notification.NotificationModel;
 import htcc.common.service.kafka.BaseKafkaConsumer;
 import htcc.common.util.StringUtil;
-import htcc.log.service.repository.NotificationBuzRepository;
+import htcc.log.service.service.jpa.NotificationBuzService;
 import htcc.log.service.service.notification.NotificationService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,7 +25,7 @@ import java.util.List;
 public class EventChangeLogInStatusListener extends BaseKafkaConsumer<NotificationBuz> {
 
     @Autowired
-    private NotificationBuzRepository notificationBuzRepository;
+    private NotificationBuzService notificationBuzService;
 
     @Autowired
     private NotificationService notificationService;
@@ -49,9 +49,7 @@ public class EventChangeLogInStatusListener extends BaseKafkaConsumer<Notificati
 
     private void handleLogInEvent(NotificationBuz model) throws Exception {
         //
-        NotificationBuz oldEntity = notificationBuzRepository.findById(model.getKey())
-                .orElse(null);
-
+        NotificationBuz oldEntity = notificationBuzService.findById(model.getKey());
         if (oldEntity == null){
             // new user logged in
             // create data
@@ -74,7 +72,7 @@ public class EventChangeLogInStatusListener extends BaseKafkaConsumer<Notificati
         }
 
         model.setTokens(StringUtil.toJsonString(oldTokens));
-        model = notificationBuzRepository.save(model);
+        model = notificationBuzService.update(model);
 
         resendPendingNotification(model);
     }
@@ -104,18 +102,19 @@ public class EventChangeLogInStatusListener extends BaseKafkaConsumer<Notificati
     }
 
     private void createNewNotificationBuz(NotificationBuz model) throws Exception {
-        if (model.getTokens().isEmpty()){
-            throw new Exception(String.format("Token Push for user [%s - %s] is empty", model.getCompanyId(), model.getUsername()));
+        if (model.getClientId() == ClientSystemEnum.MOBILE.getValue()) {
+            if (model.getTokens().isEmpty()) {
+                throw new Exception(String.format("Token Push for user [%s - %s] is empty", model.getCompanyId(), model.getUsername()));
+            }
         }
         String token = StringUtil.toJsonString(Collections.singletonList(model.getTokens()));
         model.setTokens(token);
-        notificationBuzRepository.save(model);
+        notificationBuzService.create(model);
     }
 
     private void handleLogOutEvent(NotificationBuz model) throws Exception {
-        NotificationBuz oldEntity = notificationBuzRepository.findById(model.getKey())
-                .orElse(null);
 
+        NotificationBuz oldEntity = notificationBuzService.findById(model.getKey());
         if (oldEntity == null){
             throw new Exception("Can not find NotificationBuz: " + StringUtil.toJsonString(model));
         }
@@ -138,6 +137,6 @@ public class EventChangeLogInStatusListener extends BaseKafkaConsumer<Notificati
         }
 
         model.setTokens(StringUtil.toJsonString(oldTokens));
-        notificationBuzRepository.save(model);
+        notificationBuzService.update(model);
     }
 }
