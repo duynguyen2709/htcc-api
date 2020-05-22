@@ -45,4 +45,4 @@ kafka:
   buz:
     eventLoadIcon:
       topicName: EVENT-LOAD-ICON
-      groupId: EVENT-LOAD-ICON-LOG-PRODUCTION-1
+      groupId: EVENT-LOAD-ICON-LOG-PRODUCTION-2
