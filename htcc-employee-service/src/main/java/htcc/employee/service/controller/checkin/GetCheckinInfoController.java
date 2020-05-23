@@ -28,7 +28,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-@Api(tags = "API điểm danh", description = "API điểm danh của nhân viên") @RestController @Log4j2
+@Api(tags = "API điểm danh", description = "API điểm danh của nhân viên")
+@RestController
+@Log4j2
 public class GetCheckinInfoController {
 
     @Autowired

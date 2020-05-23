@@ -82,7 +82,7 @@ public class CheckInService {
             if (res == null ||
                     res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue() ||
                     res.getData() == null) {
-                return null;
+                throw new Exception();
             }
 
             String data = StringUtil.toJsonString(res.data);

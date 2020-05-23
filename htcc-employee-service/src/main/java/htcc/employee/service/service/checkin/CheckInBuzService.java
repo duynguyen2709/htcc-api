@@ -35,6 +35,14 @@ public class CheckInBuzService {
     @Autowired
     private WorkingDayService workingDayService;
 
+    public void onCheckInSuccess(CheckinModel model) {
+        if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
+            checkInService.setCheckInLog(model);
+        } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
+            checkInService.setCheckOutLog(model);
+        }
+    }
+
     public BaseResponse doCheckInBuz(CheckinModel model) throws Exception {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
 
@@ -140,14 +148,14 @@ public class CheckInBuzService {
                 break;
             case QR_CODE:
                 break;
-            case FORCE:
+            case FORM:
                 break;
             default:
                 break;
         }
         // TODO : Check ShiftTime
 
-        if (subType != CheckinSubTypeEnum.FORCE) {
+        if (subType != CheckinSubTypeEnum.FORM) {
             if (isOffThisSession(request)) {
                 return String.format("Hôm nay là ngày nghỉ của chi nhánh %s. Vui lòng thử lại sau.", request.getOfficeId());
             }

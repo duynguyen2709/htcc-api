@@ -6,7 +6,7 @@ public enum CheckinSubTypeEnum {
     LOCATION(1),
     IMAGE (2),
     QR_CODE (3),
-    FORCE (4),
+    FORM (4),
 
     ;
 

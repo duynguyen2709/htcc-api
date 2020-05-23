@@ -81,8 +81,8 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private String hasIpAddressAllow() {
-        String result = "";
-        List<String> ipAddresses = Arrays.asList(serviceConfig.getInternalServerIp().split(";"));
+        String   result      = "";
+        String[] ipAddresses = serviceConfig.getInternalServerIp().split(";");
         for (String ip : ipAddresses){
             result += String.format(" or hasIpAddress('%s')", ip);
         }

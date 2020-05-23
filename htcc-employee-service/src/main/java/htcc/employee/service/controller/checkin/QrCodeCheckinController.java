@@ -23,14 +23,14 @@ import javax.servlet.http.HttpServletRequest;
      description = "API điểm danh của nhân viên")
 @RestController
 @Log4j2
-public class LocationCheckinController {
+public class QrCodeCheckinController {
 
     @Autowired
     private CheckInBuzService checkInBuzService;
 
     @ApiOperation(value = "Điểm danh", response = BaseResponse.class)
-    @PostMapping("/checkin/location")
-    public BaseResponse checkinByLocation(@ApiParam(value = "[Body] Thông tin điểm danh vào", required = true)
+    @PostMapping("/checkin/qrcode")
+    public BaseResponse checkinByLocation(@ApiParam(value = "[Body] Thông tin điểm danh", required = true)
                                     @RequestBody CheckinRequest request,
                                 @ApiParam(hidden = true) HttpServletRequest httpServletRequest) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
@@ -43,7 +43,7 @@ public class LocationCheckinController {
         }
 
         CheckinModel model = new CheckinModel(request, now);
-        model.setSubType(CheckinSubTypeEnum.LOCATION.getValue());
+        model.setSubType(CheckinSubTypeEnum.QR_CODE.getValue());
 
         try {
             response = checkInBuzService.doCheckInBuz(model);

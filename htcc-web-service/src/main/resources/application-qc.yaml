@@ -1,0 +1,60 @@
+server:
+  port: 9634
+
+spring:
+  data:
+    cassandra:
+      contact-points: 10.50.1.6
+      port: 9042
+      username: cassandra
+      password: cassandra
+      keyspace-name: cps_bill_split_qc
+
+proxy:
+  host: 10.40.81.2
+  port: 8088
+  useProxy: false
+
+zalopay:
+  billsplit:
+    url: http://10.50.1.9:9790/cpsbillsplit
+  app:
+    tokenSecretKey: y9ypuMubA8ESe5A3y%ubAVE2ULAPUhu6ABYrYnaMA5AryVAMY2UVum
+    tokenExpiredTime: 86400000
+  service:
+    manager:
+      host: http://10.50.1.9:9609/cps-v2/api
+  login:
+    gotptype: ga
+    gotpurl: https://security.vng.com.vn/token-gateway/api/verify_otp/
+    isLocal: false
+  datasource:
+    admin:
+      jdbcUrl: jdbc:mysql://10.50.1.25:3307/zpCPSBillSplit_Admin
+      username: dbgtest
+      password: abc@123
+      driverClassName: com.mysql.jdbc.Driver
+      showSql: false
+      ddlAuto: none
+      dialect: org.hibernate.dialect.MySQLDialect
+      entityBasePackages: zp.cps.tool.admin.billsplit.db.jpa.mysql.admin.entity
+      repository: zp.cps.tool.admin.billsplit.db.jpa.mysql.admin.repository
+    tool:
+      jdbcUrl: jdbc:mysql://10.50.1.25:3307/zpCPSToolLog
+      username: dbgtest
+      password: abc@123
+      driverClassName: com.mysql.jdbc.Driver
+      showSql: false
+      ddlAuto: none
+      dialect: org.hibernate.dialect.MySQLDialect
+      entityBasePackages: none
+      repository: none
+    log:
+      jdbcUrl: jdbc:mysql://10.50.1.25:3307/zpCPSBillSplit_Log
+      username: dbgtest
+      password: abc@123
+      driverClassName: com.mysql.jdbc.Driver
+      showSql: false
+      ddlAuto: none
+      dialect: org.hibernate.dialect.MySQLDialect
+      schemaName: zpCPSBillSplit_Log

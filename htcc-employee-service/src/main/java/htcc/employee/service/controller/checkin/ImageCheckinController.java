@@ -31,9 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 public class ImageCheckinController {
 
     @Autowired
-    private CheckInService checkInService;
-
-    @Autowired
     private GoogleDriveService googleDriveService;
 
     @Autowired
@@ -66,7 +63,7 @@ public class ImageCheckinController {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Điểm danh thành công");
 
-        CheckinRequest request = new CheckinRequest(type, companyId, officeId,
+        CheckinRequest request = new CheckinRequest(type, "", companyId, officeId,
                 username, clientTime, latitude, longitude, usedWifi, ip);
 
         long now = System.currentTimeMillis();
@@ -91,11 +88,7 @@ public class ImageCheckinController {
             response = new BaseResponse<>(e);
         } finally {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
-                if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
-                    checkInService.setCheckInLog(model);
-                } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
-                    checkInService.setCheckOutLog(model);
-                }
+                checkInBuzService.onCheckInSuccess(model);
             }
 
             printRequestLogEntity(httpServletRequest, response, model, now);
