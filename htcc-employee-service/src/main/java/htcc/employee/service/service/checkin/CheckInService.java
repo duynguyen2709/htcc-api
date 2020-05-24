@@ -93,4 +93,12 @@ public class CheckInService {
             return null;
         }
     }
+
+    public void setSucceedQrCheckin(String qrCodeId) {
+        redisService.setUsedQrCheckInCode(qrCodeId);
+    }
+
+    public boolean isQrCodeUsed(String qrCodeId) {
+        return !redisService.getUsedQrCheckInCode(qrCodeId).isEmpty();
+    }
 }

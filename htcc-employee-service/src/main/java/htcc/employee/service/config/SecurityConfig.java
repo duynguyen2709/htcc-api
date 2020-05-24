@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class SecurityConfig {
 
     public InMemoryUser user;
-    public boolean enableQrGenSecurity = false;
+    public String hashKey = "";
 
     @Data
     public static class InMemoryUser {

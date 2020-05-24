@@ -29,6 +29,9 @@ public class CheckOutLogRowMapper implements RowMapper<CheckOutLogEntity> {
         entity.usedWifi = rs.getInt("usedWifi") == 1;
         entity.ip = rs.getString("ip");
         entity.image = rs.getString("image");
+        entity.reason = rs.getString("reason");
+        entity.approver = rs.getString("approver");
+        entity.status = rs.getInt("status");
 
         return entity;
     }

@@ -8,12 +8,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "qrcode")
 public class QrCodeConfig {
-    public boolean genSig      = false;
     public boolean loadFromConfig = true;
-    public String  hashKey     = "";
-    public String  companyId   = "";
-    public String  officeId    = "";
-
-    public String baseUrl = "";
-    public String methodName = "";
+    public String  hashKey        = "";
+    public String  companyId      = "";
+    public String  officeId       = "";
+    public String  baseUrl        = "";
+    public String  methodName     = "";
 }

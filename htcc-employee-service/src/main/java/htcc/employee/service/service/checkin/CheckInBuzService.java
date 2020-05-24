@@ -41,6 +41,10 @@ public class CheckInBuzService {
         } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
             checkInService.setCheckOutLog(model);
         }
+
+        if (model.getSubType() == CheckinSubTypeEnum.QR_CODE.getValue()) {
+            checkInService.setSucceedQrCheckin(model.getQrCodeId());
+        }
     }
 
     public BaseResponse doCheckInBuz(CheckinModel model) throws Exception {
@@ -80,6 +84,19 @@ public class CheckInBuzService {
         CompletableFuture<List<CheckinModel>> checkoutData = checkInService.getCheckOutLog(model.companyId, model.username, model.date);
         CompletableFuture.allOf(checkinData, checkoutData).join();
 
+        // for QrCode specific
+        if (model.getSubType() == CheckinSubTypeEnum.QR_CODE.getValue()) {
+            int type = 0;
+            if (checkinData.get() == null || checkinData.get().isEmpty()
+                    || checkinData.get().size() == checkoutData.get().size()) {
+                type = 1;
+            } else {
+                type = 2;
+            }
+
+            model.setType(type);
+        }
+
         if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
             if (checkinData.get().size() > checkoutData.get().size()){
                 response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKOUT);
@@ -104,8 +121,11 @@ public class CheckInBuzService {
     /** Description : get valid checkin time & location base on office & shift time
      * @param model
      */
-    private void setValidTimeAndLocation(CheckinModel model) {
+    private void setValidTimeAndLocation(CheckinModel model) throws Exception {
         Office office = DbStaticConfigMap.OFFICE_MAP.get(model.getCompanyId() + "_" + model.getOfficeId());
+        if (office == null) {
+            throw new Exception("Office is null, model = " + StringUtil.toJsonString(model));
+        }
         model.setOfficeId(String.format("%s - %s", office.getOfficeId(), office.getOfficeName()));
         model.setValidLatitude(office.getLatitude());
         model.setValidLongitude(office.getLongitude());
@@ -147,6 +167,21 @@ public class CheckInBuzService {
             case IMAGE:
                 break;
             case QR_CODE:
+                String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+                if (!request.getDate().equals(today)) {
+                    return "Thời gian điểm danh không hợp lệ. Vui lòng thực hiện lại";
+                }
+
+                // add extra 5 second for request network time from client to server
+                if (request.getServerTime() - request.getClientTime() > 5 * 60 * 1000 + 5 * 1000) {
+                    return "Mã QR đã hết hạn. Vui lòng thực hiện lại";
+                }
+
+                if (checkInService.isQrCodeUsed(request.getQrCodeId())) {
+                    log.error("\n### QrCodeId [{}] had been used", request.getQrCodeId());
+                    return "Mã QR đã được sử dụng. Vui lòng thực hiện lại";
+                }
+
                 break;
             case FORM:
                 break;

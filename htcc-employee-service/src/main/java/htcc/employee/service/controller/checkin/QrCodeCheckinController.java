@@ -1,5 +1,6 @@
 package htcc.employee.service.controller.checkin;
 
+import htcc.common.component.redis.RedisService;
 import htcc.common.constant.CheckinSubTypeEnum;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
@@ -28,13 +29,22 @@ public class QrCodeCheckinController {
     @Autowired
     private CheckInBuzService checkInBuzService;
 
+    @Autowired
+    private RedisService redis;
+
     @ApiOperation(value = "Điểm danh", response = BaseResponse.class)
     @PostMapping("/checkin/qrcode")
-    public BaseResponse checkinByLocation(@ApiParam(value = "[Body] Thông tin điểm danh", required = true)
+    public BaseResponse checkInByQrCode(@ApiParam(value = "[Body] Thông tin điểm danh", required = true)
                                     @RequestBody CheckinRequest request,
                                 @ApiParam(hidden = true) HttpServletRequest httpServletRequest) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Điểm danh thành công");
+
+        if (StringUtil.isEmpty(request.getQrCodeId())) {
+            response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
+            response.setReturnMessage("Mã QR điểm danh không hợp lệ");
+            return response;
+        }
 
         long now = System.currentTimeMillis();
         Object requestTime = httpServletRequest.getAttribute(Constant.REQUEST_TIME);
@@ -44,20 +54,28 @@ public class QrCodeCheckinController {
 
         CheckinModel model = new CheckinModel(request, now);
         model.setSubType(CheckinSubTypeEnum.QR_CODE.getValue());
+        model.setQrCodeId(request.getQrCodeId());
+        model.setStatus(1);
 
         try {
+            if (!redis.lock(model.getQrCodeId())) {
+                throw new Exception("Redis lock failed ! key = " + model.getQrCodeId());
+            }
+
             response = checkInBuzService.doCheckInBuz(model);
             if (response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
                 return response;
             }
 
         } catch (Exception e){
-            log.error(String.format("checkinByLocation [%s] ex", StringUtil.toJsonString(request)), e);
+            log.error(String.format("[checkInByQrCode] [%s] ex", StringUtil.toJsonString(model)), e);
             response = new BaseResponse<>(e);
         } finally {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
                 checkInBuzService.onCheckInSuccess(model);
             }
+
+            redis.unlock(model.getQrCodeId());
         }
         return response;
     }

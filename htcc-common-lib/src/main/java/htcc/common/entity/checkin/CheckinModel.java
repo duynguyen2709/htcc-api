@@ -24,6 +24,14 @@ public class CheckinModel implements Serializable {
     @NotEmpty
     private String requestId = LoggingConfiguration.getTraceId();
 
+    public String qrCodeId = "";
+
+    public String reason = "";
+
+    public String approver = "";
+
+    public int status = 1;
+
     @NotEmpty
     public String checkInId = "";
 
@@ -95,16 +103,18 @@ public class CheckinModel implements Serializable {
             return "Tên người dùng không được rỗng";
         }
 
-        if (StringUtil.valueOf(date).isEmpty()) {
-            return String.format("Thời gian gửi request [%s] không hợp lệ", this.clientTime);
+        if (CheckinSubTypeEnum.fromInt(subType) == null){
+            return "Cách thức điểm danh không hợp lệ";
         }
 
-        if (CheckinTypeEnum.fromInt(type) == null) {
+        if (subType != CheckinSubTypeEnum.QR_CODE.getValue() &&
+                CheckinTypeEnum.fromInt(type) == null) {
             return "Loại điểm danh không hợp lệ";
         }
 
-        if (CheckinSubTypeEnum.fromInt(subType) == null){
-            return "Cách thức điểm danh không hợp lệ";
+        if (subType == CheckinSubTypeEnum.FORM.getValue() &&
+                StringUtil.isEmpty(reason)) {
+            return "Lý do không được rỗng";
         }
 
         if (usedWifi && !StringUtil.isIPAddress(StringUtil.valueOf(ip))) {
@@ -130,6 +140,7 @@ public class CheckinModel implements Serializable {
         this.image = StringUtil.EMPTY;
         this.serverTime = serverTime;
         this.date = DateTimeUtil.parseTimestampToString(this.clientTime,"yyyyMMdd");
+        this.reason = (request.reason == null) ? StringUtil.EMPTY : request.reason;
 
         this.checkInId = String.format("%s-%s-%s-%s-%s",
                 (this.type == CheckinTypeEnum.CHECKIN.getValue() ? "CheckIn" : "CheckOut"),
@@ -157,6 +168,9 @@ public class CheckinModel implements Serializable {
         this.image = model.image;
         this.serverTime = model.serverTime;
         this.date = DateTimeUtil.parseTimestampToString(this.clientTime,"yyyyMMdd");
+        this.reason = model.reason;
+        this.status = model.status;
+        this.approver = model.approver;
     }
 
     public CheckinModel(CheckOutLogEntity model) {
@@ -180,5 +194,8 @@ public class CheckinModel implements Serializable {
         this.image = model.image;
         this.serverTime = model.serverTime;
         this.date = DateTimeUtil.parseTimestampToString(this.clientTime,"yyyyMMdd");
+        this.reason = model.reason;
+        this.status = model.status;
+        this.approver = model.approver;
     }
 }

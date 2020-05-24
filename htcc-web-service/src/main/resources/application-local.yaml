@@ -1,8 +1,7 @@
 qrcode:
-  genSig: false
   hashKey: admin
-  loadFromConfig: true
+  loadFromConfig: false
   companyId: VNG
   officeId: CAMPUS
-  baseUrl: http://localhost:8200
+  baseUrl: http://localhost:8761/api/employee
   methodName: /public/genqrcode

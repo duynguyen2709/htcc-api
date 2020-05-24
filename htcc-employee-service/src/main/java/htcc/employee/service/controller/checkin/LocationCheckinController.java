@@ -30,7 +30,7 @@ public class LocationCheckinController {
 
     @ApiOperation(value = "Điểm danh", response = BaseResponse.class)
     @PostMapping("/checkin/location")
-    public BaseResponse checkinByLocation(@ApiParam(value = "[Body] Thông tin điểm danh vào", required = true)
+    public BaseResponse checkInByLocation(@ApiParam(value = "[Body] Thông tin điểm danh vào", required = true)
                                     @RequestBody CheckinRequest request,
                                 @ApiParam(hidden = true) HttpServletRequest httpServletRequest) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
@@ -44,6 +44,7 @@ public class LocationCheckinController {
 
         CheckinModel model = new CheckinModel(request, now);
         model.setSubType(CheckinSubTypeEnum.LOCATION.getValue());
+        model.setStatus(1);
 
         try {
             response = checkInBuzService.doCheckInBuz(model);
@@ -52,7 +53,7 @@ public class LocationCheckinController {
             }
 
         } catch (Exception e){
-            log.error(String.format("checkinByLocation [%s] ex", StringUtil.toJsonString(request)), e);
+            log.error(String.format("[checkInByLocation] [%s] ex", StringUtil.toJsonString(model)), e);
             response = new BaseResponse<>(e);
         } finally {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {

@@ -4,15 +4,16 @@ import htcc.common.component.LoggingConfiguration;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.qrcode.QrCodeCheckinEntity;
+import htcc.common.util.StringUtil;
 import htcc.employee.service.config.SecurityConfig;
-import io.swagger.annotations.Api;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
-@Api(tags = "API tạo QR điểm danh cho công ty")
+@ApiIgnore
 @RestController
 @Log4j2
 public class GenerateQrCodeController {
@@ -21,8 +22,9 @@ public class GenerateQrCodeController {
     private SecurityConfig securityConfig;
 
     @GetMapping("/public/genqrcode")
-    public BaseResponse generateQrCode(@RequestParam String companyId, @RequestParam String officeId,
-                                       @RequestParam(required = false) String sig) {
+    public BaseResponse generateQrCode(@RequestParam String companyId,
+                                       @RequestParam String officeId,
+                                       @RequestParam String sig) {
         BaseResponse<QrCodeCheckinEntity> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             if (!validateSig(companyId, officeId, sig)) {
@@ -48,11 +50,18 @@ public class GenerateQrCodeController {
         return response;
     }
 
-    private boolean validateSig(String companyId, String officeId, String sig) {
-        if (!securityConfig.isEnableQrGenSecurity()) {
-            return true;
+    private boolean validateSig(String companyId, String officeId, String sig) throws Exception {
+        if (StringUtil.isEmpty(sig)) {
+            throw new Exception("clientSig is empty");
         }
 
-        return false;
+        String serverSig = StringUtil.hashSHA256(String.format("%s|%s|%s",
+                companyId, officeId, securityConfig.getHashKey()));
+
+        if (!serverSig.equals(sig)) {
+            log.error("\nserverSig [{}] != clientSig [{}]\n", serverSig, sig);
+        }
+
+        return serverSig.equals(sig);
     }
 }

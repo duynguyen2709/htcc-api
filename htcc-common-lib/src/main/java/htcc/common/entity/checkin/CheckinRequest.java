@@ -27,6 +27,10 @@ public class CheckinRequest implements Serializable {
                       example = "VNG-CAMPUS-123")
     public String qrCodeId = "";
 
+    @ApiModelProperty(notes = "Lý do dùng form điểm danh",
+                      example = "Quên điểm danh vào")
+    public String reason = "";
+
     @ApiModelProperty(notes = "Mã công ty",
                       example = "VNG")
     @NotEmpty

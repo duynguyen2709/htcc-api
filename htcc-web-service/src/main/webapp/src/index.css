@@ -24,11 +24,11 @@ code {
 .countdown {
   position: fixed;
   left: 50%;
-  bottom: 30%;
+  bottom: 20%;
   transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
+  font-size: 25px;
 }
-
 
 #notfound {
   position: relative;
@@ -81,10 +81,10 @@ code {
 .notfound h2 {
   font-family: 'Maven Pro', sans-serif;
   font-size: 40px;
-  color: #000;
+  color: #d9534f;
   font-weight: 900;
   text-transform: uppercase;
-  margin: 0px;
+  margin: 0;
 }
 
 .notfound p {
@@ -92,7 +92,7 @@ code {
   font-size: 16px;
   color: #000;
   font-weight: 400;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
   margin-top: 15px;
 }
 

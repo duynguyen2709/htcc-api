@@ -15,6 +15,8 @@ public class RedisBuzConfig {
     public String checkinFormat = "CHECKIN-%s-%s-%s"; // companyId-username-date
     public String checkoutFormat = "CHECKOUT-%s-%s-%s"; // companyId-username-date
 
+    public String qrCodeCheckInFormat = "QR-CHECKIN-%s"; // qrCodeId
+
     // for special case when blocking:
     // user A was blocked by company B
     // System admin block all account of company B

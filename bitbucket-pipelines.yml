@@ -39,6 +39,33 @@ pipelines:
             - sleep 120
             - scp -P 22 -r ../htcc-$service-service/src/main/resources/ root@108.61.162.225:/home/htcc-api/htcc-$service-service
             - ssh root@108.61.162.225 "cd /home/htcc-api/htcc-$service-service/;./$service.sh"
+    deploy-web-service:
+      - variables:
+          - name: service
+      - step:
+          name: Build Common Lib
+          caches:
+            - maven
+          script:
+            - mvn -B clean install
+          artifacts:
+            - '**/target/*.jar'
+      - step:
+          name: Build Docker Image
+          script:
+            - cd htcc-web-service/
+            - docker build -t duyna5/htcc-web-service .
+            - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+            - docker push duyna5/htcc-web-service:latest
+      - step:
+          name: Deploy
+          script:
+            - mkdir -p ~/.ssh
+            - cd ssh/
+            - cat my_known_hosts >> ~/.ssh/known_hosts
+            - (umask  077 ; echo $KEY_DEV_1 | base64 --decode > ~/.ssh/id_rsa)
+            - scp -P 22 -r ../htcc-web-service/src/main/resources/ root@108.61.162.225:/home/htcc-api/htcc-web-service
+            - ssh root@108.61.162.225 "cd /home/htcc-api/htcc-web-service/;./web.sh"
     deploy-employee-and-log:
       - step:
           name: Build Common Lib

@@ -2,10 +2,10 @@ server:
   port: 8200
 
 security:
-  enableQrGenSecurity: false
   user:
     name: admin
     password: admin
+  hashKey: ${security.user.password}
 
 eureka:
   client:
