@@ -40,8 +40,6 @@ pipelines:
             - scp -P 22 -r ../htcc-$service-service/src/main/resources/ root@108.61.162.225:/home/htcc-api/htcc-$service-service
             - ssh root@108.61.162.225 "cd /home/htcc-api/htcc-$service-service/;./$service.sh"
     deploy-web-service:
-      - variables:
-          - name: service
       - step:
           name: Build Common Lib
           caches:

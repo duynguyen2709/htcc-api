@@ -37,11 +37,6 @@ public class Main {
 		return new BufferedImageHttpMessageConverter();
 	}
 
-		@Bean
-		public RestTemplate restTemplate(RestTemplateBuilder builder) {
-			return builder.build();
-		}
-
 	public static void main(String[] args) {
 		SpringApplication.run(Main.class, args);
 	}

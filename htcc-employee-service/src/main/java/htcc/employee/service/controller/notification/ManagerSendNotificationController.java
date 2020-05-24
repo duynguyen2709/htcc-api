@@ -4,6 +4,7 @@ import htcc.common.constant.NotificationReceiverSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.notification.ManagerGetNotificationResponse;
 import htcc.common.entity.notification.ManagerSendNotificationRequest;
 import htcc.common.entity.notification.NotificationModel;
 import htcc.common.util.DateTimeUtil;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "Notification API",
      description = "API gửi thông báo")
@@ -89,12 +91,12 @@ public class ManagerSendNotificationController {
     }
 
 
-    @ApiOperation(value = "Lấy danh sách thông báo đã gửi theo ngày", response = NotificationModel.class)
+    @ApiOperation(value = "Lấy danh sách thông báo đã gửi theo ngày", response = ManagerGetNotificationResponse.class)
     @GetMapping("/notifications/manager/{companyId}/{username}/{yyyyMMdd}")
     public BaseResponse getListNotification(@PathVariable String companyId,
                                             @PathVariable String username,
                                             @PathVariable String yyyyMMdd) {
-        BaseResponse<List<NotificationModel>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        BaseResponse<List<ManagerGetNotificationResponse>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             if (!DateTimeUtil.isRightFormat(yyyyMMdd, "yyyyMMdd")) {
                 response = new BaseResponse<>(ReturnCodeEnum.DATE_WRONG_FORMAT);
@@ -102,7 +104,7 @@ public class ManagerSendNotificationController {
                 return response;
             }
 
-            List<NotificationModel> dataResponse = new ArrayList<>();
+            List<NotificationModel> modelList = new ArrayList<>();
 
             List<String> listSender = new ArrayList<>();
 
@@ -126,8 +128,12 @@ public class ManagerSendNotificationController {
                 if (listNoti == null) {
                     throw new Exception("notificationService.getListNotification return null for sender " + sender);
                 }
-                dataResponse.addAll(listNoti);
+                modelList.addAll(listNoti);
             }
+
+            List<ManagerGetNotificationResponse> dataResponse = modelList.stream()
+                    .map(ManagerGetNotificationResponse::new)
+                    .collect(Collectors.toList());
 
             response.setData(dataResponse);
             return response;
