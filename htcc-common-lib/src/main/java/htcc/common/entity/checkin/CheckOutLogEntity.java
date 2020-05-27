@@ -47,7 +47,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
         this.clientTime = model.clientTime;
         this.serverTime = model.serverTime;
         this.validTime = model.validTime;
-        this.isOnTime = DateTimeUtil.isAfter(this.clientTime + 2 * 60 * 1000 + 1, this.validTime);
+        this.isOnTime = model.isOnTime;
         this.validLatitude = model.validLatitude;
         this.validLongitude = model.validLongitude;
         this.latitude = model.latitude;
@@ -64,6 +64,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
     public Map<String, Object> getParamsMap() {
         Map<String, Object> params = new HashMap<>();
         params.put("requestId", this.requestId);
+        params.put("checkInId", this.checkInId);
         params.put("subType", this.subType);
         params.put("companyId", this.companyId);
         params.put("officeId", this.officeId);
