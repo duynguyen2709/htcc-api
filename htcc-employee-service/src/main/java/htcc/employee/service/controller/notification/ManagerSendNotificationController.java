@@ -138,7 +138,7 @@ public class ManagerSendNotificationController {
                     if (receiver == null) {
                         receiverMap.put(c.getUsername(), "");
                     } else {
-                        receiverMap.put(c.getUsername(), c.getFullName());
+                        receiverMap.put(c.getUsername(), receiver.getFullName());
                     }
                 }
 
