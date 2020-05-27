@@ -14,6 +14,7 @@ public class ManagerGetNotificationResponse implements Serializable {
     public String sender            = "";
     public String officeId          = "";
     public String username          = "";
+    public String fullName          = "";
     public long   sendTime          = 0L;
     public String title             = "";
     public String content           = "";

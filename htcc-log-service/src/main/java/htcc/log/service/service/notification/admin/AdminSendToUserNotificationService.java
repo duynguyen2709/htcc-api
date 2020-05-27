@@ -1,6 +1,7 @@
 package htcc.log.service.service.notification.admin;
 
 import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.entity.notification.AdminSendNotificationRequest;
 import htcc.common.entity.notification.NotificationBuz;
 import htcc.common.entity.notification.NotificationModel;
@@ -42,7 +43,8 @@ public class AdminSendToUserNotificationService implements AdminSendNotification
             model.setUsername(notificationBuz.getUsername());
             model.setTargetClientId(notificationBuz.getClientId());
             model.setSendTime(now);
-            model.setNotiId(String.format("%s_%s", yyyyMMdd, now));
+            model.setNotiId(String.format("%s-%s-%s-%s-%s%s", yyyyMMdd, ClientSystemEnum.ADMIN_WEB.getValue(),
+                    notificationBuz.getClientId(), notificationBuz.getCompanyId(), notificationBuz.getUsername(), now));
 
             kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
 

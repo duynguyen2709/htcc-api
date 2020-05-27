@@ -2,6 +2,7 @@ package htcc.employee.service.service.notification;
 
 import com.google.gson.reflect.TypeToken;
 import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.NotificationReceiverSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
@@ -84,7 +85,8 @@ public class NotificationService {
             model.setOfficeId(employee.getOfficeId());
             model.setUsername(employee.getUsername());
             model.setSendTime(now);
-            model.setNotiId(String.format("%s_%s", yyyyMMdd, now));
+            model.setNotiId(String.format("%s-%s-%s-%s-%s%s", yyyyMMdd, ClientSystemEnum.MANAGER_WEB.getValue(),
+                    ClientSystemEnum.MOBILE.getValue(), model.getCompanyId(), model.getUsername(), now));
 
             sendNotification(model);
         }
