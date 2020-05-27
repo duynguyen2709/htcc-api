@@ -105,36 +105,20 @@ public class ManagerSendNotificationController {
                 return response;
             }
 
+
+            List<String> listSender = getListSenderByPermission(companyId, username);
+
             List<NotificationModel> modelList = new ArrayList<>();
-            Map<String, String>     senderMap = new HashMap<>();
 
-            // TODO : GET ALL NOTI SEND TO SAME OFFICE
-
-            // super admin has permission to view all notifications send by others
-            if (permissionRepo.isSuperAdmin(companyId, username)) {
-                List<EmployeeInfo> employeeList = employeeInfoService.findByCompanyId(companyId);
-                if (employeeList == null) {
-                    throw new Exception("employeeInfoService.findByCompanyId return null");
-                }
-
-                employeeList.forEach(c -> senderMap.put(c.getUsername(), c.getFullName()));
-            }
-            else {
-                EmployeeInfo currentUser = employeeInfoService.findById(new EmployeeInfo.Key(companyId, username));
-                if (currentUser == null) {
-                    throw new Exception("employeeInfoService.findById return null");
-                }
-                senderMap.put(username, currentUser.getFullName());
-            }
-
-            for (String sender : senderMap.keySet()) {
-                List<NotificationModel> listNoti =
-                        notificationService.getListNotificationForManager(companyId, sender, yyyyMMdd);
+            for (String sender : listSender) {
+                List<NotificationModel> listNoti = notificationService.getListNotificationForManager(companyId, sender, yyyyMMdd);
                 if (listNoti == null) {
                     throw new Exception("notificationService.getListNotification return null for sender " + sender);
                 }
                 modelList.addAll(listNoti);
             }
+
+            Map<String, String> receiverMap = new HashMap<>();
 
             List<ManagerGetNotificationResponse> dataResponse =
                     modelList.stream()
@@ -147,7 +131,19 @@ public class ManagerSendNotificationController {
                             .collect(Collectors.toList());
 
             dataResponse = filterDataResponse(dataResponse, index, size);
-            dataResponse.forEach(c -> c.setFullName(senderMap.getOrDefault(c.getUsername(), "")));
+
+            dataResponse.forEach(c -> {
+                if (!receiverMap.containsKey(c.getUsername())) {
+                    EmployeeInfo receiver = employeeInfoService.findById(new EmployeeInfo.Key(companyId, c.getUsername()));
+                    if (receiver == null) {
+                        receiverMap.put(c.getUsername(), "");
+                    } else {
+                        receiverMap.put(c.getUsername(), c.getFullName());
+                    }
+                }
+
+                c.setFullName(receiverMap.get(c.getUsername()));
+            });
             response.setData(dataResponse);
             return response;
 
@@ -156,6 +152,37 @@ public class ManagerSendNotificationController {
             response = new BaseResponse<>(e);
         }
         return response;
+    }
+
+    private List<String> getListSenderByPermission(String companyId, String username) throws Exception {
+        EmployeeInfo currentUser = employeeInfoService.findById(new EmployeeInfo.Key(companyId, username));
+        if (currentUser == null) {
+            throw new Exception("employeeInfoService.findById return null");
+        }
+
+        List<String> listSender = new ArrayList<>();
+
+        // super admin has permission to view all notifications send by others
+        if (permissionRepo.isSuperAdmin(companyId, username)) {
+            List<EmployeeInfo> employeeList = employeeInfoService.findByCompanyId(companyId);
+            if (employeeList == null) {
+                throw new Exception("employeeInfoService.findByCompanyId return null");
+            }
+
+            employeeList.forEach(c -> listSender.add(c.getUsername()));
+        }
+        else if (permissionRepo.canManageOffice(companyId, username, currentUser.getOfficeId())) {
+            List<EmployeeInfo> employeeList = employeeInfoService.findByCompanyIdAndOfficeId(companyId, currentUser.getOfficeId());
+            if (employeeList == null) {
+                throw new Exception("employeeInfoService.findByCompanyId return null");
+            }
+
+            employeeList.forEach(c -> listSender.add(c.getUsername()));
+        }
+        else {
+            listSender.add(username);
+        }
+        return listSender;
     }
 
     private List<ManagerGetNotificationResponse> filterDataResponse(List<ManagerGetNotificationResponse> dataResponse,
