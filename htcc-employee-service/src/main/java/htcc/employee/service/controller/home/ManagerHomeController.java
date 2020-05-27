@@ -71,7 +71,7 @@ public class ManagerHomeController {
     private void setIsSuperAdmin(ManagerHomeResponse data, String companyId, String username) {
         try {
             boolean isSuperAdmin = permissionRepo.isSuperAdmin(companyId, username);
-            data.setSuperAdmin(isSuperAdmin);
+            data.setIsSuperAdmin(isSuperAdmin);
         } catch (Exception e){
             log.error("[setIsSuperAdmin] [{} - {}]", companyId, username, e);
         }
