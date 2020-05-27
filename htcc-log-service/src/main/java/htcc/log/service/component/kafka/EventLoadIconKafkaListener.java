@@ -2,10 +2,8 @@ package htcc.log.service.component.kafka;
 
 import com.google.gson.reflect.TypeToken;
 import htcc.common.entity.icon.NotificationIconConfig;
-import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.service.kafka.BaseKafkaConsumer;
 import htcc.common.util.StringUtil;
-import htcc.log.service.repository.BaseLogDAO;
 import htcc.log.service.service.icon.IconService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

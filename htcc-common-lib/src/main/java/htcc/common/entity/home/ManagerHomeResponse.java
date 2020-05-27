@@ -39,7 +39,7 @@ public class ManagerHomeResponse implements Serializable {
     public List<EmployeeInfo> canManageEmployees = new ArrayList<>();
 
     @ApiModelProperty(notes = "Có phải quản lý tổng hay không")
-    public boolean isSuperAdmin = false;
+    public Boolean isSuperAdmin = false;
 
     @ApiModelProperty(notes = "Danh sách icon (cho notification)")
     public List<NotificationIconConfig> iconList = new ArrayList<>();

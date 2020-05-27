@@ -95,7 +95,9 @@ public class ManagerSendNotificationController {
     @GetMapping("/notifications/manager/{companyId}/{username}/{yyyyMMdd}")
     public BaseResponse getListNotification(@PathVariable String companyId,
                                             @PathVariable String username,
-                                            @PathVariable String yyyyMMdd) {
+                                            @PathVariable String yyyyMMdd,
+                                            @RequestParam(required = true, defaultValue = "0") int index,
+                                            @RequestParam(required = false, defaultValue = "0") Integer size ) {
         BaseResponse<List<ManagerGetNotificationResponse>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             if (!DateTimeUtil.isRightFormat(yyyyMMdd, "yyyyMMdd")) {
@@ -124,7 +126,7 @@ public class ManagerSendNotificationController {
             }
 
             for (String sender : listSender) {
-                List<NotificationModel> listNoti = notificationService.getListNotificationForManager(companyId, username, yyyyMMdd);
+                List<NotificationModel> listNoti = notificationService.getListNotificationForManager(companyId, sender, yyyyMMdd);
                 if (listNoti == null) {
                     throw new Exception("notificationService.getListNotification return null for sender " + sender);
                 }
@@ -135,6 +137,7 @@ public class ManagerSendNotificationController {
                     .map(ManagerGetNotificationResponse::new)
                     .collect(Collectors.toList());
 
+            filterDataResponse(dataResponse, index, size);
             response.setData(dataResponse);
             return response;
 
@@ -143,5 +146,24 @@ public class ManagerSendNotificationController {
             response = new BaseResponse<>(e);
         }
         return response;
+    }
+
+    private void filterDataResponse(List<ManagerGetNotificationResponse> dataResponse, int index, Integer size) {
+        if (size == null || size == 0){
+            size = 20;
+        }
+
+        int startIndex = size * index;
+        if (startIndex >= dataResponse.size()) {
+            // reach end of list
+            dataResponse = new ArrayList<>();
+        } else {
+            // normal case
+            int endIndex = size * (index + 1);
+            if (endIndex > dataResponse.size()) {
+                endIndex = dataResponse.size();
+            }
+            dataResponse = dataResponse.subList(startIndex, endIndex);
+        }
     }
 }

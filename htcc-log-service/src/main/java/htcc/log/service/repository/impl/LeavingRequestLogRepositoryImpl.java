@@ -2,8 +2,8 @@ package htcc.log.service.repository.impl;
 
 import com.zaxxer.hikari.HikariDataSource;
 import htcc.common.constant.ComplaintStatusEnum;
-import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import htcc.common.entity.leavingrequest.LeavingRequestLogEntity;
+import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.mapper.LeavingRequestLogRowMapper;

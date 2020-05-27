@@ -1,8 +1,8 @@
 package htcc.log.service.component.kafka;
 
+import htcc.common.entity.leavingrequest.LeavingRequestLogEntity;
 import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
-import htcc.common.entity.leavingrequest.LeavingRequestLogEntity;
 import htcc.common.service.kafka.BaseKafkaConsumer;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;

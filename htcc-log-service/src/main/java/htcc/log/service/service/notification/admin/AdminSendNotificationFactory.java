@@ -1,6 +1,5 @@
 package htcc.log.service.service.notification.admin;
 
-import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.NotificationReceiverSystemEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

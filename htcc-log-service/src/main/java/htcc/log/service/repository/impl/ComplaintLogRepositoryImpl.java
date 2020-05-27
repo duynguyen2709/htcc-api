@@ -1,8 +1,8 @@
 package htcc.log.service.repository.impl;
 
 import htcc.common.constant.ComplaintStatusEnum;
-import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.entity.complaint.ComplaintLogEntity;
+import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.mapper.ComplaintLogRowMapper;
