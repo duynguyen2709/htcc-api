@@ -80,14 +80,14 @@ public class ShiftArrangementService {
     }
 
     public BaseResponse insertShiftArrangement(ShiftArrangementRequest request) {
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        BaseResponse<Long> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Xếp ca thành công");
 
         ShiftTime shiftTime = shiftTimeService.findById(
                 new ShiftTime.Key(request.getCompanyId(), request.getOfficeId(), request.getShiftId()));
 
         if (shiftTime == null) {
-            response = new BaseResponse(ReturnCodeEnum.DATA_NOT_FOUND);
+            response = new BaseResponse<>(ReturnCodeEnum.DATA_NOT_FOUND);
             response.setReturnMessage(String.format("Không tìm thấy ca %s", request.getShiftId()));
             return response;
         }
@@ -128,7 +128,8 @@ public class ShiftArrangementService {
 
                 BaseResponse logResponse = logService.insertShiftArrangement(model);
                 if (logResponse != null && logResponse.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
-                    logResponse.setData(fixedShiftArrangement.getId());
+                    response.setData((long) fixedShiftArrangement.getId());
+                    return response;
                 }
 
                 return logResponse;
