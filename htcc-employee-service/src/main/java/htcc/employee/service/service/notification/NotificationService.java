@@ -50,7 +50,7 @@ public class NotificationService {
         return parseResponse(logService.getNotificationLogForManager(companyId, username, yyyyMMdd));
     }
 
-    @Async
+    @Async("asyncExecutor")
     public void managerSendNotification(ManagerSendNotificationRequest request) {
         List<EmployeeInfo> employeeInfoList = null;
 
@@ -111,7 +111,7 @@ public class NotificationService {
         }
     }
 
-    @Async
+    @Async("asyncExecutor")
     public void updateNotificationHasReadStatus(UpdateNotificationReadStatusModel model){
         kafka.sendMessage(kafka.getBuzConfig().getEventReadNotification().getTopicName(), model);
     }

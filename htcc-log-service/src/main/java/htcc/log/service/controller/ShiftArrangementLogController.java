@@ -86,15 +86,15 @@ public class ShiftArrangementLogController {
 
     @PostMapping("/shifts")
     public BaseResponse insertShiftArrangement(@RequestBody ShiftArrangementModel request){
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        BaseResponse<Long> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Xếp ca thành công");
         try {
             ShiftArrangementLogEntity logEntity = new ShiftArrangementLogEntity(request);
-
-            int result = logDAO.insertLog(logEntity);
-            if (result != 1) {
-                throw new Exception("logDAO.insertLog result = " + result);
+            long id = logDAO.insertLog(logEntity);
+            if (id == -1) {
+                throw new Exception("logDAO.insertLog error");
             }
+            response.setData(id);
         } catch (Exception e) {
             log.error(String.format("[insertShiftArrangement] [%s] ex", StringUtil.toJsonString(request)), e);
             return new BaseResponse(e);

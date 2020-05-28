@@ -99,7 +99,7 @@ public class ShiftArrangementService {
             return logService.insertShiftArrangement(model);
         }
         else if (request.getType() == ShiftArrangementTypeEnum.FIXED.getValue()) {
-            fixedShiftArrangementService.create(new FixedShiftArrangement(request));
+            FixedShiftArrangement fixedShiftArrangement = fixedShiftArrangementService.create(new FixedShiftArrangement(request));
 
             long now = System.currentTimeMillis();
             String yyyyMMdd = DateTimeUtil.parseTimestampToString(now, "yyyyMMdd");
@@ -121,7 +121,12 @@ public class ShiftArrangementService {
                         model.getArrangeDate(), model.getCompanyId(), model.getOfficeId(), model.getShiftId(),
                         model.getUsername(), request.getType()));
 
-                return logService.insertShiftArrangement(model);
+                BaseResponse logResponse = logService.insertShiftArrangement(model);
+                if (logResponse != null && logResponse.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
+                    logResponse.setData(fixedShiftArrangement.getId());
+                }
+
+                return logResponse;
             }
         }
 

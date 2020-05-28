@@ -93,7 +93,7 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
         repo.deleteById(key);
     }
 
-    @Async
+    @Async("asyncExecutor")
     public CompletableFuture<Float> getTotalDayOff(String companyId, String username) {
         try {
             EmployeeInfo employee = findById(new EmployeeInfo.Key(companyId, username));

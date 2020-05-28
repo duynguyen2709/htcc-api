@@ -27,7 +27,7 @@ public class LeavingRequestService {
     /*
     For Employee to get their leaving requests submitted
      */
-    @Async
+    @Async("asyncExecutor")
     public CompletableFuture<List<LeavingRequestResponse>> getLeavingRequestLog(String companyId, String username, String year){
         List<LeavingRequestResponse> result = new ArrayList<>();
         try {

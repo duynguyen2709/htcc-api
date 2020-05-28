@@ -35,7 +35,7 @@ public class ComplaintLogKafkaListener extends BaseKafkaConsumer<ComplaintModel>
     @Override
     public void process(ComplaintModel model) {
         try {
-            int result = (int) redisComplaintService.unlockWriteLock(StringUtil.valueOf(model.companyId),
+            long result = (long) redisComplaintService.unlockWriteLock(StringUtil.valueOf(model.companyId),
                     StringUtil.valueOf(model.username),
                     DateTimeUtil.parseTimestampToString(model.clientTime, "yyyyMM"),
                     new ICallback() {
@@ -46,7 +46,7 @@ public class ComplaintLogKafkaListener extends BaseKafkaConsumer<ComplaintModel>
                         }
             });
 
-            if (result == 1) {
+            if (result != -1) {
                 // if insert succeed, then increase pending counter
                 UpdateComplaintStatusModel counter = new UpdateComplaintStatusModel();
                 counter.setYyyyMM(DateTimeUtil.parseTimestampToString(model.clientTime, "yyyyMM"));

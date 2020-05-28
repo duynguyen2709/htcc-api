@@ -253,3 +253,7 @@
 23-05-2020:
  + Version 1.9.0:
     - [Employee] CheckIn by QrCode & Form
+
+28-05-2020:
+ + Version 1.9.1:
+    - [Employee & Log] Change BaseLogDAO to return logId
