@@ -25,7 +25,9 @@ public class BaseLogDAO {
             String yyyyMMdd  = DateTimeUtil.parseTimestampToString(logEntity.getCreateTime(), "yyyyMMdd");
             String tableName = logEntity.retrieveTableName() + yyyyMM;
 
-            SimpleJdbcInsert jdbc = new SimpleJdbcInsert(dataSource).withTableName(tableName);
+            SimpleJdbcInsert jdbc = new SimpleJdbcInsert(dataSource)
+                    .withTableName(tableName)
+                    .usingGeneratedKeyColumns("logId");
 
             Map<String, Object> parameters = logEntity.getParamsMap();
             parameters.put("ymd", yyyyMMdd);
