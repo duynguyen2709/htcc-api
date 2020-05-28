@@ -96,7 +96,12 @@ public class ShiftArrangementService {
             ShiftArrangementModel model = new ShiftArrangementModel(request);
             model.setShiftData(shiftTime);
 
-            return logService.insertShiftArrangement(model);
+            BaseResponse logResponse = logService.insertShiftArrangement(model);
+            if (logResponse != null && logResponse.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
+                logResponse.setData(model.getArrangementId());
+            }
+
+            return logResponse;
         }
         else if (request.getType() == ShiftArrangementTypeEnum.FIXED.getValue()) {
             FixedShiftArrangement fixedShiftArrangement = fixedShiftArrangementService.create(new FixedShiftArrangement(request));

@@ -6,7 +6,7 @@ public enum ReturnCodeEnum {
 
     INIT(2, "Đang xử lý"),
     SUCCESS(1, "Thành công"),
-    EXCEPTION(0, "Hệ thống đang có lỗi. Vui lòng thử lại sau"),
+    EXCEPTION(0, "Hệ thống có lỗi. Vui lòng thử lại sau"),
     UNAUTHORIZE(401, "Xác thực token thất bại"),
     PERMISSION_DENIED(403, "Không có quyền truy cập"),
     WRONG_USERNAME_OR_PASSWORD(-1, "Sai tên đăng nhập hoặc mật khẩu"),
