@@ -123,17 +123,19 @@ public class ShiftArrangementService {
                 model.setFixed(true);
                 model.setActor(request.getActor());
                 model.setArrangementId(String.format("%s-%s-%s-%s-%s-%s",
-                        model.getArrangeDate(), model.getCompanyId(), model.getOfficeId(), model.getShiftId(),
+                        model.getArrangeDate(), model.getCompanyId(),
+                        model.getOfficeId(), model.getShiftId(),
                         model.getUsername(), request.getType()));
 
                 BaseResponse logResponse = logService.insertShiftArrangement(model);
-                if (logResponse != null && logResponse.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
-                    response.setData((long) fixedShiftArrangement.getId());
-                    return response;
+                if (logResponse == null || logResponse.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
+                    // rollback fixedShiftArrangement insert
+                    fixedShiftArrangementService.delete(fixedShiftArrangement.getId());
+                    return logResponse;
                 }
-
-                return logResponse;
             }
+
+            response.setData((long) fixedShiftArrangement.getId());
         }
 
         return response;
