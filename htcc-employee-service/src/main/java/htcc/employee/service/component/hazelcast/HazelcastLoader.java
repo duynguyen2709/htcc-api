@@ -12,6 +12,7 @@ import htcc.common.entity.jpa.Company;
 import htcc.common.entity.jpa.Department;
 import htcc.common.entity.jpa.Office;
 import htcc.common.entity.shift.FixedShiftArrangement;
+import htcc.common.entity.shift.ShiftArrangementTemplate;
 import htcc.common.entity.shift.ShiftTime;
 import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.util.StringUtil;
@@ -56,6 +57,9 @@ public class HazelcastLoader {
     @Autowired
     private FixedShiftArrangementRepository fixedShiftArrangementRepository;
 
+    @Autowired
+    private ShiftArrangementTemplateRepository shiftArrangementTemplateRepository;
+
     @PostConstruct
     public void loadAllStaticMap() throws Exception {
         log.info("####### Started Loading Static Config Map ########\n");
@@ -75,7 +79,26 @@ public class HazelcastLoader {
 
         loadFixedShiftArrangementMap();
 
+        loadShiftArrangementTemplateMap();
+
         log.info("####### Loaded All Static Config Map Done ########\n");
+    }
+
+    public void loadShiftArrangementTemplateMap() {
+        Map<String, List<ShiftArrangementTemplate>> map = new HashMap<>();
+
+        shiftArrangementTemplateRepository.findAll().forEach(c -> {
+            String key = c.getCompanyId();
+            if (!map.containsKey(key) || map.get(key) == null) {
+                map.put(key, new ArrayList<>());
+            }
+
+            map.get(key).add(c);
+        });
+
+        SHIFT_TEMPLATE_MAP = hazelcastService.reload(map, CacheKeyEnum.SHIFT_TEMPLATE);
+        log.info("[loadShiftArrangementTemplateMap] SHIFT_TEMPLATE_MAP loaded succeed [{}]",
+                StringUtil.toJsonString(SHIFT_TEMPLATE_MAP));
     }
 
     public void loadFixedShiftArrangementMap() {

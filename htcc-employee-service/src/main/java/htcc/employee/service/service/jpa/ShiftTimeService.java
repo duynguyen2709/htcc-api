@@ -49,6 +49,19 @@ public class ShiftTimeService extends BaseJPAService<ShiftTime, ShiftTime.Key> {
         return null;
     }
 
+    public List<ShiftTime> findByCompanyId(String companyId) {
+        List<ShiftTime> result = new ArrayList<>();
+        for (List<ShiftTime> shiftTimes : DbStaticConfigMap.SHIFT_TIME_MAP.values()) {
+            for (ShiftTime shift : shiftTimes){
+                if (shift.getCompanyId().equals(companyId)) {
+                    result.add(shift);
+                }
+            }
+        }
+
+        return result;
+    }
+
     public List<ShiftTime> findByCompanyIdAndOfficeId(String companyId, String officeId) {
         return DbStaticConfigMap.SHIFT_TIME_MAP.getOrDefault(companyId + "_" + officeId,
                 new ArrayList<>());

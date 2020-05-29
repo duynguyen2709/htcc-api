@@ -258,3 +258,7 @@
  + Version 1.9.1:
     - [Employee & Log] Change BaseLogDAO to return logId; fix Notification bugs;
     finish manual ShiftArrangement
+
+29-05-2020:
+ + Version 1.9.2:
+    - [Employee] API copy ShiftTemplate

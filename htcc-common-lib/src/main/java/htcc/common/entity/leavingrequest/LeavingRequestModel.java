@@ -1,7 +1,6 @@
 package htcc.common.entity.leavingrequest;
 
 import com.google.gson.reflect.TypeToken;
-import htcc.common.comparator.DateComparator;
 import htcc.common.component.LoggingConfiguration;
 import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.util.StringUtil;
@@ -43,7 +42,7 @@ public class LeavingRequestModel implements Serializable {
         this.status = ComplaintStatusEnum.PROCESSING.getValue();
         this.detail = request.detail;
         this.approver = StringUtil.EMPTY;
-        this.detail.sort(new DateComparator());
+        this.detail.sort(LeavingRequest.LeavingDayDetail.getComparator());
     }
 
     public LeavingRequestModel(LeavingRequestLogEntity logEntity) {

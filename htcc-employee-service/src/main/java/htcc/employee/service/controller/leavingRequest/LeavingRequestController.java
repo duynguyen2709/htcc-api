@@ -1,7 +1,5 @@
 package htcc.employee.service.controller.leavingRequest;
 
-import htcc.common.comparator.DateComparator;
-import htcc.common.comparator.LeavingRequestResponseComparator;
 import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
@@ -10,15 +8,15 @@ import htcc.common.constant.WorkingDayTypeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.jpa.EmployeeInfo;
-import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.entity.leavingrequest.*;
+import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.config.ServiceConfig;
-import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.WorkingDayService;
+import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -77,7 +75,7 @@ public class LeavingRequestController {
             if (detail == null) {
                 throw new Exception("[LogService.getLeavingRequestLog] return null");
             }
-            detail.sort(new LeavingRequestResponseComparator());
+            detail.sort(LeavingRequestResponse.getComparator());
 
             // dataResponse
             LeavingRequestInfo data = new LeavingRequestInfo();
@@ -500,7 +498,7 @@ public class LeavingRequestController {
             return "Công ty không cho phép hủy đơn nghỉ phép";
         }
 
-        model.getDetail().sort(new DateComparator());
+        model.getDetail().sort(LeavingRequest.LeavingDayDetail.getComparator());
 
         Date now = new Date(System.currentTimeMillis());
         String nowStr = DateTimeUtil.parseDateToString(now, "yyyyMMdd");

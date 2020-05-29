@@ -12,6 +12,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -99,5 +101,17 @@ public class LeavingRequest extends BaseJPAEntity {
         @ApiModelProperty(notes = "Buổi nghỉ (0 : cả ngày/ 1: buổi sáng / 2: buổi chiều)",
                           example = "0")
         public int session = 0;
+
+        public static Comparator<LeavingDayDetail> getComparator(){
+            return new Comparator<LeavingDayDetail>() {
+                @Override
+                public int compare(LeavingDayDetail o1, LeavingDayDetail o2) {
+                    Date d1 = DateTimeUtil.parseStringToDate(o1.date, "yyyyMMdd");
+                    Date d2 = DateTimeUtil.parseStringToDate(o2.date, "yyyyMMdd");
+
+                    return d1.compareTo(d2);
+                }
+            };
+        }
     }
 }

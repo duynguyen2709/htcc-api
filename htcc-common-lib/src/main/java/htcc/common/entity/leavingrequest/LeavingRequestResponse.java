@@ -1,16 +1,13 @@
 package htcc.common.entity.leavingrequest;
 
-import htcc.common.comparator.DateComparator;
 import htcc.common.util.DateTimeUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Data
@@ -69,9 +66,24 @@ public class LeavingRequestResponse implements Serializable {
         this.dateSubmit = DateTimeUtil.parseTimestampToString(model.clientTime, "yyyy-MM-dd");
 
         if (this.detail.size() > 0) {
-            this.detail.sort(new DateComparator());
+            this.detail.sort(LeavingRequest.LeavingDayDetail.getComparator());
             this.dateFrom = DateTimeUtil.convertToOtherFormat(this.detail.get(0).date, "yyyyMMdd", "yyyy-MM-dd");
             this.dateTo = DateTimeUtil.convertToOtherFormat(this.detail.get(this.detail.size() - 1).date, "yyyyMMdd", "yyyy-MM-dd");
         }
+    }
+
+    public static Comparator<LeavingRequestResponse> getComparator() {
+        return new Comparator<LeavingRequestResponse>() {
+            @Override
+            public int compare(LeavingRequestResponse o1, LeavingRequestResponse o2) {
+                String yyyyMMdd1 = DateTimeUtil.convertToOtherFormat(o1.getDateFrom(), "yyyy-MM-dd", "yyyyMMdd");
+                String yyyyMMdd2 = DateTimeUtil.convertToOtherFormat(o2.getDateFrom(), "yyyy-MM-dd", "yyyyMMdd");
+
+                long dateFrom1 = Long.parseLong(yyyyMMdd1);
+                long dateFrom2 = Long.parseLong(yyyyMMdd2);
+
+                return Long.compare(dateFrom1, dateFrom2);
+            }
+        };
     }
 }

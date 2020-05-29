@@ -54,19 +54,6 @@ public class FixedShiftArrangement extends BaseJPAEntity {
         this.weekDay = request.getWeekDay();
         this.actor = request.getActor();
     }
-    //
-//    public FixedShiftArrangement copy() {
-//        FixedShiftArrangement clone = new FixedShiftArrangement();
-//        clone.companyId = this.companyId;
-//        clone.officeId = this.officeId;
-//        clone.type = this.type;
-//        clone.weekDay = this.weekDay;
-//        clone.date = this.date;
-//        clone.session = this.session;
-//        clone.isWorking = this.isWorking;
-//        clone.extraInfo = this.extraInfo;
-//        return clone;
-//    }
 
     @Override
     public String isValid() {

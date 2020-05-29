@@ -16,7 +16,10 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Api(tags = "API config ca làm việc (CỦA QUẢN LÝ)",
@@ -45,13 +48,35 @@ public class ShiftTimeController {
             List<ShiftTime> shiftTimes = shiftTimeService.findByCompanyIdAndOfficeId(companyId, officeId);
             response.setData(shiftTimes);
         } catch (Exception e) {
-            log.error("[getShiftTimeInfo] [{} - {} - {}] ex", companyId, officeId, e);
+            log.error("[getShiftTimeInfo] [{} - {}] ex", companyId, officeId, e);
             response = new BaseResponse<>(e);
         }
         return response;
     }
 
+    @GetMapping("/shifttime/{companyId}")
+    public BaseResponse getShiftTimeMap(@PathVariable String companyId) {
+        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        try {
+            List<ShiftTime> shiftTimes = shiftTimeService.findByCompanyId(companyId);
 
+            Map<String, List<ShiftTime>> dataResponse = new HashMap<>();
+            for (ShiftTime shift : shiftTimes) {
+                String officeId = shift.getOfficeId();
+                if (!dataResponse.containsKey(officeId)) {
+                    dataResponse.put(officeId, new ArrayList<>());
+                }
+
+                dataResponse.get(officeId).add(shift);
+            }
+
+            response.setData(dataResponse);
+        } catch (Exception e) {
+            log.error("[getShiftTimeMap] [{}] ex", companyId, e);
+            response = new BaseResponse<>(e);
+        }
+        return response;
+    }
 
 
     @ApiOperation(value = "Thêm mới ca làm việc", response = ShiftTime.class)
