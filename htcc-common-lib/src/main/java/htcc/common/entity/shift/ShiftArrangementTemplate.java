@@ -1,5 +1,6 @@
 package htcc.common.entity.shift;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.reflect.TypeToken;
 import htcc.common.entity.jpa.BaseJPAEntity;
 import htcc.common.util.StringUtil;
@@ -9,9 +10,10 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Data
@@ -31,33 +33,26 @@ public class ShiftArrangementTemplate extends BaseJPAEntity {
     public String templateName = "";
 
     @Column
+    @JsonIgnore
     public String data = "";
 
     @Column
     public String actor = "";
 
     @Transient
-    public List<MiniShiftTime> shiftTimeList = new ArrayList<>();
+    public Map<Integer, List<MiniShiftTime>> shiftTimeMap = new HashMap<>();
 
-    public void setData(List<MiniShiftTime> shiftTimeList) {
-        this.data = StringUtil.toJsonString(shiftTimeList);
+    public void setData(Map<Integer, List<MiniShiftTime>> shiftTimeMap) {
+        this.data = StringUtil.toJsonString(shiftTimeMap);
     }
 
-    public List<MiniShiftTime> getData() {
-        return StringUtil.json2Collection(this.data, new TypeToken<List<MiniShiftTime>>(){}.getType());
+    public Map<Integer, MiniShiftTime> getData() {
+        return StringUtil.json2Collection(this.data,
+                new TypeToken<Map<Integer, List<MiniShiftTime>>>(){}.getType());
     }
 
     @Override
     public String isValid() {
-
-        if (StringUtil.isEmpty(companyId)) {
-            return "Mã công ty không được rỗng";
-        }
-
-        if (StringUtil.isEmpty(templateName)) {
-            return "Tên ca không được rỗng";
-        }
-
         return StringUtil.EMPTY;
     }
 
@@ -68,7 +63,6 @@ public class ShiftArrangementTemplate extends BaseJPAEntity {
 
         private static final long serialVersionUID = 5922818518L;
 
-        public int    weekDay;
         public String officeId;
         public String shiftId;
         public String shiftName;
@@ -79,7 +73,7 @@ public class ShiftArrangementTemplate extends BaseJPAEntity {
             return new Comparator<MiniShiftTime>() {
                 @Override
                 public int compare(MiniShiftTime o1, MiniShiftTime o2) {
-                    return Integer.compare(o1.getWeekDay(), o2.getWeekDay());
+                    return o1.getOfficeId().compareTo(o2.getOfficeId());
                 }
             };
         }

@@ -32,8 +32,12 @@ public class ShiftTemplateRequest extends BaseJPAEntity {
             return "Tên ca không được rỗng";
         }
 
+        if (shiftTimeList == null || shiftTimeList.isEmpty()) {
+            return "Danh sách ca không được rỗng";
+        }
+
         for (MiniShiftTime shift : shiftTimeList) {
-            if (WeekDayEnum.fromInt(shift.weekDay) == null || shift.weekDay == 0) {
+            if (shift.weekDay < 1 || shift.weekDay > 7) {
                 return String.format("Thứ %s không hợp lệ", shift.weekDay);
             }
 

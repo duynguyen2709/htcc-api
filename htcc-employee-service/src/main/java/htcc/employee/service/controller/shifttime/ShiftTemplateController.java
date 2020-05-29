@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Log4j2
@@ -28,11 +30,20 @@ public class ShiftTemplateController {
 
     @GetMapping("/shifttemplates/{companyId}")
     public BaseResponse getShiftTemplates(@PathVariable String companyId) {
-        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        BaseResponse<List<ShiftArrangementTemplate>> response =
+                new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             List<ShiftArrangementTemplate> dataResponse = shiftArrangementTemplateService.findByCompanyId(companyId);
-            dataResponse.forEach(c -> c.shiftTimeList = StringUtil.json2Collection(c.data,
-                    new TypeToken<List<ShiftArrangementTemplate.MiniShiftTime>>(){}.getType()));
+            dataResponse.forEach(c -> {
+                c.shiftTimeMap = StringUtil.json2Collection(c.data,
+                        new TypeToken<Map<Integer, List<ShiftArrangementTemplate.MiniShiftTime>>>(){}.getType());
+
+                for (int i = 1; i <= 7; i++) {
+                    if (!c.getShiftTimeMap().containsKey(i)) {
+                        c.getShiftTimeMap().put(i, new ArrayList<>());
+                    }
+                }
+            });
 
             response.setData(dataResponse);
         } catch (Exception e) {
@@ -77,10 +88,9 @@ public class ShiftTemplateController {
             entity.setActor(request.getActor());
             entity.setCompanyId(request.getCompanyId());
             entity.setTemplateName(request.getTemplateName());
-            entity.setShiftTimeList(new ArrayList<>());
+            entity.setShiftTimeMap(new HashMap<>());
             for (ShiftTemplateRequest.MiniShiftTime miniShiftTime : request.getShiftTimeList()) {
                 ShiftArrangementTemplate.MiniShiftTime detail = new ShiftArrangementTemplate.MiniShiftTime();
-                detail.setWeekDay(miniShiftTime.getWeekDay());
                 detail.setOfficeId(miniShiftTime.getOfficeId());
                 detail.setShiftId(miniShiftTime.getShiftId());
 
@@ -93,9 +103,25 @@ public class ShiftTemplateController {
                 detail.setShiftName(shiftTime.getShiftName());
                 detail.setStartTime(shiftTime.getStartTime());
                 detail.setEndTime(shiftTime.getEndTime());
-                entity.getShiftTimeList().add(detail);
+
+                if (!entity.getShiftTimeMap().containsKey(miniShiftTime.getWeekDay())) {
+                    entity.getShiftTimeMap().put(miniShiftTime.getWeekDay(), new ArrayList<>());
+                }
+
+                entity.getShiftTimeMap().get(miniShiftTime.getWeekDay()).add(detail);
             }
-            entity.setData(entity.getShiftTimeList());
+
+            for (int i = 1; i <= 7; i++) {
+                if (!entity.getShiftTimeMap().containsKey(i)) {
+                    entity.getShiftTimeMap().put(i, new ArrayList<>());
+                }
+            }
+
+            for (List<ShiftArrangementTemplate.MiniShiftTime> list : entity.getShiftTimeMap().values()) {
+                list.sort(ShiftArrangementTemplate.MiniShiftTime.getComparator());
+            }
+
+            entity.setData(entity.getShiftTimeMap());
             entity = shiftArrangementTemplateService.create(entity);
 
             response.setData(entity);
