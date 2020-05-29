@@ -2,6 +2,7 @@ package htcc.common.constant;
 
 public enum CacheKeyEnum {
 
+    // Employee
     COMPANY,
     OFFICE,
     DEPARTMENT,
@@ -9,7 +10,12 @@ public enum CacheKeyEnum {
     COMPANY_DAY_OFF,
     WORKING_DAY,
     SHIFT_TIME,
-    ALL;
+    FIXED_SHIFT,
+
+    // Admin
+    NOTI_ICON,
+    ;
+//    ALL;
 
     public static CacheKeyEnum getKey(String type){
         for (CacheKeyEnum key : CacheKeyEnum.values()){

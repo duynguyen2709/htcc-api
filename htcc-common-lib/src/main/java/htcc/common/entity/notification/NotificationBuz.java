@@ -60,7 +60,7 @@ public class NotificationBuz extends BaseJPAEntity {
     @AllArgsConstructor
     public static class Key implements Serializable {
 
-        public int clientId;
+        public int    clientId;
         public String companyId;
         public String username;
 

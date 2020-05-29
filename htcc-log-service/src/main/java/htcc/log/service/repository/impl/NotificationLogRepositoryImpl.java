@@ -32,7 +32,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
 
     private static final String NON_READ_PREFIX = "NonRead";
 
-    private static final Map<String, String> MAP_TABLE_NOTIFICATION_LOG = new HashMap<>();
+    public static final Map<String, String> MAP_TABLE_NOTIFICATION_LOG = new HashMap<>();
 
     @Autowired
     private BaseLogDAO baseLogDAO;
@@ -87,12 +87,12 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
                     continue;
                 }
 
-                String query = String.format("SELECT * FROM %s%s WHERE clientId = '%s' AND companyId = '%s' " +
-                        "AND username = '%s' ORDER BY ymd DESC, sendTime DESC LIMIT %s,%s",
-                        TABLE_LOG, month, clientId,
-                        companyId, username, startIndex, size);
+                String query = String.format("SELECT * FROM %s%s WHERE targetClientId = ? AND companyId = ? " +
+                        "AND username = ? ORDER BY ymd DESC, sendTime DESC LIMIT %s,%s",
+                        TABLE_LOG, month, startIndex, size);
 
-                List<NotificationLogEntity> temp = jdbcTemplate.query(query, new NotificationLogRowMapper());
+                List<NotificationLogEntity> temp = jdbcTemplate.query(query,
+                        new Object[] {clientId, companyId, username}, new NotificationLogRowMapper());
 
                 // [!important - DO NOT DELETE THIS LINE]
                 // if reach start index, then set it to 0 to prevent skipping on next loop
@@ -142,7 +142,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
             }
 
             String query = String.format( "UPDATE %s SET hasRead = 1 " +
-                    "WHERE clientId = '%s' AND companyId = '%s' AND username = '%s'",
+                    "WHERE targetClientId = '%s' AND companyId = '%s' AND username = '%s'",
                     tableName, model.getClientId(), model.getCompanyId(), model.getUsername());
 
             queries.add(query);
@@ -171,7 +171,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
         String month     = model.getNotiId().substring(0, 6);
         String tableName = String.format("%s%s", TABLE_LOG, month);
 
-        String query = String.format("UPDATE %s SET hasRead = 1 WHERE notiId = '%s' AND clientId = '%s'" +
+        String query = String.format("UPDATE %s SET hasRead = 1 WHERE notiId = '%s' AND targetClientId = '%s'" +
                 " AND companyId = '%s' AND username = '%s'", tableName, model.getNotiId(), model.getClientId(),
                 model.getCompanyId(), model.getUsername());
 
@@ -211,7 +211,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
     @Transactional
     public void saveNotification(NotificationModel model) {
         NotificationLogEntity logEntity =
-                getOneNotification(model.getNotiId(), model.getClientId(), model.getCompanyId(), model.getUsername());
+                getOneNotification(model.getNotiId(), model.getTargetClientId(), model.getCompanyId(), model.getUsername());
 
         if (logEntity == null) {
             createNewNotification(model);
@@ -222,9 +222,9 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
         String tableName = String.format("%s%s", TABLE_LOG, month);
 
         String query = String.format(
-                "UPDATE %s SET status = '%s', retryTime = '%s'" + " WHERE notiId = '%s' AND clientId = '%s'" +
+                "UPDATE %s SET status = '%s', retryTime = '%s'" + " WHERE notiId = '%s' AND targetClientId = '%s'" +
                         " AND companyId = '%s' AND username = '%s'", tableName, model.getStatus(),
-                model.getRetryTime(), model.getNotiId(), model.getClientId(), model.getCompanyId(),
+                model.getRetryTime(), model.getNotiId(), model.getTargetClientId(), model.getCompanyId(),
                 model.getUsername());
 
         jdbcTemplate.update(query);
@@ -235,14 +235,14 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
         NotificationLogEntity logEntity = new NotificationLogEntity(model);
         baseLogDAO.insertLog(logEntity);
 
-        String params = String.format("%s-%s-%s", model.getClientId(), model.getCompanyId(), model.getUsername());
+        String params = String.format("%s-%s-%s", model.getTargetClientId(), model.getCompanyId(), model.getUsername());
         LogCounter logCounter =
                 logCounterService.findById(new LogCounter.Key(TABLE_LOG,
                         DateTimeUtil.parseTimestampToString(model.getSendTime(), "yyyyMM"), params));
 
         if (logCounter == null) {
             logCounter =
-                    createLogCounter(model.getClientId(), model.getCompanyId(), model.getUsername(),
+                    createLogCounter(model.getTargetClientId(), model.getCompanyId(), model.getUsername(),
                             DateTimeUtil.parseTimestampToString(model.getSendTime(), "yyyyMM"));
         }
         else {
@@ -253,7 +253,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
         LogCounter nonReadLogCounter =
                 logCounterService.findById(new LogCounter.Key(NON_READ_PREFIX + TABLE_LOG, "", params));
         if (nonReadLogCounter == null) {
-            nonReadLogCounter = createNonReadLogCounter(model.getClientId(), model.getCompanyId(), model.getUsername());
+            nonReadLogCounter = createNonReadLogCounter(model.getTargetClientId(), model.getCompanyId(), model.getUsername());
         }
         else {
             nonReadLogCounter.setCount(nonReadLogCounter.getCount() + 1);
@@ -263,10 +263,10 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
 
     private NotificationLogEntity getOneNotification(String notiId, int clientId, String companyId, String username) {
         try {
-            String month     = notiId.substring(0, 6);
-            String tableName = String.format("%s%s", TABLE_LOG, month);
+            final String month     = notiId.substring(0, 6);
+            final String tableName = String.format("%s%s", TABLE_LOG, month);
 
-            String query = String.format("SELECT * FROM %s WHERE notiId = '%s' AND clientId = '%s'" +
+            final String query = String.format("SELECT * FROM %s WHERE notiId = '%s' AND targetClientId = '%s'" +
                     " AND companyId = '%s' AND username = '%s'", tableName, notiId, clientId, companyId, username);
 
             return jdbcTemplate.queryForObject(query, new NotificationLogRowMapper());
@@ -297,7 +297,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
             }
 
             String query = String.format("SELECT count(*) FROM %s WHERE hasRead = '0' AND" +
-                    " clientId = '%s' AND companyId = '%s' AND username = '%s'", tableName, clientId, companyId,
+                    " targetClientId = '%s' AND companyId = '%s' AND username = '%s'", tableName, clientId, companyId,
                     username);
 
             Integer count = jdbcTemplate.queryForObject(query, Integer.class);
@@ -316,7 +316,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
         String tableName = String.format("%s%s", TABLE_LOG, yyyyMM);
 
         String query = String.format(
-                "SELECT count(*) FROM %s WHERE clientId = '%s' AND companyId = '%s' AND username = '%s'",
+                "SELECT count(*) FROM %s WHERE targetClientId = '%s' AND companyId = '%s' AND username = '%s'",
                 tableName, clientId, companyId, username);
 
         Integer count = jdbcTemplate.queryForObject(query, Integer.class);

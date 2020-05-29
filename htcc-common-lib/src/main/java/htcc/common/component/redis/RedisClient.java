@@ -103,7 +103,7 @@ public abstract class RedisClient {
         }
     }
 
-    protected boolean lock(String key) {
+    public boolean lock(String key) {
         if (instance == null) {
             return false;
         }
@@ -122,7 +122,7 @@ public abstract class RedisClient {
         }
     }
 
-    protected void unlock(String key){
+    public void unlock(String key){
         if (instance == null) {
             return;
         }

@@ -68,6 +68,10 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
         return repo.findByCompanyId(companyId);
     }
 
+    public List<EmployeeInfo> findByCompanyIdAndOfficeId(String companyId, String officeId) {
+        return repo.findByCompanyIdAndOfficeId(companyId, officeId);
+    }
+
     @Override
     public EmployeeInfo findById(EmployeeInfo.Key key) {
         Optional<EmployeeInfo> user = repo.findById(key);
@@ -89,7 +93,7 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
         repo.deleteById(key);
     }
 
-    @Async
+    @Async("asyncExecutor")
     public CompletableFuture<Float> getTotalDayOff(String companyId, String username) {
         try {
             EmployeeInfo employee = findById(new EmployeeInfo.Key(companyId, username));

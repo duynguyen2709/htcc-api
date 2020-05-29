@@ -68,6 +68,8 @@ service:
   debugMode: false
   allowDeleteCheckin: false
   maxFileSize: 10000000
+  schedule:
+    fixedShiftArrangement: 1 0 0 * * *
 
 ################## Redis Config ##################
 redis:
@@ -122,3 +124,6 @@ kafka:
     eventPushNotification:
       topicName: EVENT-PUSH-NOTIFICATION
       groupId: EVENT-PUSH-NOTIFICATION
+    eventRequireIcon:
+      topicName: EVENT-REQUIRE-ICON
+      groupId: EVENT-REQUIRE-ICON

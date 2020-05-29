@@ -1,8 +1,8 @@
 package htcc.log.service.repository.impl;
 
 import htcc.common.constant.ComplaintStatusEnum;
-import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.entity.complaint.ComplaintLogEntity;
+import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.mapper.ComplaintLogRowMapper;
@@ -30,14 +30,12 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
     @Override
     public List<ComplaintLogEntity> getComplaintLog(String companyId, String username, String yyyyMM) {
         try {
-            String tableName = "ComplaintLog" + yyyyMM;
+            final String tableName = "ComplaintLog" + yyyyMM;
 
-            String query = String.format("SELECT * FROM %s WHERE companyId='%s' " +
-                            "AND username='%s'",
-                    tableName, companyId, username);
+            final String query = String.format("SELECT * FROM %s WHERE companyId = ? AND username = ?", tableName);
 
-            return jdbcTemplate.query(query, new ComplaintLogRowMapper());
-
+            return jdbcTemplate.query(query, new Object[] {companyId, username},
+                    new ComplaintLogRowMapper());
         } catch (Exception e) {
             log.error(String.format("[getComplaintLog] [%s-%s-%s] ex ", companyId, username, yyyyMM), e);
             return null;
@@ -47,12 +45,11 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
     @Override
     public List<ComplaintLogEntity> getComplaintLogByReceiverType(int receiverType, String yyyyMM) {
         try {
-            String tableName = "ComplaintLog" + yyyyMM;
+            final String tableName = "ComplaintLog" + yyyyMM;
 
-            String query = String.format("SELECT * FROM %s WHERE receiverType='%s'",
-                    tableName, receiverType);
+            final String query = String.format("SELECT * FROM %s WHERE receiverType = ?", tableName);
 
-            return jdbcTemplate.query(query, new ComplaintLogRowMapper());
+            return jdbcTemplate.query(query, new Object[]{ receiverType }, new ComplaintLogRowMapper());
 
         } catch (Exception e) {
             log.error(String.format("[getComplaintLogByReceiverType] [%s-%s] ex ", receiverType, yyyyMM), e);
@@ -64,9 +61,9 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
     @Override
     @Transactional
     public void updateComplaintLogStatus(UpdateComplaintStatusModel model) {
-        String tableName = "ComplaintLog" + model.getYyyyMM();
+        final String tableName = "ComplaintLog" + model.getYyyyMM();
 
-        String query = String.format("UPDATE %s SET status = ?, response = ? WHERE complaintId='%s'",
+        final String query = String.format("UPDATE %s SET status = ?, response = ? WHERE complaintId = '%s'",
                 tableName, model.getComplaintId());
 
         int rowAffected = jdbcTemplate.update(query, model.getStatus(), model.getResponse());
@@ -78,9 +75,9 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
     @Override
     @Transactional
     public void resubmitComplaint(String yyyyMM, String complaintId, String newContent) {
-        String tableName = "ComplaintLog" + yyyyMM;
+        final String tableName = "ComplaintLog" + yyyyMM;
 
-        String query = String.format("UPDATE %s SET status = ?, content = ? WHERE complaintId='%s'",
+        final String query = String.format("UPDATE %s SET status = ?, content = ? WHERE complaintId = '%s'",
                 tableName, complaintId);
 
         int rowAffected = jdbcTemplate.update(query, ComplaintStatusEnum.PROCESSING.getValue(), newContent);
@@ -163,9 +160,9 @@ public class ComplaintLogRepositoryImpl implements ComplaintLogRepository {
     @Override
     public ComplaintLogEntity getComplaint(UpdateComplaintStatusModel model) {
         try {
-            String tableName = "ComplaintLog" + model.getYyyyMM();
+            final String tableName = "ComplaintLog" + model.getYyyyMM();
 
-            String query = String.format("SELECT * FROM %s WHERE complaintId='%s'",
+            final String query = String.format("SELECT * FROM %s WHERE complaintId = '%s'",
                     tableName, model.getComplaintId());
 
             return jdbcTemplate.queryForObject(query, new ComplaintLogRowMapper());

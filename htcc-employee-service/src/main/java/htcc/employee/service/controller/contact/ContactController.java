@@ -9,7 +9,9 @@ import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.Office;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
+import htcc.employee.service.service.jpa.DepartmentService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.OfficeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,6 +36,12 @@ public class ContactController {
     @Autowired
     private EmployeeInfoService employeeService;
 
+    @Autowired
+    private OfficeService officeService;
+
+    @Autowired
+    private DepartmentService departmentService;
+
     @ApiOperation(value = "Lấy danh bạ công ty", response = EmployeeInfo.class)
     @GetMapping("/contacts/{companyId}")
     public BaseResponse getListContact(@ApiParam(name = "companyId", value = "[Path] Mã công ty", defaultValue = "VNG", required = true)
@@ -49,7 +57,7 @@ public class ContactController {
                                        @ApiParam(name = "size", value = "[QueryString] Số record mỗi trang (0 = lấy toàn bộ), nếu khác 0 cần gửi thêm index để lấy trang tiếp theo",
                                                  defaultValue = "0", required = false)
                                        @RequestParam(required = false, defaultValue = "0") Integer size) {
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        BaseResponse<List<EmployeeInfo>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             List<EmployeeInfo> listEmployee = new ArrayList<>();
 
@@ -98,21 +106,30 @@ public class ContactController {
         } catch (Exception e){
             log.error(String.format("[getListContact] [%s-%s-%s-%s]",
                     companyId, StringUtil.valueOf(officeId), StringUtil.valueOf(department), size), e);
-            response = new BaseResponse(e);
+            response = new BaseResponse<>(e);
         }
         return response;
     }
 
 
 
-    @ApiOperation(value = "Lấy list value để filter theo phòng ban (departmentList) & chi nhánh (officeIdList)", response = ContactFilterEntity.class)
+    @ApiOperation(value = "Lấy list value để filter theo phòng ban (departmentList) & chi nhánh (officeIdList)",
+                  response = ContactFilterEntity.class)
     @GetMapping("/contacts/filter/{companyId}")
-    public BaseResponse getContactFilter(@ApiParam(name = "companyId", value = "[Path] Mã công ty", defaultValue = "VNG", required = true)
+    public BaseResponse getContactFilter(@ApiParam(name = "companyId", value = "[Path] Mã công ty",
+                                                   defaultValue = "VNG", required = true)
                                              @PathVariable String companyId) {
         BaseResponse<ContactFilterEntity> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
-            Set<String> departments = DbStaticConfigMap.findDepartmentByCompanyId(companyId).stream().map(Department::getDepartment).collect(Collectors.toSet());
-            Set<String> officeId = DbStaticConfigMap.findOfficeByCompanyId(companyId).stream().map(Office::getOfficeId).collect(Collectors.toSet());
+            Set<String> departments = departmentService.findByCompanyId(companyId)
+                    .stream()
+                    .map(Department::getDepartment)
+                    .collect(Collectors.toSet());
+
+            Set<String> officeId = officeService.findByCompanyId(companyId)
+                    .stream()
+                    .map(Office::getOfficeId)
+                    .collect(Collectors.toSet());
 
             List<String> departmentList = new ArrayList<>(departments);
             List<String> officeIdList = new ArrayList<>(officeId);

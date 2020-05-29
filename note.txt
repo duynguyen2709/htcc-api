@@ -237,3 +237,24 @@
  + Version 1.7.5:
     - [Employee] Add CheckInId, add Gender; Check Half day-off on Checking In;
     Add officeName to CheckInLog (with officeId)
+
+15-05-2020:
+ + Version 1.8.0:
+    - [Employee] New flow Shift Arrangement
+
+19-05-2020:
+ + Version 1.8.1:
+    - [Admin] Add CRUD Api for Icon; API Send & Get Notification
+
+21-05-2020:
+ + Version 1.8.2:
+    - [Employee] API Send & Get Notification
+
+23-05-2020:
+ + Version 1.9.0:
+    - [Employee] CheckIn by QrCode & Form
+
+28-05-2020:
+ + Version 1.9.1:
+    - [Employee & Log] Change BaseLogDAO to return logId; fix Notification bugs;
+    finish manual ShiftArrangement

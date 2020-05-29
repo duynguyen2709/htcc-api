@@ -5,7 +5,7 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.Office;
-import htcc.common.entity.jpa.WorkingDay;
+import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.LocationUtil;
 import htcc.common.util.StringUtil;
@@ -35,6 +35,18 @@ public class CheckInBuzService {
     @Autowired
     private WorkingDayService workingDayService;
 
+    public void onCheckInSuccess(CheckinModel model) {
+        if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
+            checkInService.setCheckInLog(model);
+        } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
+            checkInService.setCheckOutLog(model);
+        }
+
+        if (model.getSubType() == CheckinSubTypeEnum.QR_CODE.getValue()) {
+            checkInService.setSucceedQrCheckin(model.getQrCodeId());
+        }
+    }
+
     public BaseResponse doCheckInBuz(CheckinModel model) throws Exception {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
 
@@ -61,6 +73,8 @@ public class CheckInBuzService {
         // get valid checkin time by office
         setValidTimeAndLocation(model);
 
+        //TODO: Set dayCount & allowDiffTime from ShiftTime
+
         return response;
     }
 
@@ -69,6 +83,19 @@ public class CheckInBuzService {
         CompletableFuture<List<CheckinModel>> checkinData  = checkInService.getCheckInLog(model.companyId, model.username, model.date);
         CompletableFuture<List<CheckinModel>> checkoutData = checkInService.getCheckOutLog(model.companyId, model.username, model.date);
         CompletableFuture.allOf(checkinData, checkoutData).join();
+
+        // for QrCode specific
+        if (model.getSubType() == CheckinSubTypeEnum.QR_CODE.getValue()) {
+            int type = 0;
+            if (checkinData.get() == null || checkinData.get().isEmpty()
+                    || checkinData.get().size() == checkoutData.get().size()) {
+                type = 1;
+            } else {
+                type = 2;
+            }
+
+            model.setType(type);
+        }
 
         if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
             if (checkinData.get().size() > checkoutData.get().size()){
@@ -94,8 +121,11 @@ public class CheckInBuzService {
     /** Description : get valid checkin time & location base on office & shift time
      * @param model
      */
-    private void setValidTimeAndLocation(CheckinModel model) {
+    private void setValidTimeAndLocation(CheckinModel model) throws Exception {
         Office office = DbStaticConfigMap.OFFICE_MAP.get(model.getCompanyId() + "_" + model.getOfficeId());
+        if (office == null) {
+            throw new Exception("Office is null, model = " + StringUtil.toJsonString(model));
+        }
         model.setOfficeId(String.format("%s - %s", office.getOfficeId(), office.getOfficeName()));
         model.setValidLatitude(office.getLatitude());
         model.setValidLongitude(office.getLongitude());
@@ -137,15 +167,30 @@ public class CheckInBuzService {
             case IMAGE:
                 break;
             case QR_CODE:
+                String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+                if (!request.getDate().equals(today)) {
+                    return "Thời gian điểm danh không hợp lệ. Vui lòng thực hiện lại";
+                }
+
+                // add extra 5 second for request network time from client to server
+                if (request.getServerTime() - request.getClientTime() > 5 * 60 * 1000 + 5 * 1000) {
+                    return "Mã QR đã hết hạn. Vui lòng thực hiện lại";
+                }
+
+                if (checkInService.isQrCodeUsed(request.getQrCodeId())) {
+                    log.error("\n### QrCodeId [{}] had been used", request.getQrCodeId());
+                    return "Mã QR đã được sử dụng. Vui lòng thực hiện lại";
+                }
+
                 break;
-            case FORCE:
+            case FORM:
                 break;
             default:
                 break;
         }
         // TODO : Check ShiftTime
 
-        if (subType != CheckinSubTypeEnum.FORCE) {
+        if (subType != CheckinSubTypeEnum.FORM) {
             if (isOffThisSession(request)) {
                 return String.format("Hôm nay là ngày nghỉ của chi nhánh %s. Vui lòng thử lại sau.", request.getOfficeId());
             }

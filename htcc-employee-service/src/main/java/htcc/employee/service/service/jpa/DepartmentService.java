@@ -3,12 +3,14 @@ package htcc.employee.service.service.jpa;
 import htcc.common.entity.jpa.Department;
 import htcc.common.service.BaseJPAService;
 import htcc.employee.service.component.hazelcast.HazelcastLoader;
+import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.repository.jpa.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DepartmentService extends BaseJPAService<Department, Department.Key> {
@@ -21,17 +23,22 @@ public class DepartmentService extends BaseJPAService<Department, Department.Key
 
     @Override
     public List<Department> findAll() {
-        return repo.findAll();
+        return new ArrayList<>(DbStaticConfigMap.DEPARTMENT_MAP.values());
     }
 
     public List<Department> findByCompanyId(String companyId) {
-        return repo.findByCompanyId(companyId);
+        return DbStaticConfigMap.DEPARTMENT_MAP.values()
+                .stream()
+                .filter(o -> o.getCompanyId().equals(companyId))
+                .collect(Collectors.toList());
     }
 
     @Override
     public Department findById(Department.Key key) {
-        Optional<Department> office = repo.findById(key);
-        return office.orElse(null);
+        return DbStaticConfigMap.DEPARTMENT_MAP.values()
+                .stream()
+                .filter(o -> o.getCompanyId().equals(key.getCompanyId()) && o.getDepartment().equals(key.getDepartment()))
+                .findAny().orElse(null);
     }
 
     @Override

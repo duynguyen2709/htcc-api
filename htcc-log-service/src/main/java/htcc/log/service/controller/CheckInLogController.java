@@ -2,13 +2,16 @@ package htcc.log.service.controller;
 
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.checkin.CheckInLogEntity;
 import htcc.common.entity.checkin.CheckOutLogEntity;
+import htcc.common.entity.checkin.CheckinModel;
 import htcc.log.service.repository.CheckInLogRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;

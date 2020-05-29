@@ -1,7 +1,6 @@
 package htcc.log.service.entity.jpa;
 
 import htcc.common.entity.jpa.BaseJPAEntity;
-import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;

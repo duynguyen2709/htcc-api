@@ -8,7 +8,7 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.GoogleDriveService;
+import htcc.employee.service.service.googledrive.GoogleDriveService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -59,9 +59,6 @@ public class EmployeeInfoController {
         return response;
     }
 
-
-
-    // TODO : CHANGE GENDER TO REQUIRE TRUE
     @ApiOperation(value = "Cập nhật thông tin của nhân viên", response = EmployeeInfo.class)
     @PostMapping("/users/{companyId}/{username}")
     public BaseResponse updateUserInfo(@ApiParam(name = "companyId", value = "[Path] Mã công ty", defaultValue = "VNG", required = true)
@@ -79,7 +76,7 @@ public class EmployeeInfoController {
                                      @ApiParam(name = "fullName", value = "Họ tên", defaultValue = "NGUYỄN ANH DUY", required = true)
                                      @RequestParam(name = "fullName", required = true) String fullName,
                                      @ApiParam(name = "gender", value = "Giới tính", defaultValue = "1", required = true)
-                                     @RequestParam(name = "gender", required = false) int gender,
+                                     @RequestParam(name = "gender", required = true) int gender,
                                      @ApiParam(name = "birthDate", value = "Ngày sinh (yyyy-MM-dd)", defaultValue = "1998-09-27", required = true)
                                      @RequestParam(name = "birthDate", required = true) String birthDate,
                                      @ApiParam(name = "email", value = "Email", defaultValue = "naduy.hcmus@gmail.com", required = true)
@@ -203,6 +200,7 @@ public class EmployeeInfoController {
 
 
 
+    // TODO : DELETE THIS METHOD
     @ApiOperation(value = "Lấy thông tin của tất cả nhân viên (dành cho quản lý)", response = EmployeeInfo.class)
     @GetMapping("/users")
     public BaseResponse getAllUser() {

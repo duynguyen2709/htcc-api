@@ -18,6 +18,9 @@ public class LogService {
 
     private static final String baseURL = String.format("http://%s/internal/logs", Constant.HTCC_LOG_SERVICE);
 
+    /*
+    =========================== Complaint Section ===========================
+     */
     public BaseResponse getListComplaintLogByMonth(String yyyyMM) {
         int receiverType = 1;
         String method = String.format("/complaint/%s/%s",receiverType, yyyyMM);
@@ -30,14 +33,23 @@ public class LogService {
         return callGet(method);
     }
 
-
     public BaseResponse updateComplaintStatus(UpdateComplaintStatusModel model) {
         HttpEntity<UpdateComplaintStatusModel> request = new HttpEntity<>(model);
         String method = "/complaint/status";
         return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
     }
 
+    /*
+    =========================== Notification Section ===========================
+     */
+    public BaseResponse getListNotification(String yyyyMMdd, String sender) {
+        String method = String.format("/notifications/admin?yyyyMMdd=%s&sender=%s",yyyyMMdd, sender);
+        return callGet(method);
+    }
 
+    /*
+    =========================== Common Section ===========================
+     */
     private BaseResponse callGet(String method){
         return restTemplate.getForObject(baseURL + method, BaseResponse.class);
     }

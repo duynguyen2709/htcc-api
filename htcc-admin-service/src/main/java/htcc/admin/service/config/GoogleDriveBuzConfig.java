@@ -19,5 +19,6 @@ public class GoogleDriveBuzConfig {
     public static class BuzConfig {
         public String defaultAvatarImage;
         public String avatarImageFolder;
+        public String iconFolder;
     }
 }

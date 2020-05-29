@@ -5,6 +5,7 @@ security:
   user:
     name: admin
     password: admin
+  hashKey: ${security.user.password}
 
 eureka:
   client:
@@ -36,5 +37,9 @@ redis:
 
 kafka:
   enableProducer: true
-  enableConsumer: false
+  enableConsumer: true
   bootstrapAddress: 127.0.0.1:9092
+  buz:
+    eventLoadIcon:
+      topicName: EVENT-LOAD-ICON
+      groupId: EVENT-LOAD-ICON-EMPLOYEE-LOCAL

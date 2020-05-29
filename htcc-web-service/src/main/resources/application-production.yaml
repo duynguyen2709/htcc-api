@@ -1,0 +1,7 @@
+qrcode:
+  hashKey: 6h5K8dapxfFdVKAS
+  loadFromConfig: false
+  companyId: VNG
+  officeId: CAMPUS
+  baseUrl: https://1612145.online/api/employee
+  methodName: /public/genqrcode

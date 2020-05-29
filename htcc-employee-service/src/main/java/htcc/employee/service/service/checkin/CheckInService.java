@@ -82,7 +82,7 @@ public class CheckInService {
             if (res == null ||
                     res.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue() ||
                     res.getData() == null) {
-                return null;
+                throw new Exception();
             }
 
             String data = StringUtil.toJsonString(res.data);
@@ -92,5 +92,13 @@ public class CheckInService {
             log.warn("parseResponse {} return null", StringUtil.toJsonString(res));
             return null;
         }
+    }
+
+    public void setSucceedQrCheckin(String qrCodeId) {
+        redisService.setUsedQrCheckInCode(qrCodeId);
+    }
+
+    public boolean isQrCodeUsed(String qrCodeId) {
+        return !redisService.getUsedQrCheckInCode(qrCodeId).isEmpty();
     }
 }

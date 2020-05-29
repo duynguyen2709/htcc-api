@@ -8,12 +8,13 @@ import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.checkin.CheckinResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.Office;
-import htcc.common.entity.jpa.WorkingDay;
+import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.service.checkin.CheckInService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.OfficeService;
 import htcc.employee.service.service.jpa.WorkingDayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +28,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-@Api(tags = "API điểm danh", description = "API điểm danh của nhân viên") @RestController @Log4j2
+@Api(tags = "API điểm danh", description = "API điểm danh của nhân viên")
+@RestController
+@Log4j2
 public class GetCheckinInfoController {
 
     @Autowired
@@ -38,6 +41,9 @@ public class GetCheckinInfoController {
 
     @Autowired
     private WorkingDayService workingDayService;
+
+    @Autowired
+    private OfficeService officeService;
 
     // TODO : remove test allowDeleteCheckin
     @Value("${service.allowDeleteCheckin}")
@@ -134,7 +140,7 @@ public class GetCheckinInfoController {
     }
 
     private void setDetailOfficeList(CheckinResponse data, String companyId, String yyyyMMdd) {
-        List<Office> officeList = DbStaticConfigMap.findOfficeByCompanyId(companyId);
+        List<Office> officeList = officeService.findByCompanyId(companyId);
         for (Office office : officeList) {
             CheckinResponse.OfficeDetail detail = new CheckinResponse.OfficeDetail();
             detail.setOfficeId(office.getOfficeId());

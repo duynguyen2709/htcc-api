@@ -19,6 +19,15 @@ public class RedisCheckinService {
     @Autowired
     private RedisService redis;
 
+    public void setUsedQrCheckInCode(String qrCodeId) {
+        redis.set(qrCodeId, DateTimeUtil.getSecondUntilEndOfDay(),
+                redis.buzConfig.qrCodeCheckInFormat, qrCodeId);
+    }
+
+    public String getUsedQrCheckInCode(String qrCodeId) {
+        return StringUtil.valueOf(redis.get(redis.buzConfig.qrCodeCheckInFormat, qrCodeId));
+    }
+
     public void setCheckInLog(CheckinModel data) {
         List<CheckinModel> list = getCheckInLog(data.getCompanyId(), data.getUsername(), data.getDate());
         if (list == null){
@@ -63,6 +72,7 @@ public class RedisCheckinService {
         return StringUtil.json2Collection(rawList, new TypeToken<List<CheckinModel>>() {}.getType());
     }
 
+    // TODO : Delete this method after testing
     public void deleteCheckInLog(String companyId, String username, String date) {
         redis.delete(redis.buzConfig.checkinFormat, companyId, username, date);
         redis.delete(redis.buzConfig.checkoutFormat, companyId, username, date);

@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: htcc-web-service
+  profiles:
+    active: ${env:local}
+
+server:
+  port: 8206
+
+logging:
+  config: classpath:log4j2.properties

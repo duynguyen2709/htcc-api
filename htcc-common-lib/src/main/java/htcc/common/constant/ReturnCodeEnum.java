@@ -6,7 +6,7 @@ public enum ReturnCodeEnum {
 
     INIT(2, "Đang xử lý"),
     SUCCESS(1, "Thành công"),
-    EXCEPTION(0, "Hệ thống đang có lỗi. Vui lòng thử lại sau"),
+    EXCEPTION(0, "Hệ thống có lỗi. Vui lòng thử lại sau"),
     UNAUTHORIZE(401, "Xác thực token thất bại"),
     PERMISSION_DENIED(403, "Không có quyền truy cập"),
     WRONG_USERNAME_OR_PASSWORD(-1, "Sai tên đăng nhập hoặc mật khẩu"),
@@ -32,6 +32,7 @@ public enum ReturnCodeEnum {
     NOT_ALLOW_CANCEL_LEAVING_REQUEST(-19, "Không cho phép hủy đơn nghỉ phép"),
     DAY_OFF_CONFLICT_REMOVED(-20, "Ngày bạn đăng ký là ngày nghỉ của chi nhánh. Vui lòng kiểm tra lại"),
     NOT_CHECKOUT(-21, "Chưa thực hiện điểm danh ra trước khi điểm danh vào"),
+    INSUFFICIENT_PRIVILEGES(-22, "Không đủ quyền hạn để thực hiện hành động"),
     ;
 
     private final int value;

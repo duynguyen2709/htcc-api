@@ -7,7 +7,7 @@ import htcc.common.entity.checkin.CheckinRequest;
 import htcc.common.entity.log.RequestLogEntity;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.checkin.CheckInService;
-import htcc.employee.service.service.GoogleDriveService;
+import htcc.employee.service.service.googledrive.GoogleDriveService;
 import htcc.employee.service.service.checkin.CheckInBuzService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,9 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 public class ImageCheckinController {
 
     @Autowired
-    private CheckInService checkInService;
-
-    @Autowired
     private GoogleDriveService googleDriveService;
 
     @Autowired
@@ -42,7 +39,7 @@ public class ImageCheckinController {
     @ApiOperation(value = "Điểm danh", response = BaseResponse.class)
     @PostMapping(value = "/checkin/image",
                  consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public BaseResponse checkinByImage(@ApiParam(value = "[Param] Loại điểm danh (1: Vào / 2: Ra)", required = true)
+    public BaseResponse checkInByImage(@ApiParam(value = "[Param] Loại điểm danh (1: Vào / 2: Ra)", required = true)
                                             @RequestParam int type,
                                        @ApiParam(value = "[Param] Mã công ty", defaultValue = "VNG", required = true)
                                             @RequestParam String companyId,
@@ -66,16 +63,18 @@ public class ImageCheckinController {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Điểm danh thành công");
 
-        CheckinRequest request = new CheckinRequest(type, companyId, officeId,
-                username, clientTime, latitude, longitude, usedWifi, ip);
+        CheckinRequest request = new CheckinRequest(type, StringUtil.EMPTY, StringUtil.EMPTY,
+                companyId, officeId, username, clientTime, latitude, longitude, usedWifi, ip);
 
         long now = System.currentTimeMillis();
         Object requestTime = httpServletRequest.getAttribute(Constant.REQUEST_TIME);
         if (requestTime != null){
             now = (long)requestTime;
         }
+
         CheckinModel model = new CheckinModel(request, now);
         model.setSubType(CheckinSubTypeEnum.IMAGE.getValue());
+        model.setStatus(2);
 
         try {
             response = checkInBuzService.doCheckInBuz(model);
@@ -87,15 +86,11 @@ public class ImageCheckinController {
             model.setImage(getCheckInImage(model, image));
 
         } catch (Exception e){
-            log.error(String.format("checkinByImage [%s - %s] ex", request.companyId, request.username), e);
+            log.error(String.format("[checkInByImage] [%s] ex", StringUtil.toJsonString(model)), e);
             response = new BaseResponse<>(e);
         } finally {
             if (response.returnCode == ReturnCodeEnum.SUCCESS.getValue()) {
-                if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
-                    checkInService.setCheckInLog(model);
-                } else if (model.type == CheckinTypeEnum.CHECKOUT.getValue()) {
-                    checkInService.setCheckOutLog(model);
-                }
+                checkInBuzService.onCheckInSuccess(model);
             }
 
             printRequestLogEntity(httpServletRequest, response, model, now);

@@ -1,6 +1,6 @@
 package htcc.employee.service.service.jpa;
 
-import htcc.common.entity.jpa.WorkingDay;
+import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.service.BaseJPAService;
 import htcc.employee.service.component.hazelcast.HazelcastLoader;
 import htcc.employee.service.config.DbStaticConfigMap;

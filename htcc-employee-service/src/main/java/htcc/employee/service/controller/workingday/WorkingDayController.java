@@ -5,11 +5,12 @@ import htcc.common.constant.SessionEnum;
 import htcc.common.constant.WorkingDayTypeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.Office;
-import htcc.common.entity.jpa.WorkingDay;
+import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.entity.workingday.WorkingDayModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
+import htcc.employee.service.service.jpa.OfficeService;
 import htcc.employee.service.service.jpa.WorkingDayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,9 @@ public class WorkingDayController {
 
     @Autowired
     private WorkingDayService workingDayService;
+
+    @Autowired
+    private OfficeService officeService;
 
     @ApiOperation(value = "Lấy thông tin ngày làm việc trong 1 năm", response = WorkingDayModel.class)
     @GetMapping("/workingday/{companyId}/{officeId}/{yyyy}")
@@ -67,6 +72,13 @@ public class WorkingDayController {
                     dataResponse.getSpecialDays().add(day);
                 }
             }
+            dataResponse.getSpecialDays().sort(new Comparator<WorkingDay>() {
+
+                @Override
+                public int compare(WorkingDay o1, WorkingDay o2) {
+                    return Long.compare(Long.parseLong(o1.getDate()), Long.parseLong(o2.getDate()));
+                }
+            });
             response.setData(dataResponse);
 
         } catch (Exception e) {
@@ -237,7 +249,7 @@ public class WorkingDayController {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         try {
 
-            Office headquarter = DbStaticConfigMap.findHeadquarter(companyId);
+            Office headquarter = officeService.findHeadquarter(companyId);
             if (headquarter == null){
                 response = new BaseResponse(ReturnCodeEnum.DATA_NOT_FOUND);
                 response.setReturnMessage("Công ty chưa cấu hình trụ sở chính. Vui lòng kiểm tra lại.");

@@ -7,7 +7,13 @@ import htcc.common.constant.Constant;
 import htcc.common.constant.SessionEnum;
 import htcc.common.constant.WorkingDayTypeEnum;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
-import htcc.common.entity.jpa.*;
+import htcc.common.entity.jpa.BuzConfig;
+import htcc.common.entity.jpa.Company;
+import htcc.common.entity.jpa.Department;
+import htcc.common.entity.jpa.Office;
+import htcc.common.entity.shift.FixedShiftArrangement;
+import htcc.common.entity.shift.ShiftTime;
+import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.repository.jpa.*;
 import lombok.extern.log4j.Log4j2;
@@ -47,6 +53,9 @@ public class HazelcastLoader {
     @Autowired
     private ShiftTimeRepository shiftTimeRepository;
 
+    @Autowired
+    private FixedShiftArrangementRepository fixedShiftArrangementRepository;
+
     @PostConstruct
     public void loadAllStaticMap() throws Exception {
         log.info("####### Started Loading Static Config Map ########\n");
@@ -64,7 +73,27 @@ public class HazelcastLoader {
 
         loadShiftTimeMap();
 
+        loadFixedShiftArrangementMap();
+
         log.info("####### Loaded All Static Config Map Done ########\n");
+    }
+
+    public void loadFixedShiftArrangementMap() {
+        Map<String, List<FixedShiftArrangement>> map = new HashMap<>();
+
+        fixedShiftArrangementRepository.findAll().forEach(c -> {
+            String key = c.getCompanyId();
+            if (!map.containsKey(key) || map.get(key) == null) {
+                map.put(key, new ArrayList<>());
+            }
+
+            map.get(key).add(c);
+        });
+
+        FIXED_SHIFT_MAP = hazelcastService.reload(map, CacheKeyEnum.FIXED_SHIFT);
+        log.info("[loadFixedShiftArrangementMap] FIXED_SHIFT_MAP loaded succeed [{}]",
+                StringUtil.toJsonString(FIXED_SHIFT_MAP));
+
     }
 
     public void loadShiftTimeMap() {

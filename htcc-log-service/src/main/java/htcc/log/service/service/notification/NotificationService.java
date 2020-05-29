@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -72,7 +69,7 @@ public class NotificationService {
                 tokens.removeAll(oldTokens);
 
                 NotificationBuz buz = new NotificationBuz();
-                buz.setClientId(model.getClientId());
+                buz.setClientId(model.getTargetClientId());
                 buz.setCompanyId(model.getCompanyId());
                 buz.setUsername(model.getUsername());
                 buz.setTokens(StringUtil.toJsonString(tokens));
@@ -93,7 +90,7 @@ public class NotificationService {
                     model.getCompanyId(), model.getUsername(), StringUtil.toJsonString(model));
 
             List<NotificationModel> currentList = getPendingNotification(
-                    model.getClientId(), model.getCompanyId(), model.getUsername());
+                    model.getTargetClientId(), model.getCompanyId(), model.getUsername());
 
             if (currentList == null){
                 currentList = new ArrayList<>();
@@ -104,7 +101,7 @@ public class NotificationService {
             // save to redis for 1 day
             redis.set(StringUtil.toJsonString(currentList),24 * 60 * 60,
                     redis.buzConfig.notificationFormat,
-                    model.getClientId(), model.getCompanyId(), model.getUsername());
+                    model.getTargetClientId(), model.getCompanyId(), model.getUsername());
 
         } catch (Exception e){
             log.error("[savePendingNotification] {}", StringUtil.toJsonString(model), e);

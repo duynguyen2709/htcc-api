@@ -5,9 +5,11 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintResponse;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
+import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.service.ComplaintService;
+import htcc.employee.service.service.complaint.ComplaintService;
+import htcc.employee.service.service.jpa.EmployeeInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,7 +17,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "API của quản lý",
      description = "API để xử lý phản hồi/ khiếu nại cho quản lý")
@@ -26,6 +30,8 @@ public class UpdateComplaintController {
     @Autowired
     private ComplaintService complaintService;
 
+    @Autowired
+    private EmployeeInfoService employeeInfoService;
 
 
     @ApiOperation(value = "Lấy danh sách khiếu nại", response = ComplaintResponse.class)
@@ -42,6 +48,8 @@ public class UpdateComplaintController {
             }
 
             List<ComplaintResponse> list = complaintService.getListComplaintLogByCompany(companyId, yyyyMM);
+            formatSenderName(list);
+
             response.data = list;
 
         } catch (Exception e) {
@@ -51,8 +59,35 @@ public class UpdateComplaintController {
         return response;
     }
 
+    private void formatSenderName(List<ComplaintResponse> list) {
+        Map<String, String> fullNameMap = new HashMap<>();
 
-
+        for (ComplaintResponse entity : list) {
+            if (entity.getIsAnonymous() == 0) {
+                try {
+                    String key = entity.getCompanyId() + "_" + entity.getUsername();
+                    if (fullNameMap.containsKey(key)) {
+                        String fullName = fullNameMap.get(key).isEmpty() ? "" : String.format(" - %s", fullNameMap.get(key));
+                        entity.sender = String.format("%s%s", entity.getUsername(), fullName);
+                    }
+                    else {
+                        EmployeeInfo employeeInfo = employeeInfoService.findById(
+                                new EmployeeInfo.Key(entity.getCompanyId(), entity.getUsername()));
+                        if (employeeInfo != null) {
+                            fullNameMap.put(key, employeeInfo.getFullName());
+                        }
+                        else {
+                            fullNameMap.put(key, "");
+                        }
+                        String fullName = fullNameMap.get(key).isEmpty() ? "" : String.format(" - %s", fullNameMap.get(key));
+                        entity.sender = String.format("%s%s", entity.getUsername(), fullName);
+                    }
+                } catch (Exception e) {
+                    log.error("[formatSenderName] [{}]", StringUtil.toJsonString(entity), e);
+                }
+            }
+        }
+    }
 
     @ApiOperation(value = "Cập nhật trạng thái khiếu nại", response = BaseResponse.class)
     @PutMapping("/complaint/status")
