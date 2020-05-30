@@ -31,10 +31,10 @@ public class UpdateComplaintController {
     @GetMapping("/complaint/{month}")
     public BaseResponse getListComplaint(@ApiParam(value = "[Path] Tháng (yyyyMM)", required = true)
                                          @PathVariable String month) {
-        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        BaseResponse<List<ComplaintResponse>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             String yyyyMM = StringUtil.valueOf(month);
-            if (DateTimeUtil.isRightFormat(yyyyMM, "yyyyMM") == false) {
+            if (!DateTimeUtil.isRightFormat(yyyyMM, "yyyyMM")) {
                 return new BaseResponse<>(ReturnCodeEnum.DATE_WRONG_FORMAT, String.format("Tháng %s không phù hợp định dạng yyyyMM", month));
             }
 
@@ -63,7 +63,7 @@ public class UpdateComplaintController {
                 return new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID, String.format("Trạng thái %s không hợp lệ", request.getStatus()));
             }
 
-            if (DateTimeUtil.isRightFormat(request.getYyyyMM(), "yyyyMM") == false) {
+            if (!DateTimeUtil.isRightFormat(request.getYyyyMM(), "yyyyMM")) {
                 return new BaseResponse(ReturnCodeEnum.DATE_WRONG_FORMAT, String.format("Tháng %s không phù hợp định dạng yyyyMM", request.getYyyyMM()));
             }
 

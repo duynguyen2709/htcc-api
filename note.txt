@@ -261,4 +261,4 @@
 
 29-05-2020:
  + Version 1.9.2:
-    - [Employee] API copy ShiftTemplate
+    - [Employee] API copy ShiftTemplate, Add employeeShiftDetail on API GetShiftArrangement

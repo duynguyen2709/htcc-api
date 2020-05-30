@@ -3,6 +3,7 @@ package htcc.employee.service.controller.shifttime;
 import com.google.gson.reflect.TypeToken;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.shift.MiniShiftTime;
 import htcc.common.entity.shift.ShiftArrangementTemplate;
 import htcc.common.entity.shift.ShiftTemplateRequest;
 import htcc.common.entity.shift.ShiftTime;
@@ -36,7 +37,7 @@ public class ShiftTemplateController {
             List<ShiftArrangementTemplate> dataResponse = shiftArrangementTemplateService.findByCompanyId(companyId);
             dataResponse.forEach(c -> {
                 c.shiftTimeMap = StringUtil.json2Collection(c.data,
-                        new TypeToken<Map<Integer, List<ShiftArrangementTemplate.MiniShiftTime>>>(){}.getType());
+                        new TypeToken<Map<Integer, List<MiniShiftTime>>>(){}.getType());
 
                 for (int i = 1; i <= 7; i++) {
                     if (!c.getShiftTimeMap().containsKey(i)) {
@@ -89,10 +90,10 @@ public class ShiftTemplateController {
             entity.setCompanyId(request.getCompanyId());
             entity.setTemplateName(request.getTemplateName());
             entity.setShiftTimeMap(new HashMap<>());
-            for (ShiftTemplateRequest.MiniShiftTime miniShiftTime : request.getShiftTimeList()) {
-                ShiftArrangementTemplate.MiniShiftTime detail = new ShiftArrangementTemplate.MiniShiftTime();
-                detail.setOfficeId(miniShiftTime.getOfficeId());
-                detail.setShiftId(miniShiftTime.getShiftId());
+            for (ShiftTemplateRequest.ShiftTemplateDetail shiftTemplateDetail : request.getShiftTimeList()) {
+                MiniShiftTime detail = new MiniShiftTime();
+                detail.setOfficeId(shiftTemplateDetail.getOfficeId());
+                detail.setShiftId(shiftTemplateDetail.getShiftId());
 
                 ShiftTime shiftTime = shiftTimeService.findById(new ShiftTime.Key(request.getCompanyId(),
                         detail.getOfficeId(), detail.getShiftId()));
@@ -104,11 +105,11 @@ public class ShiftTemplateController {
                 detail.setStartTime(shiftTime.getStartTime());
                 detail.setEndTime(shiftTime.getEndTime());
 
-                if (!entity.getShiftTimeMap().containsKey(miniShiftTime.getWeekDay())) {
-                    entity.getShiftTimeMap().put(miniShiftTime.getWeekDay(), new ArrayList<>());
+                if (!entity.getShiftTimeMap().containsKey(shiftTemplateDetail.getWeekDay())) {
+                    entity.getShiftTimeMap().put(shiftTemplateDetail.getWeekDay(), new ArrayList<>());
                 }
 
-                entity.getShiftTimeMap().get(miniShiftTime.getWeekDay()).add(detail);
+                entity.getShiftTimeMap().get(shiftTemplateDetail.getWeekDay()).add(detail);
             }
 
             for (int i = 1; i <= 7; i++) {
@@ -117,8 +118,8 @@ public class ShiftTemplateController {
                 }
             }
 
-            for (List<ShiftArrangementTemplate.MiniShiftTime> list : entity.getShiftTimeMap().values()) {
-                list.sort(ShiftArrangementTemplate.MiniShiftTime.getComparator());
+            for (List<MiniShiftTime> list : entity.getShiftTimeMap().values()) {
+                list.sort(MiniShiftTime.getComparator());
             }
 
             entity.setData(entity.getShiftTimeMap());

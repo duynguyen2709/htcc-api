@@ -46,7 +46,7 @@ public class ShiftArrangementTemplate extends BaseJPAEntity {
         this.data = StringUtil.toJsonString(shiftTimeMap);
     }
 
-    public Map<Integer, MiniShiftTime> getData() {
+    public Map<Integer, List<MiniShiftTime>> getData() {
         return StringUtil.json2Collection(this.data,
                 new TypeToken<Map<Integer, List<MiniShiftTime>>>(){}.getType());
     }
@@ -54,28 +54,5 @@ public class ShiftArrangementTemplate extends BaseJPAEntity {
     @Override
     public String isValid() {
         return StringUtil.EMPTY;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class MiniShiftTime implements Serializable {
-
-        private static final long serialVersionUID = 5922818518L;
-
-        public String officeId;
-        public String shiftId;
-        public String shiftName;
-        public String startTime;
-        public String endTime;
-
-        public static Comparator<MiniShiftTime> getComparator() {
-            return new Comparator<MiniShiftTime>() {
-                @Override
-                public int compare(MiniShiftTime o1, MiniShiftTime o2) {
-                    return o1.getOfficeId().compareTo(o2.getOfficeId());
-                }
-            };
-        }
     }
 }

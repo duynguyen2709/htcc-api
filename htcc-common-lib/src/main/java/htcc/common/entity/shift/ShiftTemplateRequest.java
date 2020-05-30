@@ -1,6 +1,5 @@
 package htcc.common.entity.shift;
 
-import htcc.common.constant.WeekDayEnum;
 import htcc.common.entity.jpa.BaseJPAEntity;
 import htcc.common.util.StringUtil;
 import lombok.AllArgsConstructor;
@@ -17,10 +16,10 @@ public class ShiftTemplateRequest extends BaseJPAEntity {
 
     private static final long serialVersionUID = 592257123408L;
 
-    public String companyId = "";
-    public String templateName = "";
-    public String actor = "";
-    public List<MiniShiftTime> shiftTimeList = new ArrayList<>();
+    public String                    companyId     = "";
+    public String                    templateName  = "";
+    public String                    actor         = "";
+    public List<ShiftTemplateDetail> shiftTimeList = new ArrayList<>();
 
     @Override
     public String isValid() {
@@ -36,7 +35,7 @@ public class ShiftTemplateRequest extends BaseJPAEntity {
             return "Danh sách ca không được rỗng";
         }
 
-        for (MiniShiftTime shift : shiftTimeList) {
+        for (ShiftTemplateDetail shift : shiftTimeList) {
             if (shift.weekDay < 1 || shift.weekDay > 7) {
                 return String.format("Thứ %s không hợp lệ", shift.weekDay);
             }
@@ -56,7 +55,7 @@ public class ShiftTemplateRequest extends BaseJPAEntity {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class MiniShiftTime implements Serializable {
+    public static class ShiftTemplateDetail implements Serializable {
 
         private static final long serialVersionUID = 5922818518L;
 
