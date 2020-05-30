@@ -207,9 +207,6 @@ public class ShiftArrangementController {
 
                             Map<Integer, List<MiniShiftTime>> employeeShiftDetail =
                                     dataResponse.getEmployeeShiftDetailMap().get(username).getFixedShiftMap();
-                            if (!employeeShiftDetail.containsKey(entity.getWeekDay())) {
-                                employeeShiftDetail.put(entity.getWeekDay(), new ArrayList<>());
-                            }
 
                             MiniShiftTime miniShiftTime = new MiniShiftTime();
                             miniShiftTime.setOfficeId(officeShiftInfos.getOfficeId());
@@ -235,6 +232,14 @@ public class ShiftArrangementController {
             map.put(c.getUsername(), c);
             employeeShiftDetailMap.put(c.getUsername(), new EmployeeShiftDetail());
         });
+
+        employeeShiftDetailMap.values()
+                .forEach(c -> {
+                    Map<Integer, List<MiniShiftTime>> fixedShiftMap = c.getFixedShiftMap();
+                    for (int i = 1; i < 7; i++) {
+                        fixedShiftMap.put(i, new ArrayList<>());
+                    }
+                });
 
         dataResponse.setCanManageEmployees(employeeInfoList);
         dataResponse.setCanManageEmployeesMap(map);
