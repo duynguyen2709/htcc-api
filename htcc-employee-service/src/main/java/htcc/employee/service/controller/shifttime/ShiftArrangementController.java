@@ -13,7 +13,6 @@ import htcc.common.util.StringUtil;
 import htcc.employee.service.repository.EmployeePermissionRepository;
 import htcc.employee.service.service.jpa.FixedShiftArrangementService;
 import htcc.employee.service.service.jpa.OfficeService;
-import htcc.employee.service.service.jpa.ShiftArrangementTemplateService;
 import htcc.employee.service.service.jpa.ShiftTimeService;
 import htcc.employee.service.service.shiftarrangement.ShiftArrangementService;
 import io.swagger.annotations.ApiParam;
@@ -30,9 +29,6 @@ import java.util.stream.Collectors;
 @RestController
 @Log4j2
 public class ShiftArrangementController {
-
-    @Autowired
-    private ShiftArrangementTemplateService shiftTemplateService;
 
     @Autowired
     private ShiftArrangementService shiftArrangementService;
@@ -320,14 +316,7 @@ public class ShiftArrangementController {
                 return response;
             }
 
-            ShiftArrangementTemplate template = shiftTemplateService.findById(request.getTemplateId());
-            if (template == null) {
-                response = new BaseResponse<>(ReturnCodeEnum.DATA_NOT_FOUND);
-                response.setReturnMessage("Không tìm thấy ca mẫu có id " + request.getTemplateId());
-                return response;
-            }
-
-            return insertShiftFromTemplate(template, request);
+            return insertShiftFromTemplate(request);
 
         } catch (Exception e) {
             log.error("[copyShiftArrangementFromTemplate] [{}] ex", StringUtil.toJsonString(request), e);
@@ -336,9 +325,9 @@ public class ShiftArrangementController {
         return response;
     }
 
-    private BaseResponse insertShiftFromTemplate(ShiftArrangementTemplate template, CopyShiftRequest request) {
+    private BaseResponse insertShiftFromTemplate(CopyShiftRequest request) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
-        Map<Integer, List<MiniShiftTime>> dataMap = template.getData();
+        Map<Integer, List<MiniShiftTime>> dataMap = request.getData();
         for (Map.Entry<Integer, List<MiniShiftTime>> entry : dataMap.entrySet()) {
             for (MiniShiftTime miniShift : entry.getValue()) {
                 ShiftArrangementRequest arrangeRequest = new ShiftArrangementRequest();
