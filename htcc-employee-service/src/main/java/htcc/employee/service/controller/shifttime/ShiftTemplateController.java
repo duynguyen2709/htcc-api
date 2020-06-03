@@ -43,6 +43,10 @@ public class ShiftTemplateController {
                     if (!c.getShiftTimeMap().containsKey(i)) {
                         c.getShiftTimeMap().put(i, new ArrayList<>());
                     }
+
+                    c.getShiftTimeMap().get(i).forEach(ele -> {
+                        ele.setShiftTime(String.format("%s - %s", ele.getStartTime(), ele.getEndTime()));
+                    });
                 }
             });
 
