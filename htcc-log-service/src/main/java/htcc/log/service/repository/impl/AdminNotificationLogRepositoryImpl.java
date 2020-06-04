@@ -30,10 +30,6 @@ public class AdminNotificationLogRepositoryImpl implements AdminNotificationLogR
             final String query = String.format("SELECT * FROM %s WHERE sourceClientId = ? " +
                     "AND sender = ? AND ymd = ? ORDER BY sendTime ASC", tableName);
 
-            if (!NotificationLogRepositoryImpl.MAP_TABLE_NOTIFICATION_LOG.containsKey(tableName)) {
-                return new ArrayList<>();
-            }
-
             return jdbcTemplate.query(query,
                     new Object[] { ClientSystemEnum.ADMIN_WEB.getValue(), sender, yyyyMMdd },
                     new NotificationLogRowMapper());

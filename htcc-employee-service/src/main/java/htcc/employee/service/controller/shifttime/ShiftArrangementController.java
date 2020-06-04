@@ -232,7 +232,7 @@ public class ShiftArrangementController {
         employeeShiftDetailMap.values()
                 .forEach(c -> {
                     Map<Integer, List<MiniShiftTime>> fixedShiftMap = c.getFixedShiftMap();
-                    for (int i = 1; i < 7; i++) {
+                    for (int i = 1; i <= 7; i++) {
                         fixedShiftMap.put(i, new ArrayList<>());
                     }
                 });
