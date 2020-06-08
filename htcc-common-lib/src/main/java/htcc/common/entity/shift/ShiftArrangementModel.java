@@ -1,6 +1,7 @@
 package htcc.common.entity.shift;
 
 import htcc.common.util.DateTimeUtil;
+import htcc.common.util.StringUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,12 +20,13 @@ public class ShiftArrangementModel implements Serializable {
     public String  companyId        = "";
     public String  officeId         = "";
     public String  username         = "";
-    public String  shiftId          = "";
-    public String  startTime        = "";
-    public String  endTime          = "";
-    public float   dayCount         = 0;
-    public boolean allowDiffTime    = false;
-    public int     allowLateMinutes = 0;
+    public ShiftTime shiftTime = new ShiftTime();
+//    public String  shiftId          = "";
+//    public String  startTime        = "";
+//    public String  endTime          = "";
+//    public float   dayCount         = 0;
+//    public boolean allowDiffTime    = false;
+//    public int     allowLateMinutes = 0;
     public String  actor            = "";
     public boolean isFixed          = false;
 
@@ -35,21 +37,16 @@ public class ShiftArrangementModel implements Serializable {
         this.companyId = request.getCompanyId();
         this.officeId = request.getOfficeId();
         this.username = request.getUsername();
-        this.shiftId = request.getShiftId();
+        this.shiftTime.shiftId = request.getShiftId();
         this.actor = request.getActor();
         this.arrangementId = String.format("%s-%s-%s-%s-%s-%s",
-                this.arrangeDate, this.companyId, this.officeId, this.shiftId,
+                this.arrangeDate, this.companyId, this.officeId, request.getShiftId(),
                         this.username, request.getType());
         this.isFixed = false;
     }
 
     public void setShiftData(ShiftTime shiftTime) {
-        this.shiftId = shiftTime.getShiftId();
-        this.startTime = shiftTime.getStartTime();
-        this.endTime = shiftTime.getEndTime();
-        this.dayCount = shiftTime.getDayCount();
-        this.allowDiffTime = shiftTime.isAllowDiffTime();
-        this.allowLateMinutes = shiftTime.getAllowLateMinutes();
+        this.shiftTime = shiftTime;
     }
 
     public ShiftArrangementModel(ShiftArrangementLogEntity model) {
@@ -60,10 +57,7 @@ public class ShiftArrangementModel implements Serializable {
         this.companyId = model.getCompanyId();
         this.officeId = model.getOfficeId();
         this.username = model.getUsername();
-        this.shiftId = model.getShiftId();
-        this.startTime = model.getStartTime();
-        this.endTime = model.getEndTime();
-        this.dayCount = model.getDayCount();
+        this.shiftTime = StringUtil.fromJsonString(model.getShiftTime(), ShiftTime.class);
         this.actor = model.getActor();
         this.isFixed = (model.getIsFixed() == 1);
     }

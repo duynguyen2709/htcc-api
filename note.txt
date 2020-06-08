@@ -262,3 +262,7 @@
 29-05-2020:
  + Version 1.9.2:
     - [Employee] API copy ShiftTemplate, Add employeeShiftDetail on API GetShiftArrangement
+
+08-06-2020:
+ + Version 1.9.3:
+    - [Employee] Edit model ShiftArrangement add ShiftTime detail

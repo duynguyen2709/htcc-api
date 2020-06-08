@@ -3,6 +3,7 @@ package htcc.common.entity.shift;
 import htcc.common.component.LoggingConfiguration;
 import htcc.common.entity.base.BaseLogEntity;
 import htcc.common.util.DateTimeUtil;
+import htcc.common.util.StringUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,12 +23,7 @@ public class ShiftArrangementLogEntity extends BaseLogEntity {
     public String companyId        = "";
     public String officeId         = "";
     public String username         = "";
-    public String shiftId          = "";
-    public String startTime        = "";
-    public String endTime          = "";
-    public float  dayCount         = 0;
-    public int    allowDiffTime    = 0;
-    public int    allowLateMinutes = 0;
+    public String shiftTime          = "";
     public String actor            = "";
     public int    isFixed          = 0;
 
@@ -40,12 +36,7 @@ public class ShiftArrangementLogEntity extends BaseLogEntity {
         this.companyId = model.getCompanyId();
         this.officeId = model.getOfficeId();
         this.username = model.getUsername();
-        this.shiftId = model.getShiftId();
-        this.startTime = model.getStartTime();
-        this.endTime = model.getEndTime();
-        this.dayCount = model.getDayCount();
-        this.allowDiffTime = model.isAllowDiffTime() ? 1 : 0;
-        this.allowLateMinutes = model.getAllowLateMinutes();
+        this.shiftTime = StringUtil.toJsonString(model.getShiftTime());
         this.actor = model.getActor();
         this.isFixed = (model.isFixed() ? 1 : 0);
     }
@@ -61,12 +52,7 @@ public class ShiftArrangementLogEntity extends BaseLogEntity {
         params.put("companyId", this.companyId);
         params.put("officeId", this.officeId);
         params.put("username", this.username);
-        params.put("shiftId", this.shiftId);
-        params.put("startTime", this.startTime);
-        params.put("endTime", this.endTime);
-        params.put("dayCount", this.dayCount);
-        params.put("allowDiffTime", this.allowDiffTime);
-        params.put("allowLateMinutes", this.allowLateMinutes);
+        params.put("shiftTime", this.shiftTime);
         params.put("actor", this.actor);
         params.put("isFixed", this.isFixed);
         return params;

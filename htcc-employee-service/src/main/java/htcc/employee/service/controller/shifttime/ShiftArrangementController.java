@@ -153,7 +153,7 @@ public class ShiftArrangementController {
             ShiftArrangementResponse.OfficeShiftInfo officeShiftInfos = dataResponse.findOfficeShiftInfo(entity.getOfficeId(), false);
 
             if (officeShiftInfos != null) {
-                ShiftArrangementResponse.ShiftDetail shiftDetail = officeShiftInfos.findShiftDetail(entity.getShiftId());
+                ShiftArrangementResponse.ShiftDetail shiftDetail = officeShiftInfos.findShiftDetail(entity.getShiftTime().getShiftId());
 
                 if (shiftDetail != null) {
                     ShiftArrangementResponse.ShiftByDayDetail shiftByDayDetail = shiftDetail.findShiftByDateDetail(entity.getArrangeDate(), false);
@@ -439,7 +439,7 @@ public class ShiftArrangementController {
 
         for (ShiftArrangementModel log : shiftByDateList) {
             if (DateTimeUtil.isConflictTime(shiftTime.getStartTime(), shiftTime.getEndTime(),
-                    log.getStartTime(), log.getEndTime())) {
+                    log.getShiftTime().getStartTime(), log.getShiftTime().getEndTime())) {
                 return true;
             }
         }

@@ -63,14 +63,13 @@ public class InsertFixedShiftArrangementDailyJob {
                 model.setCompanyId(entity.getCompanyId());
                 model.setUsername(entity.getUsername());
                 model.setOfficeId(entity.getOfficeId());
-                model.setShiftId(entity.getShiftId());
                 model.setShiftData(shiftTime);
                 model.setArrangeDate(yyyyMMdd);
                 model.setWeek(DateTimeUtil.getWeekNum(yyyyMMdd));
                 model.setFixed(true);
                 model.setActor(entity.getActor());
                 model.setArrangementId(String.format("%s-%s-%s-%s-%s-%s",
-                        model.getArrangeDate(), model.getCompanyId(), model.getOfficeId(), model.getShiftId(),
+                        model.getArrangeDate(), model.getCompanyId(), model.getOfficeId(), shiftTime.getShiftId(),
                         model.getUsername(), ShiftArrangementTypeEnum.FIXED.getValue()));
 
                 BaseResponse response = logService.insertShiftArrangement(model);
