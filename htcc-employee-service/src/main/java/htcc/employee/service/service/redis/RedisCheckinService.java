@@ -71,10 +71,4 @@ public class RedisCheckinService {
         }
         return StringUtil.json2Collection(rawList, new TypeToken<List<CheckinModel>>() {}.getType());
     }
-
-    // TODO : Delete this method after testing
-    public void deleteCheckInLog(String companyId, String username, String date) {
-        redis.delete(redis.buzConfig.checkinFormat, companyId, username, date);
-        redis.delete(redis.buzConfig.checkoutFormat, companyId, username, date);
-    }
 }

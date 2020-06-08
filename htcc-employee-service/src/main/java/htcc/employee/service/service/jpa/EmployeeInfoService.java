@@ -7,6 +7,7 @@ import htcc.common.service.BaseJPAService;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.repository.jpa.EmployeeInfoRepository;
+import htcc.employee.service.service.redis.RedisEmployeeInfoService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -25,6 +26,9 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
 
     @Autowired
     private EntityManager em;
+
+    @Autowired
+    private RedisEmployeeInfoService redis;
 
     @Override
     public List<EmployeeInfo> findAll() {
@@ -74,23 +78,25 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
 
     @Override
     public EmployeeInfo findById(EmployeeInfo.Key key) {
-        Optional<EmployeeInfo> user = repo.findById(key);
-        return user.orElse(null);
+        return redis.getEmployeeInfo(key);
     }
 
     @Override
     public EmployeeInfo create(EmployeeInfo employeeInfo) {
-        return repo.save(employeeInfo);
+        EmployeeInfo newEnt = repo.save(employeeInfo);
+        redis.deleteEmployeeInfo(new EmployeeInfo.Key(employeeInfo.getCompanyId(), employeeInfo.getUsername()));
+        return newEnt;
     }
 
     @Override
     public EmployeeInfo update(EmployeeInfo employeeInfo) {
-        return repo.save(employeeInfo);
+        return create(employeeInfo);
     }
 
     @Override
     public void delete(EmployeeInfo.Key key) {
         repo.deleteById(key);
+        redis.deleteEmployeeInfo(key);
     }
 
     @Async("asyncExecutor")
@@ -145,6 +151,9 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
                 employee.setOfficeId(StringUtil.EMPTY);
             }
             repo.saveAll(listEmployee);
+            for (EmployeeInfo employee : listEmployee) {
+                redis.deleteEmployeeInfo(new EmployeeInfo.Key(employee.getCompanyId(), employee.getUsername()));
+            }
         } catch (Exception e) {
             log.error(String.format("[deleteOffice] [%s-%s] ex", companyId, officeId), e);
         }
@@ -157,6 +166,9 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
                 employee.setDepartment(StringUtil.EMPTY);
             }
             repo.saveAll(listEmployee);
+            for (EmployeeInfo employee : listEmployee) {
+                redis.deleteEmployeeInfo(new EmployeeInfo.Key(employee.getCompanyId(), employee.getUsername()));
+            }
         } catch (Exception e) {
             log.error(String.format("[deleteDepartment] [%s-%s] ex", companyId, department), e);
         }

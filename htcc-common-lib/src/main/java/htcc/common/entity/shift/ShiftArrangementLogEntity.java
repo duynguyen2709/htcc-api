@@ -15,19 +15,21 @@ public class ShiftArrangementLogEntity extends BaseLogEntity {
 
     private static final String TABLE_NAME = "ShiftArrangementLog";
 
-    public String arrangementId = "";
-    public long   actionTime    = 0L;
-    public int    week          = 0;
-    public String arrangeDate   = "";
-    public String companyId     = "";
-    public String officeId      = "";
-    public String username      = "";
-    public String shiftId       = "";
-    public String startTime     = "";
-    public String endTime       = "";
-    public float  dayCount      = 0;
-    public String actor         = "";
-    public int    isFixed       = 0;
+    public String arrangementId    = "";
+    public long   actionTime       = 0L;
+    public int    week             = 0;
+    public String arrangeDate      = "";
+    public String companyId        = "";
+    public String officeId         = "";
+    public String username         = "";
+    public String shiftId          = "";
+    public String startTime        = "";
+    public String endTime          = "";
+    public float  dayCount         = 0;
+    public int    allowDiffTime    = 0;
+    public int    allowLateMinutes = 0;
+    public String actor            = "";
+    public int    isFixed          = 0;
 
     public ShiftArrangementLogEntity(ShiftArrangementModel model) {
         this.requestId = LoggingConfiguration.getTraceId();
@@ -42,6 +44,8 @@ public class ShiftArrangementLogEntity extends BaseLogEntity {
         this.startTime = model.getStartTime();
         this.endTime = model.getEndTime();
         this.dayCount = model.getDayCount();
+        this.allowDiffTime = model.isAllowDiffTime() ? 1 : 0;
+        this.allowLateMinutes = model.getAllowLateMinutes();
         this.actor = model.getActor();
         this.isFixed = (model.isFixed() ? 1 : 0);
     }
@@ -61,6 +65,8 @@ public class ShiftArrangementLogEntity extends BaseLogEntity {
         params.put("startTime", this.startTime);
         params.put("endTime", this.endTime);
         params.put("dayCount", this.dayCount);
+        params.put("allowDiffTime", this.allowDiffTime);
+        params.put("allowLateMinutes", this.allowLateMinutes);
         params.put("actor", this.actor);
         params.put("isFixed", this.isFixed);
         return params;

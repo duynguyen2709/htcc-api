@@ -291,6 +291,24 @@ public class ShiftArrangementController {
                 return response;
             }
 
+            if (request.getType() == ShiftArrangementTypeEnum.FIXED.getValue()) {
+                if (isConflictFixedShift(request)) {
+                    response = new BaseResponse(ReturnCodeEnum.SHIFT_CONFLICT);
+                    response.setReturnMessage(String.format("%s đã có ca làm việc. Vui lòng kiểm tra lại",
+                            request.getWeekDay() == WeekDayEnum.SUNDAY_LAST_WEEK.getValue() ? "Chủ nhật" : "Thứ " + request.getWeekDay()));
+                    return response;
+                }
+            }
+
+            if (request.getType() == ShiftArrangementTypeEnum.DAY.getValue()) {
+                if (isConflictShiftByDate(request)) {
+                    response = new BaseResponse(ReturnCodeEnum.SHIFT_CONFLICT);
+                    response.setReturnMessage(String.format("Ngày %s đã có ca làm việc. Vui lòng kiểm tra lại",
+                            DateTimeUtil.convertToOtherFormat(request.getArrangeDate(), "yyyyMMdd", "dd-MM-yyyy")));
+                    return response;
+                }
+            }
+
             response = shiftArrangementService.insertShiftArrangement(request);
         } catch (Exception e) {
             log.error("[insertShiftArrangement] [{}] ex", StringUtil.toJsonString(request), e);
@@ -325,9 +343,10 @@ public class ShiftArrangementController {
         return response;
     }
 
-    private BaseResponse insertShiftFromTemplate(CopyShiftRequest request) {
+    private BaseResponse insertShiftFromTemplate(CopyShiftRequest request) throws Exception {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         Map<Integer, List<MiniShiftTime>> dataMap = request.getData();
+        List<ShiftArrangementRequest> shiftArrangementRequestList = new ArrayList<>();
         for (Map.Entry<Integer, List<MiniShiftTime>> entry : dataMap.entrySet()) {
             for (MiniShiftTime miniShift : entry.getValue()) {
                 ShiftArrangementRequest arrangeRequest = new ShiftArrangementRequest();
@@ -340,13 +359,91 @@ public class ShiftArrangementController {
                 arrangeRequest.setShiftId(miniShift.getShiftId());
                 arrangeRequest.setOfficeId(miniShift.getOfficeId());
 
-                response = shiftArrangementService.insertShiftArrangement(arrangeRequest);
-                if (response == null || response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
-                    return response;
-                }
+                shiftArrangementRequestList.add(arrangeRequest);
             }
         }
+
+        for (ShiftArrangementRequest shift : shiftArrangementRequestList) {
+            if (isConflictFixedShift(shift)) {
+                response = new BaseResponse(ReturnCodeEnum.SHIFT_CONFLICT);
+                response.setReturnMessage(String.format("%s đã có ca làm việc. Vui lòng kiểm tra lại",
+                        shift.getWeekDay() == WeekDayEnum.SUNDAY_LAST_WEEK.getValue() ? "Chủ nhật" : "Thứ " + shift.getWeekDay()));
+                return response;
+            }
+        }
+
+        for (ShiftArrangementRequest shift : shiftArrangementRequestList) {
+            response = shiftArrangementService.insertShiftArrangement(shift);
+            if (response == null || response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
+                return response;
+            }
+        }
+
         response.setReturnMessage("Sao chép ca thành công");
         return response;
+    }
+
+    private boolean isConflictFixedShift(ShiftArrangementRequest request) throws Exception {
+        List<FixedShiftArrangement> fixedShiftList = fixedShiftArrangementService.findByCompanyIdAndUsername(request.getCompanyId(), request.getUsername());
+        if (fixedShiftList == null || fixedShiftList.isEmpty()) {
+            return false;
+        }
+
+        List<ShiftTime> targetList = new ArrayList<>();
+        for (FixedShiftArrangement fixedShift : fixedShiftList) {
+            ShiftTime shift = shiftTimeService.findById(new ShiftTime.Key(fixedShift.getCompanyId(), fixedShift.getOfficeId(), fixedShift.getShiftId()));
+            if (shift == null) {
+                throw new Exception("shiftTimeService.findById return null");
+            }
+            targetList.add(shift);
+        }
+
+        if (targetList.isEmpty()) {
+            return false;
+        }
+
+        ShiftTime shiftTime = shiftTimeService.findById(new ShiftTime.Key(
+                request.getCompanyId(), request.getOfficeId(), request.getShiftId()));
+
+        if (shiftTime == null) {
+            throw new Exception("shiftTimeService.findById return null");
+        }
+
+        for (ShiftTime log : targetList) {
+            if (DateTimeUtil.isConflictTime(shiftTime.getStartTime(), shiftTime.getEndTime(),
+                    log.getStartTime(), log.getEndTime())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isConflictShiftByDate(ShiftArrangementRequest request) throws Exception {
+        List<ShiftArrangementModel> shiftByDateList = shiftArrangementService
+                .getShiftArrangementListByEmployee(request)
+                .stream()
+                .filter(c -> !c.isFixed())
+                .collect(Collectors.toList());
+
+        if (shiftByDateList.isEmpty()) {
+            return false;
+        }
+
+        ShiftTime shiftTime = shiftTimeService.findById(new ShiftTime.Key(
+                request.getCompanyId(), request.getOfficeId(), request.getShiftId()));
+
+        if (shiftTime == null) {
+            throw new Exception("shiftTimeService.findById return null");
+        }
+
+        for (ShiftArrangementModel log : shiftByDateList) {
+            if (DateTimeUtil.isConflictTime(shiftTime.getStartTime(), shiftTime.getEndTime(),
+                    log.getStartTime(), log.getEndTime())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

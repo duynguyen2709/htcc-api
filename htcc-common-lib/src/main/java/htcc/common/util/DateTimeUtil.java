@@ -177,4 +177,63 @@ public class DateTimeUtil {
             return false;
         }
     }
+
+    private static boolean isBetweenTwoTime(String argStartTime, String argEndTime, String argCurrentTime) {
+        if (argCurrentTime.equals(argStartTime) || argCurrentTime.equals(argEndTime)) {
+            return false;
+        }
+
+        boolean valid = false;
+        try {
+            // Start Time
+            java.util.Date startTime = new SimpleDateFormat("HH:mm").parse(argStartTime);
+            Calendar startCalendar = Calendar.getInstance();
+            startCalendar.setTime(startTime);
+
+            // Current Time
+            java.util.Date currentTime = new SimpleDateFormat("HH:mm").parse(argCurrentTime);
+            Calendar currentCalendar = Calendar.getInstance();
+            currentCalendar.setTime(currentTime);
+
+            // End Time
+            java.util.Date endTime = new SimpleDateFormat("HH:mm").parse(argEndTime);
+            Calendar endCalendar = Calendar.getInstance();
+            endCalendar.setTime(endTime);
+
+            if (currentTime.compareTo(endTime) < 0) {
+                currentCalendar.add(Calendar.DATE, 1);
+                currentTime = currentCalendar.getTime();
+            }
+
+            if (startTime.compareTo(endTime) < 0) {
+                startCalendar.add(Calendar.DATE, 1);
+                startTime = startCalendar.getTime();
+            }
+
+            if (currentTime.before(startTime)) {
+                valid = false;
+            }
+            else {
+                if (currentTime.after(endTime)) {
+                    endCalendar.add(Calendar.DATE, 1);
+                    endTime = endCalendar.getTime();
+                }
+
+                if (currentTime.before(endTime)) {
+                    valid = true;
+                }
+            }
+        } catch (Exception e) {
+            log.error("[isBetweenTwoTime] ex", e);
+        }
+        return valid;
+    }
+
+    public static boolean isConflictTime(String start1, String end1, String start2, String end2) {
+        return (isBetweenTwoTime(start1, end1, start2) ||
+                isBetweenTwoTime(start1, end1, end2) ||
+                isBetweenTwoTime(start2, end2, start1) ||
+                isBetweenTwoTime(start2, end2, end1)
+        );
+    }
 }

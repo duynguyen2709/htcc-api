@@ -133,6 +133,11 @@ public class LogService {
         return callGet(method);
     }
 
+    public BaseResponse getShiftArrangementListByEmployee(String companyId, String username, String arrangeDate) {
+        String method = String.format("/shifts?companyId=%s&username=%s&arrangeDate=%s", companyId, username, arrangeDate);
+        return callGet(method);
+    }
+
     public BaseResponse deleteShiftArrangement(String arrangementId) {
         try {
             HttpEntity<Object> request = new HttpEntity<>(null);

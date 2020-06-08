@@ -37,6 +37,10 @@ public class ShiftArrangementService {
         return parseResponse(logService.getShiftArrangementLog(companyId, week));
     }
 
+    public List<ShiftArrangementModel> getShiftArrangementListByEmployee(ShiftArrangementRequest request) {
+        return parseResponse(logService.getShiftArrangementListByEmployee(request.getCompanyId(), request.getUsername(), request.getArrangeDate()));
+    }
+
     public BaseResponse deleteShiftArrangement(int type, String arrangementId) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Xóa lịch xếp ca thành công");
@@ -71,8 +75,6 @@ public class ShiftArrangementService {
                         model.getArrangeDate(), model.getCompanyId(), model.getOfficeId(),
                         model.getShiftId(), model.getUsername(), type));
                 return logService.deleteShiftArrangement(model.getArrangementId());
-
-                // TODO : Delete checkin log today
             }
         }
 

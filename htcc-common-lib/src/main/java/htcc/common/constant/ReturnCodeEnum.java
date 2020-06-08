@@ -33,6 +33,7 @@ public enum ReturnCodeEnum {
     DAY_OFF_CONFLICT_REMOVED(-20, "Ngày bạn đăng ký là ngày nghỉ của chi nhánh. Vui lòng kiểm tra lại"),
     NOT_CHECKOUT(-21, "Chưa thực hiện điểm danh ra trước khi điểm danh vào"),
     INSUFFICIENT_PRIVILEGES(-22, "Không đủ quyền hạn để thực hiện hành động"),
+    SHIFT_CONFLICT(-23, "Trùng thời gian ca làm việc"),
     ;
 
     private final int value;

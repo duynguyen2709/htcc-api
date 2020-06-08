@@ -1,5 +1,6 @@
 package htcc.common.entity.leavingrequest;
 
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.SessionEnum;
 import htcc.common.entity.jpa.BaseJPAEntity;
 import htcc.common.util.DateTimeUtil;
@@ -21,6 +22,8 @@ import java.util.List;
 public class LeavingRequest extends BaseJPAEntity {
 
     private static final long serialVersionUID = 5926270983005150708L;
+
+    public int clientId = ClientSystemEnum.MOBILE.getValue();
 
     @ApiModelProperty(notes = "Mã công ty",
                       example = "VNG")
@@ -77,7 +80,8 @@ public class LeavingRequest extends BaseJPAEntity {
                 return String.format("Ngày %s không phù hợp định dạng yyyyMMdd", d.date);
             }
 
-            if (DateTimeUtil.isBeforeToday(d.date)){
+            if (clientId == ClientSystemEnum.MOBILE.getValue() &&
+                    DateTimeUtil.isBeforeToday(d.date)){
                 return "Không được đăng ký ngày trước hôm nay";
             }
 

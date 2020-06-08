@@ -72,11 +72,6 @@ public class CheckInService {
         kafka.sendMessage(kafka.getBuzConfig().checkOutLog.topicName, model);
     }
 
-    @Async("asyncExecutor")
-    public void deleteCheckInLog(String companyId, String username, String date) {
-        redisService.deleteCheckInLog(companyId, username, date);
-    }
-
     private List<CheckinModel> parseResponse(BaseResponse res) {
         try {
             if (res == null ||

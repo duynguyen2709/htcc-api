@@ -45,10 +45,6 @@ public class GetCheckinInfoController {
     @Autowired
     private OfficeService officeService;
 
-    // TODO : remove test allowDeleteCheckin
-    @Value("${service.allowDeleteCheckin}")
-    private boolean allowDeleteCheckin;
-
     @ApiOperation(value = "Kiểm tra thông tin điểm danh của nhân viên", response = CheckinResponse.class)
     @GetMapping("/checkin/{companyId}/{username}")
     public BaseResponse getCheckinInfo(@ApiParam(value = "[Path] Mã công ty", required = true)
@@ -167,38 +163,5 @@ public class GetCheckinInfoController {
                 d.getSession() == SessionEnum.FULL_DAY.getValue()).collect(Collectors.toList());
 
         return specialOffDays.isEmpty() && normalOffDays.isEmpty();
-    }
-
-    @ApiOperation(value = "Xóa thông tin điểm danh (testing)", response = BaseResponse.class)
-    @DeleteMapping("/checkin/{companyId}/{username}")
-    public BaseResponse deleteCheckinInfo(@ApiParam(value = "[Path] Mã công ty", required = true)
-                                              @PathVariable(required = true) String companyId,
-                                          @ApiParam(value = "[Path] Tên đăng nhập", required = true)
-                                          @PathVariable(required = true) String username,
-                                          @ApiParam(value = "[Query] Ngày (yyyyMMdd) (nếu ko gửi sẽ lấy ngày hiện tại)", required = false)
-                                              @PathVariable(name = "date", required = false) String date) throws Exception {
-        if (!allowDeleteCheckin) {
-            throw new Exception("Method Not Supported");
-        }
-
-        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
-        String yyyyMMdd = StringUtil.valueOf(date);
-        try {
-            if (!yyyyMMdd.isEmpty()) {
-                if (DateTimeUtil.parseStringToDate(yyyyMMdd, "yyyyMMdd") == null) {
-                    return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, String.format(
-                            "Ngày %s không hợp lệ " + "định dạng yyyyMMdd", date));
-                }
-            }
-            else {
-                yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
-            }
-
-            checkInService.deleteCheckInLog(companyId, username, yyyyMMdd);
-        } catch (Exception e) {
-            log.error(String.format("deleteCheckinInfo [%s - %s - %s] ex", companyId, username, yyyyMMdd), e);
-            response = new BaseResponse<>(e);
-        }
-        return response;
     }
 }

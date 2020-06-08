@@ -138,6 +138,8 @@ public class ShiftTimeController {
                 return response;
             }
 
+            request.setStartTime(shift.getStartTime());
+            request.setEndTime(shift.getEndTime());
             shift = shiftTimeService.update(request);
 
             response.setData(shift);

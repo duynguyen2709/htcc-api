@@ -1,10 +1,7 @@
 package htcc.employee.service.controller.leavingRequest;
 
 import htcc.common.component.kafka.KafkaProducerService;
-import htcc.common.constant.ComplaintStatusEnum;
-import htcc.common.constant.ReturnCodeEnum;
-import htcc.common.constant.SessionEnum;
-import htcc.common.constant.WorkingDayTypeEnum;
+import htcc.common.constant.*;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.jpa.EmployeeInfo;
@@ -143,7 +140,8 @@ public class LeavingRequestController {
 
     @ApiOperation(value = "Nộp đơn xin nghỉ phép", response = BaseResponse.class)
     @PostMapping("/leaving")
-    public BaseResponse submitLeavingRequest(@RequestBody LeavingRequest request){
+    public BaseResponse submitLeavingRequest(@RequestBody LeavingRequest request,
+                                             @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String actor){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Đơn nghỉ phép của bạn đã gửi thành công. Vui lòng chờ quản lý phê duyệt.");
         LeavingRequestModel model = null;
@@ -161,6 +159,12 @@ public class LeavingRequestController {
             if (model.getDetail().isEmpty()){
                 response = new BaseResponse(ReturnCodeEnum.DAY_OFF_CONFLICT_REMOVED);
                 return response;
+            }
+
+            if (request.getClientId() == ClientSystemEnum.MANAGER_WEB.getValue()) {
+                EmployeeInfo approver = employeeInfoService.findById(new EmployeeInfo.Key(request.getCompanyId(), actor));
+                model.setApprover(String.format("%s (%s)", approver.getFullName(), approver.getUsername()));
+                model.setStatus(ComplaintStatusEnum.DONE.getValue());
             }
 
             setUseDayOff(model);

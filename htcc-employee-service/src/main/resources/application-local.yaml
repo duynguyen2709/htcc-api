@@ -16,7 +16,6 @@ eureka:
 
 service:
   debugMode: true
-  allowDeleteCheckin: true
   hazelcast:
     useHazelcast: false
     enableRest: false

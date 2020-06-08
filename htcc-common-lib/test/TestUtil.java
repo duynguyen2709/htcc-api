@@ -9,15 +9,10 @@ public class TestUtil {
 
     @Test
     public void testTime(){
-        for (int weekDay = 0;
-             weekDay < 7 ;
-             weekDay++) {
-
-            String yyyyMMdd = DateTimeUtil.getDateStringFromWeek(weekDay, 20, 2020, "yyyyMMdd");
-            System.out.println(yyyyMMdd);
-        }
-//
-//        String yyyyMMdd = DateTimeUtil.getDateStringFromWeek(4, 20, 2020, "yyyyMMdd");
-//        System.out.println(yyyyMMdd);
+        String start1 = "19:30";
+        String end1 = "09:31";
+        String start2 = "09:32";
+        String end2 = "20:00";
+        System.out.println(DateTimeUtil.isConflictTime(start1, end1, start2, end2));
     }
 }

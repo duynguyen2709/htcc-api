@@ -12,19 +12,21 @@ public class ShiftArrangementModel implements Serializable {
 
     private static final long serialVersionUID = 1926325150807L;
 
-    public String  arrangementId = "";
-    public long    actionTime  = System.currentTimeMillis();
-    public int     week        = 0;
-    public String  arrangeDate = "";
-    public String  companyId   = "";
-    public String  officeId    = "";
-    public String  username    = "";
-    public String  shiftId     = "";
-    public String  startTime   = "";
-    public String  endTime     = "";
-    public float   dayCount    = 0;
-    public String  actor       = "";
-    public boolean isFixed     = false;
+    public String  arrangementId    = "";
+    public long    actionTime       = System.currentTimeMillis();
+    public int     week             = 0;
+    public String  arrangeDate      = "";
+    public String  companyId        = "";
+    public String  officeId         = "";
+    public String  username         = "";
+    public String  shiftId          = "";
+    public String  startTime        = "";
+    public String  endTime          = "";
+    public float   dayCount         = 0;
+    public boolean allowDiffTime    = false;
+    public int     allowLateMinutes = 0;
+    public String  actor            = "";
+    public boolean isFixed          = false;
 
     public ShiftArrangementModel(ShiftArrangementRequest request) {
         this.actionTime = System.currentTimeMillis();
@@ -36,8 +38,8 @@ public class ShiftArrangementModel implements Serializable {
         this.shiftId = request.getShiftId();
         this.actor = request.getActor();
         this.arrangementId = String.format("%s-%s-%s-%s-%s-%s",
-                this.arrangeDate, this.companyId, this.officeId,
-                this.shiftId, this.username, request.getType());
+                this.arrangeDate, this.companyId, this.officeId, this.shiftId,
+                        this.username, request.getType());
         this.isFixed = false;
     }
 
@@ -46,6 +48,8 @@ public class ShiftArrangementModel implements Serializable {
         this.startTime = shiftTime.getStartTime();
         this.endTime = shiftTime.getEndTime();
         this.dayCount = shiftTime.getDayCount();
+        this.allowDiffTime = shiftTime.isAllowDiffTime();
+        this.allowLateMinutes = shiftTime.getAllowLateMinutes();
     }
 
     public ShiftArrangementModel(ShiftArrangementLogEntity model) {
