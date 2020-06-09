@@ -230,6 +230,10 @@ public class DateTimeUtil {
     }
 
     public static boolean isConflictTime(String start1, String end1, String start2, String end2) {
+        if (start1.equals(start2) || end1.equals(end2)) {
+            return true;
+        }
+
         return (isBetweenTwoTime(start1, end1, start2) ||
                 isBetweenTwoTime(start1, end1, end2) ||
                 isBetweenTwoTime(start2, end2, start1) ||

@@ -389,13 +389,17 @@ public class ShiftArrangementController {
             return false;
         }
 
-        List<ShiftTime> targetList = new ArrayList<>();
+        Map<String, ShiftTime> targetList = new HashMap<>();
         for (FixedShiftArrangement fixedShift : fixedShiftList) {
+            String key = String.format("%s_%s_%s", fixedShift.getCompanyId(), fixedShift.getOfficeId(), fixedShift.getShiftId());
             ShiftTime shift = shiftTimeService.findById(new ShiftTime.Key(fixedShift.getCompanyId(), fixedShift.getOfficeId(), fixedShift.getShiftId()));
             if (shift == null) {
                 throw new Exception("shiftTimeService.findById return null");
             }
-            targetList.add(shift);
+
+            if (!targetList.containsKey(key)) {
+                targetList.put(key, shift);
+            }
         }
 
         if (targetList.isEmpty()) {
@@ -409,7 +413,7 @@ public class ShiftArrangementController {
             throw new Exception("shiftTimeService.findById return null");
         }
 
-        for (ShiftTime log : targetList) {
+        for (ShiftTime log : targetList.values()) {
             if (DateTimeUtil.isConflictTime(shiftTime.getStartTime(), shiftTime.getEndTime(),
                     log.getStartTime(), log.getEndTime())) {
                 return true;
