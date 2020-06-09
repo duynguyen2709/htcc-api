@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -92,6 +93,11 @@ public class GetCheckinInfoController {
             }
 
             CompletableFuture.allOf(checkInFuture, checkOutFuture).join();
+            if (checkInFuture == null || checkInFuture.get() == null ||
+                    checkOutFuture == null || checkOutFuture.get() == null) {
+                throw new Exception("checkInFuture | checkOutFuture return null");
+            }
+
             setDetailCheckinTimes(data, checkInFuture.get(), checkOutFuture.get());
             setDetailOfficeList(data, companyId, yyyyMMdd);
             swapDefaultOffice(data, officeId);
@@ -125,6 +131,20 @@ public class GetCheckinInfoController {
 
     private void setDetailCheckinTimes(CheckinResponse data, List<CheckinModel> checkinList,
                                        List<CheckinModel> checkoutList) {
+        checkinList.sort(new Comparator<CheckinModel>() {
+            @Override
+            public int compare(CheckinModel o1, CheckinModel o2) {
+                return Long.compare(o1.getClientTime(), o2.getClientTime());
+            }
+        });
+
+        checkoutList.sort(new Comparator<CheckinModel>() {
+            @Override
+            public int compare(CheckinModel o1, CheckinModel o2) {
+                return Long.compare(o1.getClientTime(), o2.getClientTime());
+            }
+        });
+
         int n = checkinList.size();
         for (int i = 0; i < n; i++) {
             data.detailCheckinTimes.add(new CheckinResponse.DetailCheckinTime(checkinList.get(i)));

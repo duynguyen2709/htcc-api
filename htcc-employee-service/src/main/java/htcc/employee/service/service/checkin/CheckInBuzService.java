@@ -137,10 +137,10 @@ public class CheckInBuzService {
 
         if (model.getType() == CheckinTypeEnum.CHECKIN.getValue()) {
             model.setValidTime(model.getShiftTime().getStartTime());
-            model.setOnTime(DateTimeUtil.isBefore(model.getClientTime() - 2 * 60 * 1000, model.getValidTime()));
+            model.setOnTime(DateTimeUtil.isBefore(model.getClientTime() - (model.getShiftTime().getAllowLateMinutes() + 2) * 60 * 1000, model.getValidTime()));
         } else if (model.getType() == CheckinTypeEnum.CHECKOUT.getValue()) {
             model.setValidTime(model.getShiftTime().getEndTime());
-            model.setOnTime(DateTimeUtil.isAfter(model.getClientTime() + 2 * 60 * 1000, model.getValidTime()));
+            model.setOnTime(DateTimeUtil.isAfter(model.getClientTime() + (model.getShiftTime().getAllowLateMinutes() + 2) * 60 * 1000, model.getValidTime()));
         }
     }
 
