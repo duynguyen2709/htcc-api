@@ -3,6 +3,7 @@ package htcc.common.entity.checkin;
 import htcc.common.entity.base.BaseLogEntity;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.util.DateTimeUtil;
+import htcc.common.util.StringUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -37,6 +38,9 @@ public class CheckInLogEntity extends BaseLogEntity {
     public String  approver         = "";
     public int     status           = 1;
 
+    // new fields go here
+    public String  shiftTime = "";
+
     public CheckInLogEntity(CheckinModel model) {
         this.requestId = model.getRequestId();
         this.checkInId = model.checkInId;
@@ -58,6 +62,8 @@ public class CheckInLogEntity extends BaseLogEntity {
         this.image = model.image;
         this.reason = model.reason;
         this.status = model.status;
+
+        this.shiftTime = StringUtil.toJsonString(model.shiftTime);
     }
 
     @Override
@@ -84,6 +90,7 @@ public class CheckInLogEntity extends BaseLogEntity {
         params.put("reason", this.reason);
         params.put("approver", this.approver);
         params.put("status", this.status);
+        params.put("shiftTime", this.shiftTime);
         return params;
     }
 

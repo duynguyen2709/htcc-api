@@ -38,7 +38,11 @@ public class ShiftArrangementService {
     }
 
     public List<ShiftArrangementModel> getShiftArrangementListByEmployee(ShiftArrangementRequest request) {
-        return parseResponse(logService.getShiftArrangementListByEmployee(request.getCompanyId(), request.getUsername(), request.getArrangeDate()));
+        return getShiftArrangementListByEmployee(request.getCompanyId(), request.getUsername(), request.getArrangeDate());
+    }
+
+    public List<ShiftArrangementModel> getShiftArrangementListByEmployee(String companyId, String username, String date) {
+        return parseResponse(logService.getShiftArrangementListByEmployee(companyId, username, date));
     }
 
     public BaseResponse deleteShiftArrangement(int type, String arrangementId) {

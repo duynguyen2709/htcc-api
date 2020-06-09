@@ -32,6 +32,7 @@ public class CheckInLogRowMapper implements RowMapper<CheckInLogEntity> {
         entity.reason = rs.getString("reason");
         entity.approver = rs.getString("approver");
         entity.status = rs.getInt("status");
+        entity.shiftTime = rs.getString("shiftTime");
 
         return entity;
     }

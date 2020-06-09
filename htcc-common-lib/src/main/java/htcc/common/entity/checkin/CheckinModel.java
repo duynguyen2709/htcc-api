@@ -3,6 +3,7 @@ package htcc.common.entity.checkin;
 import htcc.common.component.LoggingConfiguration;
 import htcc.common.constant.CheckinSubTypeEnum;
 import htcc.common.constant.CheckinTypeEnum;
+import htcc.common.entity.shift.ShiftTime;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import lombok.Data;
@@ -31,6 +32,8 @@ public class CheckinModel implements Serializable {
     public String approver = "";
 
     public int status = 1;
+
+    public ShiftTime shiftTime = new ShiftTime();
 
     @NotEmpty
     public String checkInId = "";
