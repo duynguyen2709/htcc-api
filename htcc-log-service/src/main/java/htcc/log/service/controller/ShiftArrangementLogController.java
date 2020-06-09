@@ -50,6 +50,31 @@ public class ShiftArrangementLogController {
         return response;
     }
 
+    @GetMapping("/shifts")
+    public BaseResponse getListShiftArrangementLogByEmployee(@RequestParam String companyId,
+                                                   @RequestParam String username,
+                                                   @RequestParam String arrangeDate){
+        BaseResponse<List<ShiftArrangementModel>> response =
+                new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        try {
+            List<ShiftArrangementLogEntity> logEntityList = repo.getListShiftArrangementLogByEmployee(companyId, username, arrangeDate);
+            if (logEntityList == null) {
+                throw new Exception("ShiftArrangementLogRepository.getListShiftArrangementLog return null");
+            }
+
+            List<ShiftArrangementModel> modelList = logEntityList
+                    .stream()
+                    .map(ShiftArrangementModel::new)
+                    .collect(Collectors.toList());
+
+            response.setData(modelList);
+        } catch (Exception e) {
+            log.error(String.format("[getListShiftArrangementLogByEmployee] [%s-%s-%s] ex", companyId, username, arrangeDate), e);
+            return new BaseResponse<>(e);
+        }
+        return response;
+    }
+
     @PostMapping("/shifts/delete/{arrangementId}")
     public BaseResponse deleteShiftArrangement(@PathVariable String arrangementId){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);

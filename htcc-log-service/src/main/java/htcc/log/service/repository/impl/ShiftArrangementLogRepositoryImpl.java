@@ -72,6 +72,27 @@ public class ShiftArrangementLogRepositoryImpl implements ShiftArrangementLogRep
     }
 
     @Override
+    public List<ShiftArrangementLogEntity> getListShiftArrangementLogByEmployee(String companyId, String username,
+                                                                                String arrangeDate) {
+        try {
+            final String yyyyMM    = arrangeDate.substring(0, 6);
+            final String tableName = String.format("%s%s", TABLE_PREFIX, yyyyMM);
+            final String query     = String.format("SELECT * FROM %s WHERE companyId = ? AND username = ? AND arrangeDate = ?", tableName);
+
+            if (!MAP_TABLE_LOG.containsKey(tableName)) {
+                log.warn("Table {} does not exist", tableName);
+                return new ArrayList<>();
+            }
+
+            return jdbcTemplate.query(query, new Object[] {companyId, username, arrangeDate},
+                    new ShiftArrangementLogRowMapper());
+        } catch (Exception e) {
+            log.error("[getListShiftArrangementLogByEmployee] [{} - {} - {}] ex", companyId, username, arrangeDate, e);
+            return null;
+        }
+    }
+
+    @Override
     public ShiftArrangementLogEntity getOneShiftArrangementLog(String arrangementId) {
         try {
             final String month     = arrangementId.substring(0, 6);
