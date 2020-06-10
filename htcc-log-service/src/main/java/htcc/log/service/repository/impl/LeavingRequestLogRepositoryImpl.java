@@ -68,6 +68,19 @@ public class LeavingRequestLogRepositoryImpl implements LeavingRequestLogReposit
     }
 
     @Override
+    public List<LeavingRequestLogEntity> getListPendingLeavingRequestLog(String yyyyMM) {
+        try {
+            final String table = TABLE_PREFIX + yyyyMM;
+            final String query = String.format("SELECT * FROM %s WHERE status = ?", table);
+            return jdbcTemplate.query(query, new Object[]{ 2 },
+                    new LeavingRequestLogRowMapper());
+        } catch (Exception e) {
+            log.error("[getListPendingLeavingRequestLog] [{}]", yyyyMM, e);
+            return null;
+        }
+    }
+
+    @Override
     @Transactional
     public int updateLeavingRequestLogStatus(UpdateLeavingRequestStatusModel model) {
         final String tableName = TABLE_PREFIX + model.getYyyyMM();

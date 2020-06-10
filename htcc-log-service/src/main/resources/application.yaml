@@ -55,7 +55,8 @@ logging:
 ################## Service Config ##################
 service:
   debugMode: false
-
+  schedule:
+    leaveRequest: 1 0 0 * * *
 ################## Redis Config ##################
 redis:
   delimiterAddress: ;

@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -131,27 +132,19 @@ public class GetCheckinInfoController {
 
     private void setDetailCheckinTimes(CheckinResponse data, List<CheckinModel> checkinList,
                                        List<CheckinModel> checkoutList) {
-        checkinList.sort(new Comparator<CheckinModel>() {
+
+        List<CheckinModel> combinedList = new ArrayList<>(checkinList);
+        combinedList.addAll(checkoutList);
+
+        combinedList.sort(new Comparator<CheckinModel>() {
             @Override
             public int compare(CheckinModel o1, CheckinModel o2) {
                 return Long.compare(o1.getClientTime(), o2.getClientTime());
             }
         });
 
-        checkoutList.sort(new Comparator<CheckinModel>() {
-            @Override
-            public int compare(CheckinModel o1, CheckinModel o2) {
-                return Long.compare(o1.getClientTime(), o2.getClientTime());
-            }
-        });
-
-        int n = checkinList.size();
-        for (int i = 0; i < n; i++) {
-            data.detailCheckinTimes.add(new CheckinResponse.DetailCheckinTime(checkinList.get(i)));
-
-            if (checkoutList.size() > i) {
-                data.detailCheckinTimes.add(new CheckinResponse.DetailCheckinTime(checkoutList.get(i)));
-            }
+        for (CheckinModel model : combinedList) {
+            data.detailCheckinTimes.add(new CheckinResponse.DetailCheckinTime(model));
         }
     }
 

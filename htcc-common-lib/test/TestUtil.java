@@ -13,7 +13,8 @@ public class TestUtil {
     @Test
     public void testTime() throws ParseException {
 
-        Date parse = new SimpleDateFormat("yyyyMMdd HH:mm").parse("20200609 07:30");
-        System.out.println(parse.getTime());
+        String d1 = "20200609";
+        String d2 = "20200606";
+        System.out.println(DateTimeUtil.calcDayDiff(d1, d2, "yyyyMMdd"));
     }
 }

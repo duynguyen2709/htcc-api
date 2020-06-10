@@ -11,6 +11,8 @@ public interface LeavingRequestLogRepository {
 
     List<LeavingRequestLogEntity> getListLeavingRequestLogByCompany(String companyId, String yyyyMM);
 
+    List<LeavingRequestLogEntity> getListPendingLeavingRequestLog(String yyyyMM);
+
     int updateLeavingRequestLogStatus(UpdateLeavingRequestStatusModel model);
 
     LeavingRequestLogEntity getOneLeavingRequest(UpdateLeavingRequestStatusModel model);

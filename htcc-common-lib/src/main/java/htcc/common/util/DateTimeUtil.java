@@ -116,6 +116,15 @@ public class DateTimeUtil {
         return diff.getMonths();
     }
 
+    public static int calcDayDiff(String from, String to, String format) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        Period diff = Period.between(
+                LocalDate.parse(from, formatter),
+                LocalDate.parse(to, formatter));
+
+        return Math.abs(diff.getDays());
+    }
+
     public static Date parseStringToDate(String str){
         return parseStringToDate(str, DATE_FORMAT);
     }

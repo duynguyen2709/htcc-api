@@ -94,6 +94,7 @@ public class LeavingRequest extends BaseJPAEntity {
     }
 
     @ApiModel(description = "Chi tiết ngày nghỉ (buổi nào)")
+    @Data
     public static class LeavingDayDetail implements Serializable {
 
         private static final long serialVersionUID = 5926271083005150708L;
