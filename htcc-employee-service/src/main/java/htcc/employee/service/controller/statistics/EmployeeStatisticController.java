@@ -9,6 +9,7 @@ import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.shift.ShiftArrangementModel;
 import htcc.common.entity.statistic.EmployeeStatisticResponse;
 import htcc.common.util.DateTimeUtil;
+import htcc.employee.service.config.StatisticConfig;
 import htcc.employee.service.service.statistic.EmployeeStatisticService;
 import io.swagger.annotations.Api;
 import lombok.extern.log4j.Log4j2;
@@ -31,6 +32,9 @@ public class EmployeeStatisticController {
 
     @Autowired
     private EmployeeStatisticService statisticService;
+
+    @Autowired
+    private StatisticConfig statisticConfig;
 
     @GetMapping("/statistic")
     public BaseResponse getStatistics(@RequestParam String companyId,
@@ -152,15 +156,19 @@ public class EmployeeStatisticController {
         }
 
         String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
-        if (Long.parseLong(today) <= Long.parseLong(dateTo)) {
+        if (Long.parseLong(today) - Long.parseLong(dateTo) < statisticConfig.getDistanceFromToday()) {
             response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
-            response.setReturnMessage("Ngày kết thúc phải trước ngày hôm nay");
+            if (statisticConfig.getDistanceFromToday() == 0) {
+                response.setReturnMessage("Ngày kết thúc không được sau ngày hôm nay");
+            } else {
+                response.setReturnMessage(String.format("Ngày kết thúc phải cách %s ngày trước ngày hôm nay", statisticConfig.getDistanceFromToday()));
+            }
             return response;
         }
 
-        if (DateTimeUtil.calcDayDiff(dateFrom, dateTo, "yyyyMMdd") > 31) {
+        if (DateTimeUtil.calcDayDiff(dateFrom, dateTo, "yyyyMMdd") > statisticConfig.getMaxDayDiff()) {
             response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
-            response.setReturnMessage("Khoảng cách tối đa là 1 tháng. Vui lòng chọn lại");
+            response.setReturnMessage(String.format("Khoảng cách tối đa là %s ngày. Vui lòng chọn lại", statisticConfig.getMaxDayDiff()));
             return response;
         }
         return response;

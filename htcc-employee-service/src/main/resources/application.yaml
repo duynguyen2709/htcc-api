@@ -126,3 +126,7 @@ kafka:
     eventRequireIcon:
       topicName: EVENT-REQUIRE-ICON
       groupId: EVENT-REQUIRE-ICON
+
+statistic:
+  maxDayDiff: 31
+  distanceFromToday: 0

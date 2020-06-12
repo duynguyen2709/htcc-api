@@ -233,7 +233,7 @@ public class CheckInBuzService {
 
             model.setShiftTime(lastCheckinModel.getShiftTime());
             model.setOppositeModel(lastCheckinModel);
-            model.setOppositeId(lastCheckinModel.getOppositeId());
+            model.setOppositeId(lastCheckinModel.getCheckInId());
         }
 
         return StringUtil.EMPTY;
