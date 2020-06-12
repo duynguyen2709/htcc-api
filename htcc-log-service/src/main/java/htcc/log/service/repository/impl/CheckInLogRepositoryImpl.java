@@ -60,7 +60,7 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
     public int updateOppositeId(CheckinModel checkOutModel) {
         try {
             final CheckinModel oppositeModel = checkOutModel.getOppositeModel();
-            final String tableName = "CheckInLog" + oppositeModel.getDate();
+            final String tableName = "CheckInLog" + oppositeModel.getDate().substring(0, 6);
             final String query = String.format("UPDATE %s SET oppositeId = ? WHERE checkInId = ?", tableName);
             return jdbcTemplate.update(query, checkOutModel.getCheckInId(), oppositeModel.getCheckInId());
         } catch (Exception e) {
