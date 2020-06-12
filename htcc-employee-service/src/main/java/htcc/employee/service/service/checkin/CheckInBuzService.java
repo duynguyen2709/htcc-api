@@ -228,10 +228,6 @@ public class CheckInBuzService {
                 ShiftTime shiftTime = findNearestShift(shiftByDateList, model);
                 model.setShiftTime(shiftTime);
             }
-
-            if (DateTimeUtil.isAfter(model.getClientTime(), model.getShiftTime().getEndTime())) {
-                return "Thời gian điểm danh không hợp lệ";
-            }
         }
         else {
             CheckinModel lastCheckinModel = checkInService.getLastCheckInTime(model.getCompanyId(), model.getUsername());
@@ -253,8 +249,7 @@ public class CheckInBuzService {
 
         for (ShiftArrangementModel arrangeModel : shiftList) {
             try {
-                String time = (model.getType() == CheckinTypeEnum.CHECKIN.getValue()) ?
-                        arrangeModel.getShiftTime().getStartTime() : arrangeModel.getShiftTime().getEndTime();
+                String time = arrangeModel.getShiftTime().getStartTime();
 
                 String fullTimeStr = String.format("%s %s", model.getDate(), time);
                 long timeMillis = new SimpleDateFormat("yyyyMMdd HH:mm").parse(fullTimeStr).getTime();
