@@ -69,6 +69,8 @@ public class CheckInService {
     public void setCheckOutLog(CheckinModel model){
         redisService.setCheckOutLog(model);
 
+        redisService.setLastCheckInTime(model);
+
         kafka.sendMessage(kafka.getBuzConfig().checkOutLog.topicName, model);
     }
 
