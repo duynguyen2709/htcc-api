@@ -28,6 +28,20 @@ public class RedisCheckinService {
         return StringUtil.valueOf(redis.get(redis.buzConfig.qrCodeCheckInFormat, qrCodeId));
     }
 
+    public void setLastCheckInTime(CheckinModel model) {
+        redis.set(StringUtil.toJsonString(model), 86400 * 2, redis.buzConfig.getLastCheckInFormat(),
+                model.getCompanyId(), model.getUsername());
+    }
+
+    public CheckinModel getLastCheckInTime(String companyId, String username) {
+        String raw = StringUtil.valueOf(redis.get(redis.buzConfig.getLastCheckInFormat(), companyId, username));
+        if (raw.isEmpty()) {
+            return null;
+        }
+
+        return StringUtil.fromJsonString(raw, CheckinModel.class);
+    }
+
     public void setCheckInLog(CheckinModel data) {
         List<CheckinModel> list = getCheckInLog(data.getCompanyId(), data.getUsername(), data.getDate());
         if (list == null){

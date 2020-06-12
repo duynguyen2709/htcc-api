@@ -65,15 +65,15 @@ public class CheckInBuzService {
             return response;
         }
 
+        response = validateListCheckInAndCheckOut(model);
+        if (response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()){
+            return response;
+        }
+
         error = validateCheckinModel(model);
         if (!error.isEmpty()) {
             response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
             response.setReturnMessage(error);
-            return response;
-        }
-
-        response = validateListCheckInAndCheckOut(model);
-        if (response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()){
             return response;
         }
 
@@ -111,11 +111,6 @@ public class CheckInBuzService {
             if (checkinData.get() == null || checkinData.get().isEmpty()
                     || checkinData.get().size() == checkoutData.get().size()) {
                 response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKIN);
-                return response;
-            }
-
-            if (model.clientTime <= checkinData.get().get(checkinData.get().size() - 1).getClientTime()) {
-                response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_TIME_NOT_VALID);
                 return response;
             }
         }
@@ -206,29 +201,39 @@ public class CheckInBuzService {
     }
 
     private String validateShiftTime(CheckinModel model) {
-        List<ShiftArrangementModel> shiftArrangementList = shiftArrangementService.getShiftArrangementListByEmployee(
-                model.getCompanyId(), model.getUsername(), model.getDate());
+        if (model.getType() == CheckinTypeEnum.CHECKIN.getValue()) {
+            List<ShiftArrangementModel> shiftArrangementList = shiftArrangementService.getShiftArrangementListByEmployee(model.getCompanyId(), model.getUsername(), model.getDate());
 
-        if (shiftArrangementList == null || shiftArrangementList.isEmpty()) {
-            return "Chưa có ca làm việc hôm nay. Vui lòng liên hệ quản lý để xếp ca";
+            if (shiftArrangementList == null || shiftArrangementList.isEmpty()) {
+                return "Chưa có ca làm việc hôm nay. Vui lòng liên hệ quản lý để xếp ca";
+            }
+
+            List<ShiftArrangementModel> fixedShiftList = shiftArrangementList.stream()
+                    .filter(c -> c.isFixed)
+                    .collect(Collectors.toList());
+
+            List<ShiftArrangementModel> shiftByDateList = shiftArrangementList.stream()
+                    .filter(c -> !c.isFixed)
+                    .collect(Collectors.toList());
+
+            if (shiftByDateList.isEmpty()) {
+                ShiftTime shiftTime = findNearestShift(fixedShiftList, model);
+                model.setShiftTime(shiftTime);
+            }
+            else {
+                ShiftTime shiftTime = findNearestShift(shiftByDateList, model);
+                model.setShiftTime(shiftTime);
+            }
         }
+        else {
+            CheckinModel lastCheckinModel = checkInService.getLastCheckInTime(model.getCompanyId(), model.getUsername());
+            if (lastCheckinModel == null) {
+                return "Không tìm thấy dữ liệu điểm danh vào";
+            }
 
-        List<ShiftArrangementModel> fixedShiftList = shiftArrangementList
-                .stream()
-                .filter(c -> c.isFixed)
-                .collect(Collectors.toList());
-
-        List<ShiftArrangementModel> shiftByDateList = shiftArrangementList
-                .stream()
-                .filter(c -> !c.isFixed)
-                .collect(Collectors.toList());
-
-        if (shiftByDateList.isEmpty()) {
-            ShiftTime shiftTime = findNearestShift(fixedShiftList, model);
-            model.setShiftTime(shiftTime);
-        } else {
-            ShiftTime shiftTime = findNearestShift(shiftByDateList, model);
-            model.setShiftTime(shiftTime);
+            model.setShiftTime(lastCheckinModel.getShiftTime());
+            model.setOppositeModel(lastCheckinModel);
+            model.setOppositeId(lastCheckinModel.getOppositeId());
         }
 
         return StringUtil.EMPTY;

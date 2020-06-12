@@ -6,6 +6,7 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.leavingrequest.*;
+import htcc.common.entity.shift.ShiftArrangementModel;
 import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
@@ -14,6 +15,7 @@ import htcc.employee.service.config.ServiceConfig;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.WorkingDayService;
 import htcc.employee.service.service.leavingrequest.LeavingRequestService;
+import htcc.employee.service.service.shiftarrangement.ShiftArrangementService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -46,6 +48,9 @@ public class LeavingRequestController {
 
     @Autowired
     private WorkingDayService workingDayService;
+
+    @Autowired
+    private ShiftArrangementService shiftArrangementService;
 
     @ApiOperation(value = "Lấy thông tin phép còn lại & đơn đã submit", response = LeavingRequestInfo.class)
     @GetMapping("/leaving/{companyId}/{username}/{yyyy}")
@@ -156,8 +161,14 @@ public class LeavingRequestController {
             model = new LeavingRequestModel(request);
 
             removeNonWorkingDays(model);
-            if (model.getDetail().isEmpty()){
+            if (model.getDetail().isEmpty()) {
                 response = new BaseResponse(ReturnCodeEnum.DAY_OFF_CONFLICT_REMOVED);
+                return response;
+            }
+
+            removeNonArrangeShiftDays(model);
+            if (model.getDetail().isEmpty()) {
+                response = new BaseResponse(ReturnCodeEnum.NON_SHIFT_ARRANGE_DAY_OFF);
                 return response;
             }
 
@@ -170,7 +181,7 @@ public class LeavingRequestController {
             setUseDayOff(model);
 
             // check if days off left is enough to register
-            if (model.useDayOff) {
+            if (model.isUseDayOff()) {
                 error = validateNumOfDayOffLeft(model);
                 if (!error.isEmpty()) {
                     response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
@@ -197,6 +208,56 @@ public class LeavingRequestController {
             }
         }
         return response;
+    }
+
+    private void removeNonArrangeShiftDays(LeavingRequestModel model) throws Exception {
+        List<LeavingRequest.LeavingDayDetail> toRemove = new ArrayList<>();
+
+        Map<String, List<LeavingRequest.LeavingDayDetail>> detailMap = new HashMap<>();
+        model.getDetail().forEach(c -> {
+            if (!detailMap.containsKey(c.getDate())) {
+                detailMap.put(c.getDate(), new ArrayList<>());
+            }
+
+            detailMap.get(c.getDate()).add(c);
+        });
+
+        for (String date : detailMap.keySet()) {
+            List<ShiftArrangementModel> shiftArrangementList = shiftArrangementService.getShiftArrangementListByEmployee
+                    (model.getCompanyId(), model.getUsername(), date);
+
+            if (shiftArrangementList == null) {
+                throw new Exception("[shiftArrangementService.getShiftArrangementListByEmployee] return null");
+            }
+
+            if (shiftArrangementList.isEmpty()) {
+                toRemove.addAll(detailMap.get(date));
+                continue;
+            }
+
+            List<LeavingRequest.LeavingDayDetail> dayDetailList = detailMap.get(date);
+            for (LeavingRequest.LeavingDayDetail detail : dayDetailList) {
+                if (!isConflictSession(detail, shiftArrangementList)) {
+                    toRemove.add(detail);
+                }
+            }
+        }
+
+        model.getDetail().removeAll(toRemove);
+    }
+
+    private boolean isConflictSession(LeavingRequest.LeavingDayDetail detail, List<ShiftArrangementModel> shiftArrangementList) {
+        for (ShiftArrangementModel model : shiftArrangementList) {
+            if (model.getShiftTime().getSession() == SessionEnum.FULL_DAY.getValue()) {
+                return true;
+            }
+
+            if (model.getShiftTime().getSession() == detail.getSession()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void setUseDayOff(LeavingRequestModel model) {
@@ -362,15 +423,15 @@ public class LeavingRequestController {
 
         // count days used
         float daysOff = 0.0f;
-        for (LeavingRequestResponse entity : info.listRequest) {
+        for (LeavingRequestResponse entity : info.getListRequest()) {
             if (entity.getStatus() == ComplaintStatusEnum.REJECTED.getValue()) {
                 // skip rejected forms
                 continue;
             }
 
-            for (LeavingRequest.LeavingDayDetail d : entity.detail) {
-                if (entity.useDayOff) {
-                    if (d.session == SessionEnum.FULL_DAY.getValue()) {
+            for (LeavingRequest.LeavingDayDetail d : entity.getDetail()) {
+                if (entity.isUseDayOff()) {
+                    if (d.getSession() == SessionEnum.FULL_DAY.getValue()) {
                         daysOff += 1;
                     } else {
                         daysOff += 0.5f;
@@ -381,8 +442,8 @@ public class LeavingRequestController {
 
         //count days in request
         float daysInRequest = 0.0f;
-        for (LeavingRequest.LeavingDayDetail d : model.detail) {
-            if (d.session == SessionEnum.FULL_DAY.getValue()) {
+        for (LeavingRequest.LeavingDayDetail d : model.getDetail()) {
+            if (d.getSession() == SessionEnum.FULL_DAY.getValue()) {
                 daysInRequest += 1;
             } else {
                 daysInRequest += 0.5f;
@@ -399,15 +460,15 @@ public class LeavingRequestController {
 
     private String validateDetailDates(LeavingRequestModel model) throws Exception {
         Set<String> listYear = new HashSet<>();
-        for (LeavingRequest.LeavingDayDetail detail : model.detail) {
-            listYear.add(detail.date.substring(0, 4));
+        for (LeavingRequest.LeavingDayDetail detail : model.getDetail()) {
+            listYear.add(detail.getDate().substring(0, 4));
         }
 
         for (String year : listYear) {
             // get list leavingRequest in year
-            List<LeavingRequestResponse> response = service.getLeavingRequestLog(model.companyId, model.username, year).get();
+            List<LeavingRequestResponse> response = service.getLeavingRequestLog(model.getCompanyId(), model.getUsername(), year).get();
             if (response == null){
-                throw new Exception(String.format("[service.getLeavingRequestLog] [%s - %s - %s] return null", model.companyId, model.username, year));
+                throw new Exception(String.format("[service.getLeavingRequestLog] [%s - %s - %s] return null", model.getCompanyId(), model.getUsername(), year));
             }
 
             response = response.stream()
@@ -416,18 +477,18 @@ public class LeavingRequestController {
 
             // check collision in day
             for (LeavingRequestResponse each : response) {
-                for (LeavingRequest.LeavingDayDetail detailInHistory : each.detail) {
-                    for (LeavingRequest.LeavingDayDetail detailInNewForm : model.detail) {
-                        if (detailInHistory.date.equals(detailInNewForm.date)) {
-                            if (detailInHistory.session == SessionEnum.FULL_DAY.getValue() ||
-                                detailInNewForm.session == SessionEnum.FULL_DAY.getValue()) {
+                for (LeavingRequest.LeavingDayDetail detailInHistory : each.getDetail()) {
+                    for (LeavingRequest.LeavingDayDetail detailInNewForm : model.getDetail()) {
+                        if (detailInHistory.getDate().equals(detailInNewForm.getDate())) {
+                            if (detailInHistory.getSession() == SessionEnum.FULL_DAY.getValue() ||
+                                detailInNewForm.getSession() == SessionEnum.FULL_DAY.getValue()) {
                                 return String.format("Ngày %s đã được đăng ký nghỉ trước đó",
-                                        DateTimeUtil.convertToOtherFormat(detailInHistory.date, "yyyyMMdd", "dd/MM/yyyy"));
+                                        DateTimeUtil.convertToOtherFormat(detailInHistory.getDate(), "yyyyMMdd", "dd/MM/yyyy"));
 
-                            } else if (detailInHistory.session == detailInNewForm.session) {
+                            } else if (detailInHistory.getSession() == detailInNewForm.session) {
                                 return String.format("Buổi %s ngày %s đã được đăng ký nghỉ trước đó",
-                                        detailInHistory.session == SessionEnum.MORNING.getValue() ? "sáng" : "chiều",
-                                        DateTimeUtil.convertToOtherFormat(detailInHistory.date, "yyyyMMdd", "dd/MM/yyyy"));
+                                        detailInHistory.getSession() == SessionEnum.MORNING.getValue() ? "sáng" : "chiều",
+                                        DateTimeUtil.convertToOtherFormat(detailInHistory.getDate(), "yyyyMMdd", "dd/MM/yyyy"));
                             }
                         }
                     }
@@ -507,7 +568,7 @@ public class LeavingRequestController {
         Date now = new Date(System.currentTimeMillis());
         String nowStr = DateTimeUtil.parseDateToString(now, "yyyyMMdd");
         Date today = DateTimeUtil.parseStringToDate(nowStr, "yyyyMMdd");
-        Date firstDay = DateTimeUtil.parseStringToDate(model.detail.get(0).date, "yyyyMMdd");
+        Date firstDay = DateTimeUtil.parseStringToDate(model.getDetail().get(0).getDate(), "yyyyMMdd");
 
         long diffInMillies = Math.abs(today.getTime() - firstDay.getTime());
         long dayDiff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);

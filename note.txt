@@ -266,3 +266,7 @@
 08-06-2020:
  + Version 1.9.3:
     - [Employee] Edit model ShiftArrangement add ShiftTime detail
+
+12-06-2020:
+ + Version 2.0.0:
+    - [Employee & Log] Statistic Feature

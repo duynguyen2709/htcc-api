@@ -92,6 +92,7 @@ public class ShiftTimeController {
                 return response;
             }
 
+            request.calculateSession();
             response.setData(shiftTimeService.create(request));
 
         } catch (Exception e){
@@ -140,6 +141,8 @@ public class ShiftTimeController {
 
             request.setStartTime(shift.getStartTime());
             request.setEndTime(shift.getEndTime());
+            request.setSession(shift.getSession());
+
             shift = shiftTimeService.update(request);
 
             response.setData(shift);

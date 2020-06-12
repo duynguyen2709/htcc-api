@@ -3,6 +3,7 @@ package htcc.log.service.controller;
 import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.leavingrequest.LeavingRequest;
 import htcc.common.entity.leavingrequest.LeavingRequestLogEntity;
 import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,7 +33,7 @@ public class LeavingRequestLogController {
     @GetMapping("/leaving")
     public BaseResponse getOneLeavingRequestLog(@RequestParam String leavingRequestId,
                                                 @RequestParam String yyyyMM) {
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        BaseResponse<LeavingRequestModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             UpdateLeavingRequestStatusModel model = new UpdateLeavingRequestStatusModel();
             model.setYyyyMM(yyyyMM);
@@ -47,7 +49,41 @@ public class LeavingRequestLogController {
             response.setData(new LeavingRequestModel(oldEnt));
         } catch (Exception e) {
             log.error(String.format("[getOneLeavingRequestLog] [#%s-%s] ex", leavingRequestId, yyyyMM), e);
-            return new BaseResponse(e);
+            return new BaseResponse<>(e);
+        }
+        return response;
+    }
+
+    @GetMapping("/leaving/date")
+    public BaseResponse getLeavingRequestByDate(@RequestParam String companyId,
+                                             @RequestParam String username,
+                                             @RequestParam String yyyyMMdd){
+        BaseResponse<List<LeavingRequestModel>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        try {
+            List<LeavingRequestModel> listModel = repo.getLeavingRequestLogByDate(companyId, username, yyyyMMdd)
+                    .stream()
+                    .map(LeavingRequestModel::new)
+                    .filter(new Predicate<LeavingRequestModel>() {
+                        @Override
+                        public boolean test(LeavingRequestModel leavingRequestModel) {
+                            if (leavingRequestModel.getStatus() == ComplaintStatusEnum.REJECTED.getValue()) {
+                                return false;
+                            }
+
+                            for (LeavingRequest.LeavingDayDetail detail : leavingRequestModel.getDetail()) {
+                                if (detail.getDate().equals(yyyyMMdd)) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+                    })
+                    .collect(Collectors.toList());
+
+            response.setData(listModel);
+        } catch (Exception e) {
+            log.error(String.format("[getLeavingRequestByDate] [%s-%s-%s] ex", companyId, username, yyyyMMdd), e);
+            return new BaseResponse<>(e);
         }
         return response;
     }
@@ -56,7 +92,7 @@ public class LeavingRequestLogController {
     public BaseResponse getLeavingRequestLog(@PathVariable String companyId,
                                       @PathVariable String username,
                                       @PathVariable String yyyy){
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        BaseResponse<List<LeavingRequestModel>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             List<LeavingRequestModel> listModel = repo.getLeavingRequestLog(companyId, username, yyyy)
                     .stream()
@@ -66,7 +102,7 @@ public class LeavingRequestLogController {
             response.setData(listModel);
         } catch (Exception e) {
             log.error(String.format("[getLeavingRequestLog] [%s-%s-%s] ex", companyId, username, yyyy), e);
-            return new BaseResponse(e);
+            return new BaseResponse<>(e);
         }
         return response;
     }
@@ -77,7 +113,7 @@ public class LeavingRequestLogController {
     @GetMapping("/leaving/{companyId}/{yyyyMM}")
     public BaseResponse getListLeavingRequestLogByCompany(@PathVariable String yyyyMM,
                                                       @PathVariable String companyId){
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        BaseResponse<List<LeavingRequestModel>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             List<LeavingRequestLogEntity> data = repo.getListLeavingRequestLogByCompany(companyId, yyyyMM);
             if (data == null) {
@@ -92,11 +128,11 @@ public class LeavingRequestLogController {
                         .collect(Collectors.toList());
             }
 
-            response.data = listResponse;
+            response.setData(listResponse);
 
         } catch (Exception e) {
             log.error(String.format("[getListLeavingRequestLogByCompany] [%s-%s] ex", companyId, yyyyMM), e);
-            return new BaseResponse(e);
+            return new BaseResponse<>(e);
         }
         return response;
     }
@@ -106,7 +142,7 @@ public class LeavingRequestLogController {
 
     @GetMapping("/leaving/count/{companyId}")
     public BaseResponse countPendingLeavingRequestLog(@PathVariable String companyId){
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        BaseResponse<Integer> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         int count = 0;
         try {
             final String logType = "LeavingRequestLog";
@@ -118,7 +154,7 @@ public class LeavingRequestLogController {
                 }
             }
 
-            response.data = count;
+            response.setData(count);
         } catch (Exception e) {
             log.error(String.format("[countPendingLeavingRequestLog] [%s] ex", companyId), e);
             return new BaseResponse(e);

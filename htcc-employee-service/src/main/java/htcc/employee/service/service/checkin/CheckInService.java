@@ -96,4 +96,8 @@ public class CheckInService {
     public boolean isQrCodeUsed(String qrCodeId) {
         return !redisService.getUsedQrCheckInCode(qrCodeId).isEmpty();
     }
+
+    public CheckinModel getLastCheckInTime(String companyId, String username) {
+        return redisService.getLastCheckInTime(companyId, username);
+    }
 }

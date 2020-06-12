@@ -73,6 +73,11 @@ public class LogService {
         return callGet(method);
     }
 
+    public BaseResponse getListLeavingRequestByDate(String companyId, String username, String yyyyMMdd) {
+        String method = String.format("/leaving/date?companyId=%s&username=%s&yyyyMMdd=%s", companyId, username, yyyyMMdd);
+        return callGet(method);
+    }
+
     //for manager
     public BaseResponse getListLeavingRequestLogByCompany(String companyId, String yyyyMM) {
         String method = String.format("/leaving/%s/%s",companyId, yyyyMM);

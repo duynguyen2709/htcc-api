@@ -17,7 +17,7 @@ eureka:
 service:
   debugMode: true
   hazelcast:
-    useHazelcast: false
+    useHazelcast: true
     enableRest: false
     monitorLevel: "OFF"
     address: 127.0.0.1

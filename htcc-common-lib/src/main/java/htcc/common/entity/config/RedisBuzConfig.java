@@ -17,6 +17,7 @@ public class RedisBuzConfig {
     public String checkinFormat = "CHECKIN-%s-%s-%s"; // companyId-username-date
     public String checkoutFormat = "CHECKOUT-%s-%s-%s"; // companyId-username-date
 
+    public String lastCheckInFormat = "LAST-CHECKIN-%s-%s"; // companyId-username
     public String qrCodeCheckInFormat = "QR-CHECKIN-%s"; // qrCodeId
 
     // for special case when blocking:

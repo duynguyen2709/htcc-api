@@ -75,6 +75,14 @@ public class LeavingRequest extends BaseJPAEntity {
             return "Chi tiết ngày nghỉ không được rỗng";
         }
 
+        detail.sort(LeavingDayDetail.getComparator());
+
+        String today = DateTimeUtil.parseTimestampToString(clientTime, "yyyyMMdd");
+        int monthDiff = DateTimeUtil.calcMonthDiff(detail.get(detail.size() - 1).getDate(), today, "yyyyMMdd");
+        if (monthDiff > 1) {
+            return "Chỉ có thể đăng ký nghỉ trước 1 tháng";
+        }
+
         for (LeavingDayDetail d : detail) {
             if (!DateTimeUtil.isRightFormat(d.date, "yyyyMMdd")) {
                 return String.format("Ngày %s không phù hợp định dạng yyyyMMdd", d.date);

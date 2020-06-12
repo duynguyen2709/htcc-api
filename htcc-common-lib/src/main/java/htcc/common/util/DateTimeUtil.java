@@ -249,4 +249,8 @@ public class DateTimeUtil {
                 isBetweenTwoTime(start2, end2, end1)
         );
     }
+
+    public static boolean isBeforeMidDay(String startTime) {
+        return isBefore(parseStringToDate(startTime, "HH:mm").getTime(), "12:00");
+    }
 }

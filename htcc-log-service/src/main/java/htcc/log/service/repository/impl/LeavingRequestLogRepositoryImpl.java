@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.entity.leavingrequest.LeavingRequestLogEntity;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
+import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.mapper.LeavingRequestLogRowMapper;
@@ -20,6 +21,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -49,6 +52,29 @@ public class LeavingRequestLogRepositoryImpl implements LeavingRequestLogReposit
                         new LeavingRequestLogRowMapper()));
             } catch (Exception e) {
                 log.error("[getLeavingRequestLog] [{}-{}-{}]", table, companyId, username, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<LeavingRequestLogEntity> getLeavingRequestLogByDate(String companyId, String username,
+                                                                    String yyyyMMdd) {
+        String yyyyMM = yyyyMMdd.substring(0, 6);
+        Date yyyyMMddDate = DateTimeUtil.parseStringToDate(yyyyMMdd, "yyyyMMdd");
+        String lastMonth = DateTimeUtil.subtractMonthFromDate(yyyyMMddDate, 1);
+
+        List<LeavingRequestLogEntity> result = new ArrayList<>();
+        List<String> tableNames = Arrays.asList(yyyyMM, lastMonth);
+
+        for (String month : tableNames) {
+            try {
+                final String query = String.format("SELECT * FROM %s%s WHERE companyId = ? AND username = ?", TABLE_PREFIX, month);
+
+                result.addAll(jdbcTemplate.query(query, new Object[] {companyId, username},
+                        new LeavingRequestLogRowMapper()));
+            } catch (Exception e) {
+                log.error("[getLeavingRequestLogByDate] [{}-{}-{}]", month, companyId, username, e);
             }
         }
         return result;

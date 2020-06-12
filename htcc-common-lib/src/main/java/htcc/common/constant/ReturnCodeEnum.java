@@ -34,6 +34,7 @@ public enum ReturnCodeEnum {
     NOT_CHECKOUT(-21, "Chưa thực hiện điểm danh ra trước khi điểm danh vào"),
     INSUFFICIENT_PRIVILEGES(-22, "Không đủ quyền hạn để thực hiện hành động"),
     SHIFT_CONFLICT(-23, "Trùng thời gian ca làm việc"),
+    NON_SHIFT_ARRANGE_DAY_OFF(-24, "Bạn chưa được xếp ca làm việc vào các ngày đăng ký nghỉ"),
     ;
 
     private final int value;

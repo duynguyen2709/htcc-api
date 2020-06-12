@@ -9,6 +9,8 @@ public interface LeavingRequestLogRepository {
 
     List<LeavingRequestLogEntity> getLeavingRequestLog(String companyId, String username, String year);
 
+    List<LeavingRequestLogEntity> getLeavingRequestLogByDate(String companyId, String username, String yyyyMMdd);
+
     List<LeavingRequestLogEntity> getListLeavingRequestLogByCompany(String companyId, String yyyyMM);
 
     List<LeavingRequestLogEntity> getListPendingLeavingRequestLog(String yyyyMM);

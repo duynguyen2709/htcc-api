@@ -1,5 +1,6 @@
 package htcc.common.entity.shift;
 
+import htcc.common.constant.SessionEnum;
 import htcc.common.entity.jpa.BaseJPAEntity;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
@@ -53,6 +54,9 @@ public class ShiftTime extends BaseJPAEntity {
     @ApiModelProperty(notes = "Giờ kết thúc ca (HH:mm)",
                       example = "17:30")
     public String endTime = "";
+
+    @Column
+    public int session = SessionEnum.FULL_DAY.getValue();
 
     @Column
     @ApiModelProperty(notes = "Số ngày công để chấm công",
@@ -113,11 +117,24 @@ public class ShiftTime extends BaseJPAEntity {
         entity.shiftId = this.shiftId;
         entity.shiftName = this.shiftName;
         entity.startTime = this.startTime;
-        entity.dayCount = this.dayCount;
         entity.endTime = this.endTime;
+        entity.session = this.session;
+        entity.dayCount = this.dayCount;
         entity.allowDiffTime = this.allowDiffTime;
         entity.allowLateMinutes = this.allowLateMinutes;
         return entity;
+    }
+
+    public void calculateSession() {
+        if (dayCount == 1) {
+            session = SessionEnum.FULL_DAY.getValue();
+        } else if (dayCount == 0.5f) {
+            if (DateTimeUtil.isBeforeMidDay(startTime)) {
+                session = SessionEnum.MORNING.getValue();
+            } else {
+                session = SessionEnum.AFTERNOON.getValue();
+            }
+        }
     }
 
     @Data
