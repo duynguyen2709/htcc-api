@@ -71,6 +71,8 @@ public class CheckInService {
     public void setCheckOutLog(CheckinModel model){
         redisService.setCheckOutLog(model);
 
+        redisService.updateLastCheckInTimeOppositeId(model);
+
         kafka.sendMessage(kafka.getBuzConfig().checkOutLog.topicName, model);
     }
 

@@ -202,9 +202,13 @@ public class CheckInBuzService {
 
     private String validateShiftTime(CheckinModel model) {
         if (model.getType() == CheckinTypeEnum.CHECKIN.getValue()) {
-            List<ShiftArrangementModel> shiftArrangementList = shiftArrangementService.getShiftArrangementListByEmployee(model.getCompanyId(), model.getUsername(), model.getDate());
+            List<ShiftArrangementModel> shiftArrangementList = shiftArrangementService.getShiftArrangementListByEmployee(
+                    model.getCompanyId(), model.getUsername(), model.getDate())
+                    .stream()
+                    .filter(c -> c.getOfficeId().equals(model.getOfficeId()))
+                    .collect(Collectors.toList());
 
-            if (shiftArrangementList == null || shiftArrangementList.isEmpty()) {
+            if (shiftArrangementList.isEmpty()) {
                 return "Chưa có ca làm việc hôm nay. Vui lòng liên hệ quản lý để xếp ca";
             }
 
@@ -223,6 +227,10 @@ public class CheckInBuzService {
             else {
                 ShiftTime shiftTime = findNearestShift(shiftByDateList, model);
                 model.setShiftTime(shiftTime);
+            }
+
+            if (DateTimeUtil.isAfter(model.getClientTime(), model.getShiftTime().getEndTime())) {
+                return "Thời gian điểm danh không hợp lệ";
             }
         }
         else {

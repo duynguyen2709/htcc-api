@@ -29,7 +29,7 @@ public class RedisCheckinService {
     }
 
     public void setLastCheckInTime(CheckinModel model) {
-        redis.set(StringUtil.toJsonString(model), 86400 * 2, redis.buzConfig.getLastCheckInFormat(),
+        redis.set(StringUtil.toJsonString(model), 86400, redis.buzConfig.getLastCheckInFormat(),
                 model.getCompanyId(), model.getUsername());
     }
 
@@ -40,6 +40,28 @@ public class RedisCheckinService {
         }
 
         return StringUtil.fromJsonString(raw, CheckinModel.class);
+    }
+
+    public void updateLastCheckInTimeOppositeId(CheckinModel model) {
+
+        CheckinModel lastCheckInTime = getLastCheckInTime(model.getCompanyId(), model.getUsername());
+        List<CheckinModel> listCheckInTime = getCheckInLog(model.getCompanyId(), model.getUsername(), model.getDate());
+
+        if (listCheckInTime.isEmpty()) {
+            return;
+        }
+
+        for (CheckinModel checkinModel : listCheckInTime) {
+            if (checkinModel.getCheckInId().equals(lastCheckInTime.getCheckInId())) {
+                checkinModel.setOppositeId(model.getCheckInId());
+            }
+        }
+
+        redis.set(StringUtil.toJsonString(listCheckInTime), DateTimeUtil.getSecondUntilEndOfDay(),
+                redis.buzConfig.getCheckinFormat(), model.getCompanyId(), model.getUsername(), model.getDate());
+
+        lastCheckInTime.setOppositeId(model.getCheckInId());
+        setLastCheckInTime(lastCheckInTime);
     }
 
     public void setCheckInLog(CheckinModel data) {
