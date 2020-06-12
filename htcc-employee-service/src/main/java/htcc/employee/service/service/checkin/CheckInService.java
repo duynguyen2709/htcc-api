@@ -62,14 +62,14 @@ public class CheckInService {
     public void setCheckInLog(CheckinModel model){
         redisService.setCheckInLog(model);
 
+        redisService.setLastCheckInTime(model);
+
         kafka.sendMessage(kafka.getBuzConfig().checkInLog.topicName, model);
     }
 
     @Async("asyncExecutor")
     public void setCheckOutLog(CheckinModel model){
         redisService.setCheckOutLog(model);
-
-        redisService.setLastCheckInTime(model);
 
         kafka.sendMessage(kafka.getBuzConfig().checkOutLog.topicName, model);
     }
