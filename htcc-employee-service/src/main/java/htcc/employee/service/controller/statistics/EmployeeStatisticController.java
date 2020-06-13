@@ -54,7 +54,7 @@ public class EmployeeStatisticController {
             LocalDate startDate = LocalDate.parse(dateFrom, formatter);
             LocalDate endDate = LocalDate.parse(dateTo, formatter);
 
-            for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
+            for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                 String yyyyMMdd = date.format(formatter);
                 handleBuz(dataResponse, companyId, username, yyyyMMdd);
             }

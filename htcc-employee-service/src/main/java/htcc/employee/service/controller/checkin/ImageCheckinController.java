@@ -55,8 +55,8 @@ public class ImageCheckinController {
                                            @RequestParam float longitude,
                                        @ApiParam(value = "[Param] Điểm danh bằng wifi", defaultValue = "false", required = true)
                                            @RequestParam boolean usedWifi,
-                                       @ApiParam(value = "[Param] IP đã thực hiện điểm danh", defaultValue = "127.0.0.1", required = true)
-                                           @RequestParam String ip,
+                                       @ApiParam(value = "[Param] IP đã thực hiện điểm danh", defaultValue = "127.0.0.1", required = false)
+                                           @RequestParam(required = false) String ip,
                                        @ApiParam(value = "[Param] Hình ảnh điểm danh", required = true)
                                            @RequestParam MultipartFile image,
                                        @ApiParam(hidden = true) HttpServletRequest httpServletRequest) {
