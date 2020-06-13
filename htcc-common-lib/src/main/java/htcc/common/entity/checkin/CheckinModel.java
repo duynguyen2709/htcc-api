@@ -182,6 +182,7 @@ public class CheckinModel implements Serializable {
         this.status = model.status;
         this.approver = model.approver;
 
+        this.shiftTime = StringUtil.fromJsonString(model.shiftTime, ShiftTime.class);
         this.oppositeId = model.oppositeId;
         this.hasOppositeAction = !this.oppositeId.isEmpty();
     }
@@ -211,6 +212,7 @@ public class CheckinModel implements Serializable {
         this.status = model.status;
         this.approver = model.approver;
 
+        this.shiftTime = StringUtil.fromJsonString(model.shiftTime, ShiftTime.class);
         this.oppositeId = model.oppositeId;
         this.hasOppositeAction = !this.oppositeId.isEmpty();
     }

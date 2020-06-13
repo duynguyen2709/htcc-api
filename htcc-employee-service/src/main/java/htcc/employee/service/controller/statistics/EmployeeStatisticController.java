@@ -80,7 +80,7 @@ public class EmployeeStatisticController {
         CompletableFuture<List<ShiftArrangementModel>> shiftArrangementList = statisticService.getListShiftArrangement(companyId, username, yyyyMMdd);
         CompletableFuture<List<LeavingRequestModel>> leaveRequestList = statisticService.getListLeavingRequest(companyId, username, yyyyMMdd);
 
-        CompletableFuture.allOf(checkInTime, shiftArrangementList, leaveRequestList);
+        CompletableFuture.allOf(checkInTime, shiftArrangementList, leaveRequestList).join();
 
         EmployeeStatisticResponse.DetailStatisticsByDate detail = new EmployeeStatisticResponse.DetailStatisticsByDate();
         detail.setDate(yyyyMMdd);
@@ -113,7 +113,7 @@ public class EmployeeStatisticController {
 
         if (dataResponse.getCheckinTimes() != 0) {
             float percentage = dataResponse.getOnTimeCount() * 1.0f / dataResponse.getCheckinTimes();
-            dataResponse.setOnTimePercentage(percentage);
+            dataResponse.setOnTimePercentage(percentage * 100);
         }
 
         dataResponse.getDetailList().add(detail);
