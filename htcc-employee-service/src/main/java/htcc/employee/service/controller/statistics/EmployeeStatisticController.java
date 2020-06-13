@@ -115,6 +115,8 @@ public class EmployeeStatisticController {
             float percentage = dataResponse.getOnTimeCount() * 1.0f / dataResponse.getCheckinTimes();
             dataResponse.setOnTimePercentage(percentage);
         }
+
+        dataResponse.getDetailList().add(detail);
     }
 
     private float calcTotalWorkingDays(List<ShiftArrangementModel> shiftArrangementModels) {

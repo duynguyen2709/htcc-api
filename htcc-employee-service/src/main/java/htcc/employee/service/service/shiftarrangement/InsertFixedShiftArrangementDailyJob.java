@@ -13,6 +13,7 @@ import htcc.employee.service.service.jpa.FixedShiftArrangementService;
 import htcc.employee.service.service.jpa.ShiftTimeService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@ConditionalOnProperty(
+        value="service.schedule.fixedShiftArrangementEnable",
+        havingValue = "true",
+        matchIfMissing = false)
 @EnableScheduling
 @Log4j2
 public class InsertFixedShiftArrangementDailyJob {

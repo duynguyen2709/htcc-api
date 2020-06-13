@@ -22,6 +22,8 @@ service:
     monitorLevel: "OFF"
     address: 10.25.96.3
     port: 5702
+  schedule:
+    fixedShiftArrangementEnable: false
 
 spring:
   datasource:

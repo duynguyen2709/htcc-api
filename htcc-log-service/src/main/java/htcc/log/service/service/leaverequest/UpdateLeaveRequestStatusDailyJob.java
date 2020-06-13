@@ -10,6 +10,7 @@ import htcc.common.util.StringUtil;
 import htcc.log.service.repository.LeavingRequestLogRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
+@ConditionalOnProperty(
+        value="service.schedule.leaveRequestEnable",
+        havingValue = "true",
+        matchIfMissing = false)
 @EnableScheduling
 @Log4j2
 public class UpdateLeaveRequestStatusDailyJob {

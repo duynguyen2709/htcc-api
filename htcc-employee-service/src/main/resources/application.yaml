@@ -69,6 +69,7 @@ service:
   maxFileSize: 10000000
   schedule:
     fixedShiftArrangement: 1 0 0 * * *
+    fixedShiftArrangementEnable: true
 
 ################## Redis Config ##################
 redis:
