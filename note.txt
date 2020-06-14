@@ -270,3 +270,7 @@
 12-06-2020:
  + Version 2.0.0:
     - [Employee & Log] Statistic Feature
+
+14-06-2020:
+ + Version 2.0.1:
+    - [Employee] API GetWorkingDays for Employee

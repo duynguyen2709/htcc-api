@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -44,6 +45,14 @@ public class WorkingDayService extends BaseJPAService<WorkingDay, Integer> {
         }
 
         return null;
+    }
+
+    public List<WorkingDay> findByCompanyId(String companyId) {
+        List<WorkingDay> all = findAll()
+                .stream()
+                .filter(c -> c.getCompanyId().equals(companyId))
+                .collect(Collectors.toList());
+        return all;
     }
 
     public List<WorkingDay> findByCompanyIdAndOfficeId(String companyId, String officeId) {
