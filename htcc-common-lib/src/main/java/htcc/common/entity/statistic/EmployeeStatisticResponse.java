@@ -56,6 +56,8 @@ public class EmployeeStatisticResponse implements Serializable {
         public String shiftName = "";
         // thời gian ca
         public String shiftTime = "";
+        public String shiftStartTime = "";
+        public String shiftEndTime = "";
         // loại (1 = điểm danh vào/ 2 = ra)
         public int type;
         // hình thức (1 = tọa độ/ 2 = hình ảnh/ 3 = QRCode/ 4 = Form)
@@ -79,6 +81,8 @@ public class EmployeeStatisticResponse implements Serializable {
             this.status = model.getStatus();
             this.shiftName = model.getShiftTime().getShiftName();
             this.shiftTime = String.format("%s - %s", model.getShiftTime().getStartTime(), model.getShiftTime().getEndTime());
+            this.shiftStartTime = model.getShiftTime().getStartTime();
+            this.shiftEndTime = model.getShiftTime().getEndTime();
             this.officeId = model.getOfficeId();
             this.type = model.getType();
             this.subType = model.getSubType();
