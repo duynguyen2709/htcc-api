@@ -238,6 +238,7 @@ public class CheckInBuzService {
             model.setShiftTime(lastCheckinModel.getShiftTime());
             model.setOppositeModel(lastCheckinModel);
             model.setOppositeId(lastCheckinModel.getCheckInId());
+            model.setIsFixedShift(lastCheckinModel.getIsFixedShift());
         }
 
         return StringUtil.EMPTY;
@@ -245,6 +246,7 @@ public class CheckInBuzService {
 
     private ShiftTime findNearestShift(List<ShiftArrangementModel> shiftList, CheckinModel model) {
         ShiftTime shift = shiftList.get(0).getShiftTime();
+        boolean isFixed = shiftList.get(0).isFixed();
         long minDistance = model.getClientTime();
 
         for (ShiftArrangementModel arrangeModel : shiftList) {
@@ -258,12 +260,14 @@ public class CheckInBuzService {
                 if (newDistance < minDistance) {
                     minDistance = newDistance;
                     shift = arrangeModel.getShiftTime();
+                    isFixed = arrangeModel.isFixed();
                 }
             } catch (Exception e) {
                 log.error("[findNearestShift] ex", e);
             }
         }
 
+        model.setIsFixedShift(isFixed);
         return shift;
     }
 

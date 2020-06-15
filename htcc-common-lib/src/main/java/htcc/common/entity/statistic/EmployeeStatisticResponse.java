@@ -18,23 +18,21 @@ import java.util.Random;
 public class EmployeeStatisticResponse implements Serializable {
 
     // tỉ lệ checkin đúng giờ
-    public float onTimePercentage     = 0.0f;
+    public float onTimePercentage = 0.0f;
     // số lần điểm danh đúng giờ
     public int onTimeCount = 0;
     // số lần thực hiện điểm danh
     public int checkinTimes = 0;
-
     // tổng số ngày phải đi làm
-    public float totalDays            = 0.0f;
+    public float totalDays = 0.0f;
     // số ngày đi làm thực tế
-    public float workingDays          = 0.0f;
+    public float workingDays = 0.0f;
     // số ngày nghỉ có phép
-    public float validOffDays         = 0.0f;
+    public float validOffDays = 0.0f;
     // số ngày nghỉ không phép (= totalDays - workingDays - validOffDays)
     public float nonPermissionOffDays = 0.0f;
     // số giờ OT
-    // TODO : calc OT hours
-    public float overtimeHours        = new Random().nextInt(20);
+    public float overtimeHours = 0.0f;
     // danh sách chi tiết theo ngày
     public List<DetailStatisticsByDate> detailList = new ArrayList<>();
 

@@ -41,6 +41,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
     // new fields go here
     public String  shiftTime = "";
     public String  oppositeId = "";
+    public int     isFixedShift = 1;
 
     public CheckOutLogEntity(CheckinModel model) {
         this.requestId = model.getRequestId();
@@ -66,6 +67,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
 
         this.shiftTime = StringUtil.toJsonString(model.shiftTime);
         this.oppositeId = model.oppositeId;
+        this.isFixedShift = model.isFixedShift ? 1 : 0;
     }
 
     @Override
@@ -94,6 +96,7 @@ public class CheckOutLogEntity extends BaseLogEntity {
         params.put("status", this.status);
         params.put("shiftTime", this.shiftTime);
         params.put("oppositeId", this.oppositeId);
+        params.put("isFixedShift", this.isFixedShift);
         return params;
     }
 

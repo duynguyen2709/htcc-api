@@ -253,4 +253,23 @@ public class DateTimeUtil {
     public static boolean isBeforeMidDay(String startTime) {
         return isBefore(parseStringToDate(startTime, "HH:mm").getTime(), "12:00");
     }
+
+    public static float calcHoursDiff(String startTime, String endTime) {
+        try {
+            Date start = parseStringToDate(startTime, HHMM_FORMAT);
+            Date end = parseStringToDate(endTime, HHMM_FORMAT);
+
+            if (start.after(end)) {
+                Calendar c = Calendar.getInstance(new Locale("vi","VN"));
+                c.setTime(end);
+                c.add(Calendar.DATE, 1);
+                end = c.getTime();
+            }
+
+            return (end.getTime() - start.getTime()) * 1.0f / (1000 * 60 * 60);
+        } catch (Exception e) {
+            log.error("[calcHoursDiff] [{} - {}] ex", startTime, endTime, e);
+            return 0.0f;
+        }
+    }
 }

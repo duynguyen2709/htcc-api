@@ -13,8 +13,8 @@ public class TestUtil {
     @Test
     public void testTime() throws ParseException {
 
-        String d1 = "20200609";
-        String d2 = "20200606";
-        System.out.println(DateTimeUtil.calcDayDiff(d1, d2, "yyyyMMdd"));
+        String d1 = "20:30";
+        String d2 = "06:30";
+        System.out.println(DateTimeUtil.calcHoursDiff(d1, d2));
     }
 }

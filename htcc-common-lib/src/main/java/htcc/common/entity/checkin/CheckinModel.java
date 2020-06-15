@@ -38,6 +38,7 @@ public class CheckinModel implements Serializable {
     public int status = 1;
 
     public ShiftTime shiftTime = new ShiftTime();
+    public Boolean isFixedShift = false;
 
     public String oppositeId = "";
     public boolean hasOppositeAction = false;
@@ -185,6 +186,7 @@ public class CheckinModel implements Serializable {
         this.shiftTime = StringUtil.fromJsonString(model.shiftTime, ShiftTime.class);
         this.oppositeId = model.oppositeId;
         this.hasOppositeAction = !this.oppositeId.isEmpty();
+        this.isFixedShift = model.isFixedShift == 1;
     }
 
     public CheckinModel(CheckOutLogEntity model) {
@@ -215,5 +217,6 @@ public class CheckinModel implements Serializable {
         this.shiftTime = StringUtil.fromJsonString(model.shiftTime, ShiftTime.class);
         this.oppositeId = model.oppositeId;
         this.hasOppositeAction = !this.oppositeId.isEmpty();
+        this.isFixedShift = model.isFixedShift == 1;
     }
 }

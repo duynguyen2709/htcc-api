@@ -65,6 +65,10 @@ public class EmployeeStatisticController {
             }
 
             dataResponse.setNonPermissionOffDays(nonPermissionOffDays);
+            if (dataResponse.getOvertimeHours() > 0) {
+                String otHours = String.format("%.1f", dataResponse.getOvertimeHours());
+                dataResponse.setOvertimeHours(Float.valueOf(otHours));
+            }
             response.setData(dataResponse);
 
         } catch (Exception e) {
@@ -94,6 +98,11 @@ public class EmployeeStatisticController {
                 dataResponse.setWorkingDays(dataResponse.getWorkingDays() + checkinModel.getShiftTime().getDayCount());
             }
 
+            if (isOvertime(checkinModel)) {
+                dataResponse.setOvertimeHours(dataResponse.getOvertimeHours() +
+                        DateTimeUtil.calcHoursDiff(checkinModel.getShiftTime().getStartTime(), checkinModel.getShiftTime().getEndTime()));
+            }
+
             dataResponse.setCheckinTimes(dataResponse.getCheckinTimes() + 1);
             if (checkinModel.isOnTime()) {
                 dataResponse.setOnTimeCount(dataResponse.getOnTimeCount() + 1);
@@ -117,6 +126,12 @@ public class EmployeeStatisticController {
         }
 
         dataResponse.getDetailList().add(detail);
+    }
+
+    private boolean isOvertime(CheckinModel checkinModel) {
+        return !checkinModel.getIsFixedShift() &&
+                checkinModel.isHasOppositeAction() &&
+                checkinModel.getType() == CheckinTypeEnum.CHECKIN.getValue();
     }
 
     private float calcTotalWorkingDays(List<ShiftArrangementModel> shiftArrangementModels) {
