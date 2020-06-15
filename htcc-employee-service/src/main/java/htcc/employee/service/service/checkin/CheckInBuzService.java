@@ -238,7 +238,7 @@ public class CheckInBuzService {
             model.setShiftTime(lastCheckinModel.getShiftTime());
             model.setOppositeModel(lastCheckinModel);
             model.setOppositeId(lastCheckinModel.getCheckInId());
-            model.setIsFixedShift(lastCheckinModel.getIsFixedShift());
+            model.setFixedShift(lastCheckinModel.isFixedShift);
         }
 
         return StringUtil.EMPTY;
@@ -267,7 +267,7 @@ public class CheckInBuzService {
             }
         }
 
-        model.setIsFixedShift(isFixed);
+        model.setFixedShift(isFixed);
         return shift;
     }
 
