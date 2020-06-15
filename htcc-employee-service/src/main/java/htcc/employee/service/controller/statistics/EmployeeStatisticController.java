@@ -94,7 +94,7 @@ public class EmployeeStatisticController {
         for (CheckinModel checkinModel : checkInTime.get()) {
             detail.getListCheckInTime().add(new EmployeeStatisticResponse.DetailCheckInTime(checkinModel));
 
-            if (checkinModel.getType() == CheckinTypeEnum.CHECKOUT.getValue()) {
+            if (checkinModel.getType() == CheckinTypeEnum.CHECKOUT.getValue() && checkinModel.hasOppositeAction) {
                 dataResponse.setWorkingDays(dataResponse.getWorkingDays() + checkinModel.getShiftTime().getDayCount());
             }
 
@@ -118,7 +118,7 @@ public class EmployeeStatisticController {
         }
 
         float totalDayCount = calcTotalWorkingDays(shiftArrangementList.get());
-        dataResponse.setTotalDays(dataResponse.getWorkingDays() + totalDayCount);
+        dataResponse.setTotalDays(dataResponse.getTotalDays() + totalDayCount);
 
         if (dataResponse.getCheckinTimes() != 0) {
             float percentage = dataResponse.getOnTimeCount() * 1.0f / dataResponse.getCheckinTimes();
