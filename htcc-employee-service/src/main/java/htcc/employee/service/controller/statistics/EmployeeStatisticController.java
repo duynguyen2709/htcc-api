@@ -129,9 +129,9 @@ public class EmployeeStatisticController {
     }
 
     private boolean isOvertime(CheckinModel checkinModel) {
-        return !checkinModel.getIsFixedShift() &&
-                checkinModel.isHasOppositeAction() &&
-                checkinModel.getType() == CheckinTypeEnum.CHECKIN.getValue();
+        return !checkinModel.isFixedShift &&
+                checkinModel.hasOppositeAction &&
+                checkinModel.type == CheckinTypeEnum.CHECKIN.getValue();
     }
 
     private float calcTotalWorkingDays(List<ShiftArrangementModel> shiftArrangementModels) {
