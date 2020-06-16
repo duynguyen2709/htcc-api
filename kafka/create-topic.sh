@@ -11,4 +11,5 @@ docker exec kafka1 kafka-topics.sh --create --zookeeper 172.17.0.1:2181 --replic
 docker exec kafka1 kafka-topics.sh --create --zookeeper 172.17.0.1:2181 --replication-factor 2 --partitions 2 --topic LEAVING-REQUEST-LOG &
 docker exec kafka1 kafka-topics.sh --create --zookeeper 172.17.0.1:2181 --replication-factor 2 --partitions 2 --topic EVENT-ADMIN-SEND-NOTIFICATION &
 docker exec kafka1 kafka-topics.sh --create --zookeeper 172.17.0.1:2181 --replication-factor 2 --partitions 2 --topic EVENT-LOAD-ICON &
-docker exec kafka1 kafka-topics.sh --create --zookeeper 172.17.0.1:2181 --replication-factor 2 --partitions 2 --topic EVENT-REQUIRE-ICON
+docker exec kafka1 kafka-topics.sh --create --zookeeper 172.17.0.1:2181 --replication-factor 2 --partitions 2 --topic EVENT-REQUIRE-ICON &
+docker exec kafka1 kafka-topics.sh --create --zookeeper 172.17.0.1:2181 --replication-factor 2 --partitions 2 --topic EVENT-RESET-PASSWORD

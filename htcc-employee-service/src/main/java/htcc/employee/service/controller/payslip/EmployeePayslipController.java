@@ -29,7 +29,8 @@ public class EmployeePayslipController {
     @GetMapping("/payslip")
     public BaseResponse getPayslip(@RequestParam String companyId,
                                       @RequestParam String username,
-                                      @RequestParam String yyyyMM) {
+                                      @RequestParam String yyyyMM,
+                                   @RequestParam(required = false) Integer count) {
         BaseResponse<List<EmployeePayslipResponse>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             if (!DateTimeUtil.isRightFormat(yyyyMM, "yyyyMM")) {
@@ -43,7 +44,7 @@ public class EmployeePayslipController {
             String thisMonth = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMM");
             if (Integer.parseInt(yyyyMM) <= Integer.parseInt(thisMonth) ||
                     Integer.parseInt(yyyyMM) > 202002) {
-                int n = new Random().nextInt(3) + 1;
+                int n = count == null ? new Random().nextInt(3) + 1 : count;
                 for (int i = 0; i < n; i++) {
                     EmployeePayslipResponse entity = fakeResponse(n, i, companyId, username, yyyyMM);
                     dataResponse.add(entity);
