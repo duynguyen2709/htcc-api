@@ -30,10 +30,6 @@ public class ManagerNotificationLogRepositoryImpl implements ManagerNotification
             final String query = String.format("SELECT * FROM %s WHERE sourceClientId = ? " +
                     "AND companyId = ? AND sender = ? AND ymd = ? ORDER BY sendTime ASC", tableName);
 
-            if (!NotificationLogRepositoryImpl.MAP_TABLE_NOTIFICATION_LOG.containsKey(tableName)) {
-                return new ArrayList<>();
-            }
-
             return jdbcTemplate.query(query,
                     new Object[] { ClientSystemEnum.MANAGER_WEB.getValue(), companyId, sender, yyyyMMdd },
                     new NotificationLogRowMapper());

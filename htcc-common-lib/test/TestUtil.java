@@ -2,22 +2,19 @@ import htcc.common.constant.WeekDayEnum;
 import htcc.common.util.DateTimeUtil;
 import org.junit.Test;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class TestUtil {
 
     @Test
-    public void testTime(){
-        for (int weekDay = 0;
-             weekDay < 7 ;
-             weekDay++) {
+    public void testTime() throws ParseException {
 
-            String yyyyMMdd = DateTimeUtil.getDateStringFromWeek(weekDay, 20, 2020, "yyyyMMdd");
-            System.out.println(yyyyMMdd);
-        }
-//
-//        String yyyyMMdd = DateTimeUtil.getDateStringFromWeek(4, 20, 2020, "yyyyMMdd");
-//        System.out.println(yyyyMMdd);
+        String d1 = "20:30";
+        String d2 = "06:30";
+        System.out.println(DateTimeUtil.calcHoursDiff(d1, d2));
     }
 }

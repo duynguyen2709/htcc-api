@@ -11,6 +11,7 @@ public enum CacheKeyEnum {
     WORKING_DAY,
     SHIFT_TIME,
     FIXED_SHIFT,
+    SHIFT_TEMPLATE,
 
     // Admin
     NOTI_ICON,

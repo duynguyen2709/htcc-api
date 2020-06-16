@@ -28,6 +28,42 @@ public class RedisCheckinService {
         return StringUtil.valueOf(redis.get(redis.buzConfig.qrCodeCheckInFormat, qrCodeId));
     }
 
+    public void setLastCheckInTime(CheckinModel model) {
+        redis.set(StringUtil.toJsonString(model), 86400, redis.buzConfig.getLastCheckInFormat(),
+                model.getCompanyId(), model.getUsername());
+    }
+
+    public CheckinModel getLastCheckInTime(String companyId, String username) {
+        String raw = StringUtil.valueOf(redis.get(redis.buzConfig.getLastCheckInFormat(), companyId, username));
+        if (raw.isEmpty()) {
+            return null;
+        }
+
+        return StringUtil.fromJsonString(raw, CheckinModel.class);
+    }
+
+    public void updateLastCheckInTimeOppositeId(CheckinModel model) {
+
+        CheckinModel lastCheckInTime = getLastCheckInTime(model.getCompanyId(), model.getUsername());
+        List<CheckinModel> listCheckInTime = getCheckInLog(model.getCompanyId(), model.getUsername(), model.getDate());
+
+        if (listCheckInTime.isEmpty()) {
+            return;
+        }
+
+        for (CheckinModel checkinModel : listCheckInTime) {
+            if (checkinModel.getCheckInId().equals(lastCheckInTime.getCheckInId())) {
+                checkinModel.setOppositeId(model.getCheckInId());
+            }
+        }
+
+        redis.set(StringUtil.toJsonString(listCheckInTime), DateTimeUtil.getSecondUntilEndOfDay(),
+                redis.buzConfig.getCheckinFormat(), model.getCompanyId(), model.getUsername(), model.getDate());
+
+        lastCheckInTime.setOppositeId(model.getCheckInId());
+        setLastCheckInTime(lastCheckInTime);
+    }
+
     public void setCheckInLog(CheckinModel data) {
         List<CheckinModel> list = getCheckInLog(data.getCompanyId(), data.getUsername(), data.getDate());
         if (list == null){
@@ -70,11 +106,5 @@ public class RedisCheckinService {
             return new ArrayList<>();
         }
         return StringUtil.json2Collection(rawList, new TypeToken<List<CheckinModel>>() {}.getType());
-    }
-
-    // TODO : Delete this method after testing
-    public void deleteCheckInLog(String companyId, String username, String date) {
-        redis.delete(redis.buzConfig.checkinFormat, companyId, username, date);
-        redis.delete(redis.buzConfig.checkoutFormat, companyId, username, date);
     }
 }

@@ -32,6 +32,9 @@ public class CheckOutLogRowMapper implements RowMapper<CheckOutLogEntity> {
         entity.reason = rs.getString("reason");
         entity.approver = rs.getString("approver");
         entity.status = rs.getInt("status");
+        entity.shiftTime = rs.getString("shiftTime");
+        entity.oppositeId = rs.getString("oppositeId");
+        entity.isFixedShift = rs.getInt("isFixedShift");
 
         return entity;
     }

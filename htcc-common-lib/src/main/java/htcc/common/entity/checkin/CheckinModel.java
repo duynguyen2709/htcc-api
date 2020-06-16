@@ -1,8 +1,10 @@
 package htcc.common.entity.checkin;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import htcc.common.component.LoggingConfiguration;
 import htcc.common.constant.CheckinSubTypeEnum;
 import htcc.common.constant.CheckinTypeEnum;
+import htcc.common.entity.shift.ShiftTime;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import lombok.Data;
@@ -21,6 +23,9 @@ public class CheckinModel implements Serializable {
 
     private static final long serialVersionUID = 5926468583125150708L;
 
+    @JsonIgnore
+    public CheckinModel oppositeModel = null;
+
     @NotEmpty
     private String requestId = LoggingConfiguration.getTraceId();
 
@@ -31,6 +36,12 @@ public class CheckinModel implements Serializable {
     public String approver = "";
 
     public int status = 1;
+
+    public ShiftTime shiftTime = new ShiftTime();
+    public boolean isFixedShift = true;
+
+    public String oppositeId = "";
+    public boolean hasOppositeAction = false;
 
     @NotEmpty
     public String checkInId = "";
@@ -171,6 +182,11 @@ public class CheckinModel implements Serializable {
         this.reason = model.reason;
         this.status = model.status;
         this.approver = model.approver;
+
+        this.shiftTime = StringUtil.fromJsonString(model.shiftTime, ShiftTime.class);
+        this.oppositeId = model.oppositeId;
+        this.hasOppositeAction = !StringUtil.isEmpty(model.oppositeId);
+        this.isFixedShift = model.isFixedShift == 1;
     }
 
     public CheckinModel(CheckOutLogEntity model) {
@@ -197,5 +213,10 @@ public class CheckinModel implements Serializable {
         this.reason = model.reason;
         this.status = model.status;
         this.approver = model.approver;
+
+        this.shiftTime = StringUtil.fromJsonString(model.shiftTime, ShiftTime.class);
+        this.oppositeId = model.oppositeId;
+        this.hasOppositeAction = !StringUtil.isEmpty(model.oppositeId);
+        this.isFixedShift = model.isFixedShift == 1;
     }
 }

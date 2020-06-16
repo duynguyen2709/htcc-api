@@ -45,6 +45,16 @@ public class LeavingRequestService {
         }
     }
 
+    public List<LeavingRequestModel> getListLeavingRequestByDate(String companyId, String username, String yyyyMMdd) {
+        try {
+            BaseResponse response = logService.getListLeavingRequestByDate(companyId, username, yyyyMMdd);
+            return parseResponse(response);
+        } catch (Exception e) {
+            log.error("[getListLeavingRequestByDate] [{} - {} - {}]", companyId, username, yyyyMMdd, e);
+            return null;
+        }
+    }
+
     public LeavingRequestModel getOneLeavingRequest(String leavingRequestId, String yyyyMM){
         try {
             BaseResponse res = logService.getOneLeavingRequestLog(leavingRequestId, yyyyMM);

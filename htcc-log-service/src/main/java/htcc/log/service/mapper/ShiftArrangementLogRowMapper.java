@@ -14,17 +14,15 @@ public class ShiftArrangementLogRowMapper implements RowMapper<ShiftArrangementL
         ShiftArrangementLogEntity entity = new ShiftArrangementLogEntity();
         entity.arrangementId = rs.getString("arrangementId");
         entity.actionTime = rs.getLong("actionTime");
+        entity.week = rs.getInt("week");
+        entity.arrangeDate = rs.getString("arrangeDate");
         entity.requestId = rs.getString("requestId");
         entity.companyId = rs.getString("companyId");
         entity.officeId = rs.getString("officeId");
         entity.username = rs.getString("username");
-        entity.week = rs.getInt("week");
-        entity.arrangeDate = rs.getString("arrangeDate");
-        entity.shiftId = rs.getString("shiftId");
-        entity.startTime = rs.getString("startTime");
-        entity.endTime = rs.getString("endTime");
-        entity.dayCount = rs.getFloat("dayCount");
+        entity.shiftTime = rs.getString("shiftTime");
         entity.actor = rs.getString("actor");
+        entity.isFixed = rs.getInt("isFixed");
         return entity;
     }
 }

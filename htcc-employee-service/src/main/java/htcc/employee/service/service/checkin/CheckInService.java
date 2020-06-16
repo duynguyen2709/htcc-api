@@ -62,6 +62,8 @@ public class CheckInService {
     public void setCheckInLog(CheckinModel model){
         redisService.setCheckInLog(model);
 
+        redisService.setLastCheckInTime(model);
+
         kafka.sendMessage(kafka.getBuzConfig().checkInLog.topicName, model);
     }
 
@@ -69,12 +71,9 @@ public class CheckInService {
     public void setCheckOutLog(CheckinModel model){
         redisService.setCheckOutLog(model);
 
-        kafka.sendMessage(kafka.getBuzConfig().checkOutLog.topicName, model);
-    }
+        redisService.updateLastCheckInTimeOppositeId(model);
 
-    @Async("asyncExecutor")
-    public void deleteCheckInLog(String companyId, String username, String date) {
-        redisService.deleteCheckInLog(companyId, username, date);
+        kafka.sendMessage(kafka.getBuzConfig().checkOutLog.topicName, model);
     }
 
     private List<CheckinModel> parseResponse(BaseResponse res) {
@@ -100,5 +99,9 @@ public class CheckInService {
 
     public boolean isQrCodeUsed(String qrCodeId) {
         return !redisService.getUsedQrCheckInCode(qrCodeId).isEmpty();
+    }
+
+    public CheckinModel getLastCheckInTime(String companyId, String username) {
+        return redisService.getLastCheckInTime(companyId, username);
     }
 }

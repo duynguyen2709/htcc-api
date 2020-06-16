@@ -2,6 +2,8 @@ package htcc.log.service.repository.impl;
 
 import htcc.common.entity.checkin.CheckInLogEntity;
 import htcc.common.entity.checkin.CheckOutLogEntity;
+import htcc.common.entity.checkin.CheckinModel;
+import htcc.common.util.StringUtil;
 import htcc.log.service.mapper.CheckInLogRowMapper;
 import htcc.log.service.mapper.CheckOutLogRowMapper;
 import htcc.log.service.repository.CheckInLogRepository;
@@ -52,5 +54,18 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
             log.error(String.format("[getCheckOutLog] [%s-%s-%s] ex ", companyId, username, ymd), e);
         }
         return null;
+    }
+
+    @Override
+    public int updateOppositeId(CheckinModel checkOutModel) {
+        try {
+            final CheckinModel oppositeModel = checkOutModel.getOppositeModel();
+            final String tableName = "CheckInLog" + oppositeModel.getDate().substring(0, 6);
+            final String query = String.format("UPDATE %s SET oppositeId = ? WHERE checkInId = ?", tableName);
+            return jdbcTemplate.update(query, checkOutModel.getCheckInId(), oppositeModel.getCheckInId());
+        } catch (Exception e) {
+            log.error("[updateOppositeId] {} ex", StringUtil.toJsonString(checkOutModel), e);
+            return -1;
+        }
     }
 }

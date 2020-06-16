@@ -66,10 +66,10 @@ logging:
 ################## Service Config ##################
 service:
   debugMode: false
-  allowDeleteCheckin: false
   maxFileSize: 10000000
   schedule:
     fixedShiftArrangement: 1 0 0 * * *
+    fixedShiftArrangementEnable: true
 
 ################## Redis Config ##################
 redis:
@@ -127,3 +127,7 @@ kafka:
     eventRequireIcon:
       topicName: EVENT-REQUIRE-ICON
       groupId: EVENT-REQUIRE-ICON
+
+statistic:
+  maxDayDiff: 31
+  distanceFromToday: 0

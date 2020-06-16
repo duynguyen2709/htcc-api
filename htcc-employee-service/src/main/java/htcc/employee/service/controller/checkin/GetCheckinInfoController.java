@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -44,10 +46,6 @@ public class GetCheckinInfoController {
 
     @Autowired
     private OfficeService officeService;
-
-    // TODO : remove test allowDeleteCheckin
-    @Value("${service.allowDeleteCheckin}")
-    private boolean allowDeleteCheckin;
 
     @ApiOperation(value = "Kiểm tra thông tin điểm danh của nhân viên", response = CheckinResponse.class)
     @GetMapping("/checkin/{companyId}/{username}")
@@ -96,6 +94,11 @@ public class GetCheckinInfoController {
             }
 
             CompletableFuture.allOf(checkInFuture, checkOutFuture).join();
+            if (checkInFuture == null || checkInFuture.get() == null ||
+                    checkOutFuture == null || checkOutFuture.get() == null) {
+                throw new Exception("checkInFuture | checkOutFuture return null");
+            }
+
             setDetailCheckinTimes(data, checkInFuture.get(), checkOutFuture.get());
             setDetailOfficeList(data, companyId, yyyyMMdd);
             swapDefaultOffice(data, officeId);
@@ -129,13 +132,19 @@ public class GetCheckinInfoController {
 
     private void setDetailCheckinTimes(CheckinResponse data, List<CheckinModel> checkinList,
                                        List<CheckinModel> checkoutList) {
-        int n = checkinList.size();
-        for (int i = 0; i < n; i++) {
-            data.detailCheckinTimes.add(new CheckinResponse.DetailCheckinTime(checkinList.get(i)));
 
-            if (checkoutList.size() > i) {
-                data.detailCheckinTimes.add(new CheckinResponse.DetailCheckinTime(checkoutList.get(i)));
+        List<CheckinModel> combinedList = new ArrayList<>(checkinList);
+        combinedList.addAll(checkoutList);
+
+        combinedList.sort(new Comparator<CheckinModel>() {
+            @Override
+            public int compare(CheckinModel o1, CheckinModel o2) {
+                return Long.compare(o1.getClientTime(), o2.getClientTime());
             }
+        });
+
+        for (CheckinModel model : combinedList) {
+            data.detailCheckinTimes.add(new CheckinResponse.DetailCheckinTime(model));
         }
     }
 
@@ -167,38 +176,5 @@ public class GetCheckinInfoController {
                 d.getSession() == SessionEnum.FULL_DAY.getValue()).collect(Collectors.toList());
 
         return specialOffDays.isEmpty() && normalOffDays.isEmpty();
-    }
-
-    @ApiOperation(value = "Xóa thông tin điểm danh (testing)", response = BaseResponse.class)
-    @DeleteMapping("/checkin/{companyId}/{username}")
-    public BaseResponse deleteCheckinInfo(@ApiParam(value = "[Path] Mã công ty", required = true)
-                                              @PathVariable(required = true) String companyId,
-                                          @ApiParam(value = "[Path] Tên đăng nhập", required = true)
-                                          @PathVariable(required = true) String username,
-                                          @ApiParam(value = "[Query] Ngày (yyyyMMdd) (nếu ko gửi sẽ lấy ngày hiện tại)", required = false)
-                                              @PathVariable(name = "date", required = false) String date) throws Exception {
-        if (!allowDeleteCheckin) {
-            throw new Exception("Method Not Supported");
-        }
-
-        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
-        String yyyyMMdd = StringUtil.valueOf(date);
-        try {
-            if (!yyyyMMdd.isEmpty()) {
-                if (DateTimeUtil.parseStringToDate(yyyyMMdd, "yyyyMMdd") == null) {
-                    return new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID, String.format(
-                            "Ngày %s không hợp lệ " + "định dạng yyyyMMdd", date));
-                }
-            }
-            else {
-                yyyyMMdd = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
-            }
-
-            checkInService.deleteCheckInLog(companyId, username, yyyyMMdd);
-        } catch (Exception e) {
-            log.error(String.format("deleteCheckinInfo [%s - %s - %s] ex", companyId, username, yyyyMMdd), e);
-            response = new BaseResponse<>(e);
-        }
-        return response;
     }
 }

@@ -55,6 +55,9 @@ logging:
 ################## Service Config ##################
 service:
   debugMode: false
+  schedule:
+    leaveRequest: 1 0 0 * * *
+    leaveRequestEnable: true
 
 ################## Redis Config ##################
 redis:

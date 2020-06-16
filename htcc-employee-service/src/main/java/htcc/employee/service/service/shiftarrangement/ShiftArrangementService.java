@@ -37,6 +37,14 @@ public class ShiftArrangementService {
         return parseResponse(logService.getShiftArrangementLog(companyId, week));
     }
 
+    public List<ShiftArrangementModel> getShiftArrangementListByEmployee(ShiftArrangementRequest request) {
+        return getShiftArrangementListByEmployee(request.getCompanyId(), request.getUsername(), request.getArrangeDate());
+    }
+
+    public List<ShiftArrangementModel> getShiftArrangementListByEmployee(String companyId, String username, String date) {
+        return parseResponse(logService.getShiftArrangementListByEmployee(companyId, username, date));
+    }
+
     public BaseResponse deleteShiftArrangement(int type, String arrangementId) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Xóa lịch xếp ca thành công");
@@ -61,18 +69,10 @@ public class ShiftArrangementService {
             int weekDay = DateTimeUtil.getWeekDayInt(yyyyMMdd);
 
             if (weekDay == shift.getWeekDay()) {
-                ShiftArrangementModel model = new ShiftArrangementModel();
-                model.setCompanyId(shift.getCompanyId());
-                model.setUsername(shift.getUsername());
-                model.setOfficeId(shift.getOfficeId());
-                model.setShiftId(shift.getShiftId());
-                model.setArrangeDate(yyyyMMdd);
-                model.setArrangementId(String.format("%s-%s-%s-%s-%s-%s",
-                        model.getArrangeDate(), model.getCompanyId(), model.getOfficeId(),
-                        model.getShiftId(), model.getUsername(), type));
-                return logService.deleteShiftArrangement(model.getArrangementId());
-
-                // TODO : Delete checkin log today
+                String modelId = String.format("%s-%s-%s-%s-%s-%s",
+                        yyyyMMdd, shift.getCompanyId(), shift.getOfficeId(),
+                        shift.getShiftId(), shift.getUsername(), type);
+                return logService.deleteShiftArrangement(modelId);
             }
         }
 
@@ -116,7 +116,6 @@ public class ShiftArrangementService {
                 model.setCompanyId(request.getCompanyId());
                 model.setUsername(request.getUsername());
                 model.setOfficeId(request.getOfficeId());
-                model.setShiftId(request.getShiftId());
                 model.setShiftData(shiftTime);
                 model.setArrangeDate(yyyyMMdd);
                 model.setWeek(DateTimeUtil.getWeekNum(yyyyMMdd));
@@ -124,7 +123,7 @@ public class ShiftArrangementService {
                 model.setActor(request.getActor());
                 model.setArrangementId(String.format("%s-%s-%s-%s-%s-%s",
                         model.getArrangeDate(), model.getCompanyId(),
-                        model.getOfficeId(), model.getShiftId(),
+                        model.getOfficeId(), shiftTime.getShiftId(),
                         model.getUsername(), request.getType()));
 
                 BaseResponse logResponse = logService.insertShiftArrangement(model);

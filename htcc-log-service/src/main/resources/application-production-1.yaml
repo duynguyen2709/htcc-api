@@ -25,6 +25,8 @@ service:
     allowRetryOnFail: true
     retryDelaySecond: 3600
     maxRetries: 3
+  schedule:
+    leaveRequestEnable: false
 
 spring:
   datasource:

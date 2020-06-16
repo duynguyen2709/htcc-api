@@ -5,6 +5,8 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.Office;
+import htcc.common.entity.shift.ShiftArrangementModel;
+import htcc.common.entity.shift.ShiftTime;
 import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.LocationUtil;
@@ -12,15 +14,18 @@ import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.WorkingDayService;
+import htcc.employee.service.service.shiftarrangement.ShiftArrangementService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -34,6 +39,9 @@ public class CheckInBuzService {
 
     @Autowired
     private WorkingDayService workingDayService;
+
+    @Autowired
+    private ShiftArrangementService shiftArrangementService;
 
     public void onCheckInSuccess(CheckinModel model) {
         if (model.type == CheckinTypeEnum.CHECKIN.getValue()) {
@@ -57,6 +65,11 @@ public class CheckInBuzService {
             return response;
         }
 
+        response = validateListCheckInAndCheckOut(model);
+        if (response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()){
+            return response;
+        }
+
         error = validateCheckinModel(model);
         if (!error.isEmpty()) {
             response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
@@ -64,16 +77,7 @@ public class CheckInBuzService {
             return response;
         }
 
-
-        response = validateListCheckInAndCheckOut(model);
-        if (response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()){
-            return response;
-        }
-
-        // get valid checkin time by office
         setValidTimeAndLocation(model);
-
-        //TODO: Set dayCount & allowDiffTime from ShiftTime
 
         return response;
     }
@@ -109,11 +113,6 @@ public class CheckInBuzService {
                 response = new BaseResponse<>(ReturnCodeEnum.NOT_CHECKIN);
                 return response;
             }
-
-            if (model.clientTime <= checkinData.get().get(checkinData.get().size() - 1).getClientTime()) {
-                response = new BaseResponse<>(ReturnCodeEnum.CHECKIN_TIME_NOT_VALID);
-                return response;
-            }
         }
         return response;
     }
@@ -131,14 +130,12 @@ public class CheckInBuzService {
         model.setValidLongitude(office.getLongitude());
         model.setMaxAllowDistance(office.getMaxAllowDistance());
 
-        // TODO : remove hard code time here,
-        // GET from ShiftTime
         if (model.getType() == CheckinTypeEnum.CHECKIN.getValue()) {
-            model.setValidTime("08:30");
-            model.setOnTime(DateTimeUtil.isBefore(model.getClientTime() - 2 * 60 * 1000, model.getValidTime()));
+            model.setValidTime(model.getShiftTime().getStartTime());
+            model.setOnTime(DateTimeUtil.isBefore(model.getClientTime() - (model.getShiftTime().getAllowLateMinutes() + 2) * 60 * 1000, model.getValidTime()));
         } else if (model.getType() == CheckinTypeEnum.CHECKOUT.getValue()) {
-            model.setValidTime("17:30");
-            model.setOnTime(DateTimeUtil.isAfter(model.getClientTime() + 2 * 60 * 1000, model.getValidTime()));
+            model.setValidTime(model.getShiftTime().getEndTime());
+            model.setOnTime(DateTimeUtil.isAfter(model.getClientTime() + (model.getShiftTime().getAllowLateMinutes() + 2) * 60 * 1000, model.getValidTime()));
         }
     }
 
@@ -188,7 +185,6 @@ public class CheckInBuzService {
             default:
                 break;
         }
-        // TODO : Check ShiftTime
 
         if (subType != CheckinSubTypeEnum.FORM) {
             if (isOffThisSession(request)) {
@@ -196,7 +192,83 @@ public class CheckInBuzService {
             }
         }
 
+        String validShift = validateShiftTime(request);
+        if (!validShift.isEmpty()) {
+            return validShift;
+        }
+
         return StringUtil.EMPTY;
+    }
+
+    private String validateShiftTime(CheckinModel model) {
+        if (model.getType() == CheckinTypeEnum.CHECKIN.getValue()) {
+            List<ShiftArrangementModel> shiftArrangementList = shiftArrangementService.getShiftArrangementListByEmployee(
+                    model.getCompanyId(), model.getUsername(), model.getDate())
+                    .stream()
+                    .filter(c -> c.getOfficeId().equals(model.getOfficeId()))
+                    .collect(Collectors.toList());
+
+            if (shiftArrangementList.isEmpty()) {
+                return "Chưa có ca làm việc hôm nay. Vui lòng liên hệ quản lý để xếp ca";
+            }
+
+            List<ShiftArrangementModel> fixedShiftList = shiftArrangementList.stream()
+                    .filter(c -> c.isFixed)
+                    .collect(Collectors.toList());
+
+            List<ShiftArrangementModel> shiftByDateList = shiftArrangementList.stream()
+                    .filter(c -> !c.isFixed)
+                    .collect(Collectors.toList());
+
+            if (shiftByDateList.isEmpty()) {
+                ShiftTime shiftTime = findNearestShift(fixedShiftList, model);
+                model.setShiftTime(shiftTime);
+            }
+            else {
+                ShiftTime shiftTime = findNearestShift(shiftByDateList, model);
+                model.setShiftTime(shiftTime);
+            }
+        }
+        else {
+            CheckinModel lastCheckinModel = checkInService.getLastCheckInTime(model.getCompanyId(), model.getUsername());
+            if (lastCheckinModel == null) {
+                return "Không tìm thấy dữ liệu điểm danh vào";
+            }
+
+            model.setShiftTime(lastCheckinModel.getShiftTime());
+            model.setOppositeModel(lastCheckinModel);
+            model.setOppositeId(lastCheckinModel.getCheckInId());
+            model.setFixedShift(lastCheckinModel.isFixedShift);
+        }
+
+        return StringUtil.EMPTY;
+    }
+
+    private ShiftTime findNearestShift(List<ShiftArrangementModel> shiftList, CheckinModel model) {
+        ShiftTime shift = shiftList.get(0).getShiftTime();
+        boolean isFixed = shiftList.get(0).isFixed();
+        long minDistance = model.getClientTime();
+
+        for (ShiftArrangementModel arrangeModel : shiftList) {
+            try {
+                String time = arrangeModel.getShiftTime().getStartTime();
+
+                String fullTimeStr = String.format("%s %s", model.getDate(), time);
+                long timeMillis = new SimpleDateFormat("yyyyMMdd HH:mm").parse(fullTimeStr).getTime();
+
+                long newDistance = Math.abs(model.getClientTime() - timeMillis);
+                if (newDistance < minDistance) {
+                    minDistance = newDistance;
+                    shift = arrangeModel.getShiftTime();
+                    isFixed = arrangeModel.isFixed();
+                }
+            } catch (Exception e) {
+                log.error("[findNearestShift] ex", e);
+            }
+        }
+
+        model.setFixedShift(isFixed);
+        return shift;
     }
 
     private boolean isOffThisSession(CheckinModel request) {

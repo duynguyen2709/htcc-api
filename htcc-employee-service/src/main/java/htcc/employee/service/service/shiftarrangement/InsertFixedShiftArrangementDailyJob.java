@@ -13,6 +13,7 @@ import htcc.employee.service.service.jpa.FixedShiftArrangementService;
 import htcc.employee.service.service.jpa.ShiftTimeService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@ConditionalOnProperty(
+        value="service.schedule.fixedShiftArrangementEnable",
+        havingValue = "true",
+        matchIfMissing = false)
 @EnableScheduling
 @Log4j2
 public class InsertFixedShiftArrangementDailyJob {
@@ -63,14 +68,13 @@ public class InsertFixedShiftArrangementDailyJob {
                 model.setCompanyId(entity.getCompanyId());
                 model.setUsername(entity.getUsername());
                 model.setOfficeId(entity.getOfficeId());
-                model.setShiftId(entity.getShiftId());
                 model.setShiftData(shiftTime);
                 model.setArrangeDate(yyyyMMdd);
                 model.setWeek(DateTimeUtil.getWeekNum(yyyyMMdd));
                 model.setFixed(true);
                 model.setActor(entity.getActor());
                 model.setArrangementId(String.format("%s-%s-%s-%s-%s-%s",
-                        model.getArrangeDate(), model.getCompanyId(), model.getOfficeId(), model.getShiftId(),
+                        model.getArrangeDate(), model.getCompanyId(), model.getOfficeId(), shiftTime.getShiftId(),
                         model.getUsername(), ShiftArrangementTypeEnum.FIXED.getValue()));
 
                 BaseResponse response = logService.insertShiftArrangement(model);

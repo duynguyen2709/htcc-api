@@ -1,15 +1,18 @@
 package htcc.employee.service.config;
 
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
-import htcc.common.entity.jpa.*;
+import htcc.common.entity.jpa.BuzConfig;
+import htcc.common.entity.jpa.Company;
+import htcc.common.entity.jpa.Department;
+import htcc.common.entity.jpa.Office;
 import htcc.common.entity.shift.FixedShiftArrangement;
+import htcc.common.entity.shift.ShiftArrangementTemplate;
 import htcc.common.entity.shift.ShiftTime;
 import htcc.common.entity.workingday.WorkingDay;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class DbStaticConfigMap {
 
@@ -28,6 +31,7 @@ public class DbStaticConfigMap {
     public static Map<String, List<ShiftTime>> SHIFT_TIME_MAP = new HashMap<>();
 
     // key = companyId
-    // List Fixed Shift for 1 company
-    public static Map<String, List<FixedShiftArrangement>> FIXED_SHIFT_MAP = new HashMap<>();
+    // List Shift for 1 company
+    public static Map<String, List<FixedShiftArrangement>>    FIXED_SHIFT_MAP = new HashMap<>();
+    public static Map<String, List<ShiftArrangementTemplate>> SHIFT_TEMPLATE_MAP = new HashMap<>();
 }

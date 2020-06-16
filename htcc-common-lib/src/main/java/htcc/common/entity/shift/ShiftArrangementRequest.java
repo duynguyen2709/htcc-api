@@ -64,7 +64,6 @@ public class ShiftArrangementRequest extends BaseJPAEntity {
             if (monthDiff > 1) {
                 return "Chỉ có thể xếp ca trước 1 tháng";
             }
-
         }
 
         if (type == 1) {

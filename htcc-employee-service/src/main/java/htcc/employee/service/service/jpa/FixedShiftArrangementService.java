@@ -45,6 +45,13 @@ public class FixedShiftArrangementService extends BaseJPAService<FixedShiftArran
                 .collect(Collectors.toList());
     }
 
+    public List<FixedShiftArrangement> findByCompanyIdAndUsername(String companyId, String username) {
+        return DbStaticConfigMap.FIXED_SHIFT_MAP.getOrDefault(companyId, new ArrayList<>())
+                .stream()
+                .filter(c -> c.getUsername().equals(username))
+                .collect(Collectors.toList());
+    }
+
     @Override
     public FixedShiftArrangement findById(Integer key) {
         for (List<FixedShiftArrangement> shiftTimes : DbStaticConfigMap.FIXED_SHIFT_MAP.values()) {

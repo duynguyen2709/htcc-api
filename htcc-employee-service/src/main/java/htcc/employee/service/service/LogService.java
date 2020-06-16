@@ -73,6 +73,11 @@ public class LogService {
         return callGet(method);
     }
 
+    public BaseResponse getListLeavingRequestByDate(String companyId, String username, String yyyyMMdd) {
+        String method = String.format("/leaving/date?companyId=%s&username=%s&yyyyMMdd=%s", companyId, username, yyyyMMdd);
+        return callGet(method);
+    }
+
     //for manager
     public BaseResponse getListLeavingRequestLogByCompany(String companyId, String yyyyMM) {
         String method = String.format("/leaving/%s/%s",companyId, yyyyMM);
@@ -130,6 +135,11 @@ public class LogService {
      */
     public BaseResponse getShiftArrangementLog(String companyId, int week) {
         String method = String.format("/shifts/%s/%s", companyId, week);
+        return callGet(method);
+    }
+
+    public BaseResponse getShiftArrangementListByEmployee(String companyId, String username, String arrangeDate) {
+        String method = String.format("/shifts?companyId=%s&username=%s&arrangeDate=%s", companyId, username, arrangeDate);
         return callGet(method);
     }
 

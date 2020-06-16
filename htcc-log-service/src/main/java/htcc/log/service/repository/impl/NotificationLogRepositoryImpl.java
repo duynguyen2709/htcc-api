@@ -32,7 +32,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
 
     private static final String NON_READ_PREFIX = "NonRead";
 
-    public static final Map<String, String> MAP_TABLE_NOTIFICATION_LOG = new HashMap<>();
+    private static final Map<String, String> MAP_TABLE_NOTIFICATION_LOG = new HashMap<>();
 
     @Autowired
     private BaseLogDAO baseLogDAO;

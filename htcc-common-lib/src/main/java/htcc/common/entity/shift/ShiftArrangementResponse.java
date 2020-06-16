@@ -23,6 +23,8 @@ public class ShiftArrangementResponse implements Serializable {
     public List<OfficeShiftInfo> fixedShiftList = new ArrayList<>();
     public List<EmployeeInfo> canManageEmployees = new ArrayList<>();
 
+    public Map<String, EmployeeShiftDetail> employeeShiftDetailMap = new HashMap<>();
+
     @JsonIgnore
     public transient Map<String, EmployeeInfo> canManageEmployeesMap = new HashMap<>();
 
