@@ -111,7 +111,9 @@ kafka:
     eventRequireIcon:
       topicName: EVENT-REQUIRE-ICON
       groupId: EVENT-REQUIRE-ICON
-
+    eventResetPassword:
+      topicName: EVENT-RESET-PASSWORD
+      groupId: EVENT-RESET-PASSWORD
 ################## Mail Buz Config ##################
 mail:
   buz:

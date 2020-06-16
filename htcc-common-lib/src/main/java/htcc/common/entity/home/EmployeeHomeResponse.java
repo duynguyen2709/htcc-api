@@ -17,4 +17,6 @@ public class EmployeeHomeResponse implements Serializable {
     @ApiModelProperty(notes = "Số lượng notification chưa đọc",
                       example = "10")
     public int unreadNotifications = 0;
+
+    public List<Integer> displayScreens = new ArrayList<>();
 }

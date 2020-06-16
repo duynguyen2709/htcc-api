@@ -10,6 +10,7 @@ public class KafkaBuzConfig {
     public KafkaTopicConfig checkOutLog;
     public KafkaTopicConfig complaintLog;
     public KafkaTopicConfig leavingRequestLog;
+    public KafkaTopicConfig eventResetPassword;
     public KafkaTopicConfig eventCreateUser;
     public KafkaTopicConfig eventUpdateCompanyUser;
     public KafkaTopicConfig eventUpdateEmployeeInfo;
