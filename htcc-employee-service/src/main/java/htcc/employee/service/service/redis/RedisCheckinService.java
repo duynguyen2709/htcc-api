@@ -28,13 +28,19 @@ public class RedisCheckinService {
         return StringUtil.valueOf(redis.get(redis.buzConfig.qrCodeCheckInFormat, qrCodeId));
     }
 
-    public void setLastCheckInTime(CheckinModel model) {
-        redis.set(StringUtil.toJsonString(model), 86400, redis.buzConfig.getLastCheckInFormat(),
-                model.getCompanyId(), model.getUsername());
+    public void deleteLastCheckInTime(CheckinModel model) {
+        redis.delete(redis.buzConfig.getLastCheckInFormat(),
+                model.getCompanyId(), model.getUsername(), model.getDate());
     }
 
-    public CheckinModel getLastCheckInTime(String companyId, String username) {
-        String raw = StringUtil.valueOf(redis.get(redis.buzConfig.getLastCheckInFormat(), companyId, username));
+    public void setLastCheckInTime(CheckinModel model) {
+        long cacheTime = 31 * 86_400L;
+        redis.set(StringUtil.toJsonString(model), cacheTime, redis.buzConfig.getLastCheckInFormat(),
+                model.getCompanyId(), model.getUsername(), model.getDate());
+    }
+
+    public CheckinModel getLastCheckInTime(String companyId, String username, String date) {
+        String raw = StringUtil.valueOf(redis.get(redis.buzConfig.getLastCheckInFormat(), companyId, username, date));
         if (raw.isEmpty()) {
             return null;
         }
@@ -44,7 +50,7 @@ public class RedisCheckinService {
 
     public void updateLastCheckInTimeOppositeId(CheckinModel model) {
 
-        CheckinModel lastCheckInTime = getLastCheckInTime(model.getCompanyId(), model.getUsername());
+        CheckinModel lastCheckInTime = getLastCheckInTime(model.getCompanyId(), model.getUsername(), model.getDate());
         List<CheckinModel> listCheckInTime = getCheckInLog(model.getCompanyId(), model.getUsername(), model.getDate());
 
         if (listCheckInTime.isEmpty()) {
@@ -60,8 +66,7 @@ public class RedisCheckinService {
         redis.set(StringUtil.toJsonString(listCheckInTime), DateTimeUtil.getSecondUntilEndOfDay(),
                 redis.buzConfig.getCheckinFormat(), model.getCompanyId(), model.getUsername(), model.getDate());
 
-        lastCheckInTime.setOppositeId(model.getCheckInId());
-        setLastCheckInTime(lastCheckInTime);
+        deleteLastCheckInTime(lastCheckInTime);
     }
 
     public void setCheckInLog(CheckinModel data) {

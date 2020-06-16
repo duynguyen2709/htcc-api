@@ -101,7 +101,7 @@ public class CheckInService {
         return !redisService.getUsedQrCheckInCode(qrCodeId).isEmpty();
     }
 
-    public CheckinModel getLastCheckInTime(String companyId, String username) {
-        return redisService.getLastCheckInTime(companyId, username);
+    public CheckinModel getLastCheckInTime(String companyId, String username, String date) {
+        return redisService.getLastCheckInTime(companyId, username, date);
     }
 }

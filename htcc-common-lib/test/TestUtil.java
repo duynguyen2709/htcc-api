@@ -13,8 +13,7 @@ public class TestUtil {
     @Test
     public void testTime() throws ParseException {
 
-        String d1 = "20:30";
-        String d2 = "06:30";
-        System.out.println(DateTimeUtil.calcHoursDiff(d1, d2));
+        String d1 = "20:29";
+        System.out.println(DateTimeUtil.timeToFloat(d1));
     }
 }

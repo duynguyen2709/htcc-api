@@ -272,4 +272,17 @@ public class DateTimeUtil {
             return 0.0f;
         }
     }
+
+    public static float timeToFloat(String time) {
+        float result = 0.00f;
+        try {
+            int hour = Integer.parseInt(time.split(":")[0]);
+            int minute = Integer.parseInt(time.split(":")[1]);
+            result = hour + (minute * 1.0f / 60);
+        } catch (Exception e) {
+            log.error("[timeToFloat] [{}] ex", time, e);
+        }
+
+        return result;
+    }
 }

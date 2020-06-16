@@ -230,7 +230,7 @@ public class CheckInBuzService {
             }
         }
         else {
-            CheckinModel lastCheckinModel = checkInService.getLastCheckInTime(model.getCompanyId(), model.getUsername());
+            CheckinModel lastCheckinModel = checkInService.getLastCheckInTime(model.getCompanyId(), model.getUsername(), model.getDate());
             if (lastCheckinModel == null) {
                 return "Không tìm thấy dữ liệu điểm danh vào";
             }
