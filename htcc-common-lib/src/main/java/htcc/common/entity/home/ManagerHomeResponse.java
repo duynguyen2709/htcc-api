@@ -32,6 +32,9 @@ public class ManagerHomeResponse implements Serializable {
                       example = "10")
     public int pendingCheckIn = 0;
 
+    @ApiModelProperty(notes = "Danh sách loại nghỉ phép được chọn", example = "[\"Nghỉ phép năm\",\"Nghỉ bệnh\",\"Nghỉ thai sản\"]")
+    public List<String> leavingRequestCategories = new ArrayList<>();
+
     @ApiModelProperty(notes = "Số lượng khiếu nại chưa xử lý (để hiển thị ở sidebar)",
                       example = "10")
     public int pendingComplaint = 0;

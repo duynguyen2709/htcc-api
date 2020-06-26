@@ -209,7 +209,7 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
 
     @Override
     @Transactional
-    public void saveNotification(NotificationModel model) {
+    public void saveNotification(NotificationModel model) throws Exception {
         NotificationLogEntity logEntity =
                 getOneNotification(model.getNotiId(), model.getTargetClientId(), model.getCompanyId(), model.getUsername());
 
@@ -231,9 +231,12 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
     }
 
     @Override
-    public void createNewNotification(NotificationModel model) {
+    public void createNewNotification(NotificationModel model) throws Exception {
         NotificationLogEntity logEntity = new NotificationLogEntity(model);
-        baseLogDAO.insertLog(logEntity);
+        long result = baseLogDAO.insertLog(logEntity);
+        if (result == -1) {
+            throw new Exception("[createNewNotification] baseLogDAO.insertLog ex");
+        }
 
         String params = String.format("%s-%s-%s", model.getTargetClientId(), model.getCompanyId(), model.getUsername());
         LogCounter logCounter =

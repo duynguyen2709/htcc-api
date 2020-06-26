@@ -3,10 +3,12 @@ package htcc.employee.service.controller.home;
 import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.home.EmployeeHomeResponse;
 import htcc.common.entity.home.ManagerHomeResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.DateTimeUtil;
+import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.repository.EmployeePermissionRepository;
 import htcc.employee.service.service.LogService;
 import htcc.employee.service.service.checkin.CheckInService;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "API của quản lý",
      description = "API ở màn hình chính")
@@ -157,5 +160,16 @@ public class ManagerHomeController {
             log.error("[countUnreadNotifications] [{} - {}] ex", companyId, username, e);
         }
         data.setUnreadNotifications(count);
+    }
+
+    private void setLeavingRequestCategories(ManagerHomeResponse data, String companyId) {
+        List<String> categoryList = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP
+                .get(companyId)
+                .getCategoryList()
+                .stream()
+                .map(CompanyDayOffInfo.CategoryEntity::getCategory)
+                .collect(Collectors.toList());
+
+        data.setLeavingRequestCategories(categoryList);
     }
 }
