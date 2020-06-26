@@ -63,6 +63,7 @@ public class CheckInLogEntity extends BaseLogEntity {
         this.ip = model.ip;
         this.image = model.image;
         this.reason = model.reason;
+        this.approver = model.approver;
         this.status = model.status;
 
         this.shiftTime = StringUtil.toJsonString(model.shiftTime);

@@ -123,13 +123,21 @@ public class CheckinModel implements Serializable {
             return "Loại điểm danh không hợp lệ";
         }
 
-        if (subType == CheckinSubTypeEnum.FORM.getValue() &&
+        if ((subType == CheckinSubTypeEnum.FORM.getValue() ||
+            subType == CheckinSubTypeEnum.MANAGER.getValue()) &&
                 StringUtil.isEmpty(reason)) {
             return "Lý do không được rỗng";
         }
 
         if (usedWifi && !StringUtil.isIPAddress(StringUtil.valueOf(ip))) {
             return String.format("IP %s không hợp lệ", ip);
+        }
+
+        String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+        int monthDiff = DateTimeUtil.calcMonthDiff(date, today, "yyyyMMdd");
+
+        if (monthDiff > 0) {
+            return "Không thể điểm danh hơn tháng hiện tại";
         }
 
         return StringUtil.EMPTY;

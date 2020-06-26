@@ -1,5 +1,6 @@
 package htcc.log.service.component.kafka;
 
+import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.entity.checkin.CheckOutLogEntity;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.service.kafka.BaseKafkaConsumer;
@@ -36,6 +37,10 @@ public class CheckOutLogKafkaListener extends BaseKafkaConsumer<CheckinModel> {
             int result = checkInLogRepo.updateOppositeId(model);
             if (result != 1) {
                 throw new Exception("checkInLogRepo.updateOppositeId return " + result);
+            }
+
+            if (model.getStatus() == ComplaintStatusEnum.PROCESSING.getValue()) {
+                checkInLogRepo.increasePendingCheckInCounter(model);
             }
         } catch (Exception e) {
             log.error("process {} ex", StringUtil.toJsonString(model), e);

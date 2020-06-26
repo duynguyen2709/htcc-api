@@ -1,9 +1,11 @@
 package htcc.employee.service.controller.home;
 
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.constant.ScreenEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.home.EmployeeHomeResponse;
+import htcc.common.util.StringUtil;
 import htcc.employee.service.service.LogService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,11 +54,13 @@ public class EmployeeHomeController {
         Set<Integer> displayScreens = new HashSet<>();
         displayScreens.add(1);
         try {
-            String[] list = screens.split(",");
-            for (String str : list) {
-                int screenValue = Integer.parseInt(str);
-                if (ScreenEnum.fromInt(screenValue) != null) {
-                    displayScreens.add(Integer.parseInt(str));
+            if (!StringUtil.isEmpty(screens)) {
+                String[] list = screens.split(",");
+                for (String str : list) {
+                    int screenValue = Integer.parseInt(str);
+                    if (ScreenEnum.fromInt(screenValue) != null) {
+                        displayScreens.add(Integer.parseInt(str));
+                    }
                 }
             }
         } catch (Exception e) {
@@ -68,7 +72,7 @@ public class EmployeeHomeController {
     private void countUnreadNotifications(EmployeeHomeResponse data, String companyId, String username){
         int count = 0;
         try {
-            BaseResponse response = logService.countUnreadNotificationForMobile(companyId, username);
+            BaseResponse response = logService.countUnreadNotification(ClientSystemEnum.MOBILE.getValue(), companyId, username);
             if (response != null && response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
                 count = (int) response.getData();
             }

@@ -1,12 +1,14 @@
 package htcc.employee.service.controller.statistics;
 
 import htcc.common.constant.CheckinTypeEnum;
+import htcc.common.constant.ComplaintStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.constant.SessionEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.shift.ShiftArrangementModel;
+import htcc.common.entity.statistic.DetailCheckInTime;
 import htcc.common.entity.statistic.EmployeeStatisticResponse;
 import htcc.common.util.DateTimeUtil;
 import htcc.employee.service.config.StatisticConfig;
@@ -92,7 +94,11 @@ public class EmployeeStatisticController {
         detail.setListDayOff(new ArrayList<>());
 
         for (CheckinModel checkinModel : checkInTime.get()) {
-            detail.getListCheckInTime().add(new EmployeeStatisticResponse.DetailCheckInTime(checkinModel));
+            if (checkinModel.getStatus() == ComplaintStatusEnum.REJECTED.getValue()) {
+                continue;
+            }
+
+            detail.getListCheckInTime().add(new DetailCheckInTime(checkinModel));
 
             if (checkinModel.getType() == CheckinTypeEnum.CHECKOUT.getValue() && checkinModel.hasOppositeAction) {
                 dataResponse.setWorkingDays(dataResponse.getWorkingDays() + checkinModel.getShiftTime().getDayCount());

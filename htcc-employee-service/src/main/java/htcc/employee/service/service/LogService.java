@@ -1,8 +1,8 @@
 package htcc.employee.service.service;
 
-import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.Constant;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.checkin.UpdateCheckInStatusModel;
 import htcc.common.entity.complaint.ResubmitComplaintModel;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
@@ -109,18 +109,35 @@ public class LogService {
         return callGet(method);
     }
 
-    /*
-    ##################### Notification Section #####################
-     */
-    public BaseResponse getNotificationLog(String companyId, String username, int startIndex, int size) {
-        String method = String.format("/notifications?clientId=%s&companyId=%s&username=%s&startIndex=%s&size=%s",
-                ClientSystemEnum.MOBILE.getValue(), companyId, username, startIndex, size);
+    public BaseResponse getListPendingCheckInLog(String companyId, String yyyyMM) {
+        String method = String.format("/checkin/pending?companyId=%s&yyyyMM=%s", companyId, yyyyMM);
         return callGet(method);
     }
 
-    public BaseResponse countUnreadNotificationForMobile(String companyId, String username) {
+    public BaseResponse countPendingCheckInLogByCompany(String companyId) {
+        String method = String.format("/checkin/pending/count?companyId=%s", companyId);
+        return callGet(method);
+    }
+
+
+    public BaseResponse updateCheckInStatus(UpdateCheckInStatusModel model) {
+        HttpEntity<UpdateCheckInStatusModel> request = new HttpEntity<>(model);
+        String method = "/checkin/status";
+        return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
+    }
+
+    /*
+    ##################### Notification Section #####################
+     */
+    public BaseResponse getNotificationLog(int clientId, String companyId, String username, int startIndex, int size) {
+        String method = String.format("/notifications?clientId=%s&companyId=%s&username=%s&startIndex=%s&size=%s",
+                clientId, companyId, username, startIndex, size);
+        return callGet(method);
+    }
+
+    public BaseResponse countUnreadNotification(int clientId, String companyId, String username) {
         String method = String.format("/notifications/count?clientId=%s&companyId=%s&username=%s",
-                ClientSystemEnum.MOBILE.getValue(), companyId, username);
+                clientId, companyId, username);
         return callGet(method);
     }
 

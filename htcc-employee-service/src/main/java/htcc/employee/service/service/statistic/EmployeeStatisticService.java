@@ -37,8 +37,12 @@ public class EmployeeStatisticService {
             CompletableFuture<List<CheckinModel>> checkOutLog = checkInService.getCheckOutLog(companyId, username, yyyyMMdd);
             CompletableFuture.allOf(checkInLog, checkOutLog).join();
 
-            result.addAll(checkInLog.get());
-            result.addAll(checkOutLog.get());
+            if (checkInLog != null && checkInLog.get() != null) {
+                result.addAll(checkInLog.get());
+            }
+            if (checkOutLog != null && checkOutLog.get() != null) {
+                result.addAll(checkOutLog.get());
+            }
         } catch (Exception e) {
             log.error("[getListCheckInTime] [{}-{}-{}] ex", companyId, username, yyyyMMdd, e);
         }

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(description = "Request để điểm danh")
 public class CheckinRequest implements Serializable {
@@ -71,4 +73,15 @@ public class CheckinRequest implements Serializable {
     @ApiModelProperty(notes = "IP đã thực hiện điểm danh",
                       example = "127.0.0.1")
     public String ip = "";
+
+    public CheckinRequest(ManagerCheckinRequest request) {
+        this.type = request.getType();
+        this.reason = request.getReason();
+        this.companyId = request.getCompanyId();
+        this.officeId = request.getOfficeId();
+        this.username = request.getUsername();
+        this.clientTime = request.getClientTime();
+        this.usedWifi = false;
+        this.ip = "";
+    }
 }
