@@ -1,6 +1,7 @@
 package htcc.common.entity.checkin;
 
 import htcc.common.util.DateTimeUtil;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
+@ApiModel("Chi tiết thời gian điểm danh")
 public class ManagerDetailCheckInTime implements Serializable {
     // mã điểm danh
     @ApiModelProperty(notes = "Mã điểm danh",
