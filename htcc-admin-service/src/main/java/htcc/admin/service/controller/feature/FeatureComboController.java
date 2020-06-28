@@ -131,6 +131,10 @@ public class FeatureComboController {
                 if (!comboDetail.containsKey(featureEnum.getValue())) {
                     return "Thiếu thông tin tính năng " + featureEnum.getValue() + " trong gói";
                 }
+
+                if (!featureEnum.getValue().equals(FeatureEnum.EMPLOYEE_MANAGE.getValue())) {
+                    boolean isActive = Boolean.parseBoolean(StringUtil.valueOf(comboDetail.get(featureEnum.getValue())));
+                }
             }
 
             Object value = comboDetail.get(FeatureEnum.EMPLOYEE_MANAGE.getValue());
@@ -138,9 +142,9 @@ public class FeatureComboController {
             if (numEmployees <= 0) {
                 return "Số nhân viên trong gói phải lớn hơn 0";
             }
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             log.error("[validateComboDetail] {} ex", StringUtil.toJsonString(comboDetail), e);
-            return "Số nhân viên trong gói không hợp lệ";
+            return "Thông tin trong gói không hợp lệ";
         }
         return StringUtil.EMPTY;
     }

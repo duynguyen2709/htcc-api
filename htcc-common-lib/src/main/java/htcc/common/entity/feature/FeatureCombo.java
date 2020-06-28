@@ -69,6 +69,10 @@ public class FeatureCombo extends BaseJPAEntity {
             return "Giá trị giảm giá phải lớn hơn 0";
         }
 
+        if (discountPercentage >= 100) {
+            return "Giá trị giảm giá phải nhỏ hơn 100";
+        }
+
         if (comboDetail == null || comboDetail.isEmpty()) {
             return "Danh sách tính năng không được rỗng";
         }
