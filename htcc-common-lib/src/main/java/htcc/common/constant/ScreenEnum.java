@@ -13,6 +13,11 @@ public enum ScreenEnum {
     PAYCHECK(6, "Màn hình Bảng lương"),
     COMPLAINT(7, "Màn hình Khiếu nại"),
     HOME(8, "Màn hình chính"),
+    CHECKIN_IMAGE(9, "Màn hình Điểm danh bằng hình ảnh"),
+    CHECKIN_QR(10, "Màn hình Điểm danh bằng QR Code"),
+    CHECKIN_FORM(11, "Màn hình Điểm danh bằng form"),
+    WORKING_DAY(12, "Màn hình Lịch làm việc"),
+
     ;
 
     private final int value;

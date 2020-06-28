@@ -175,14 +175,14 @@ public class LeavingRequestLogController {
         try {
             LeavingRequestLogEntity oldEnt = repo.getOneLeavingRequest(request);
             if (oldEnt == null) {
-                log.warn("[repo.getOneLeavingRequest] {} return null", StringUtil.toJsonString(request));
+                log.error("[repo.getOneLeavingRequest] {} return null", StringUtil.toJsonString(request));
                 response = new BaseResponse<>(ReturnCodeEnum.LOG_NOT_FOUND);
                 return response;
             }
 
             if (oldEnt.getStatus() == ComplaintStatusEnum.DONE.getValue() ||
                     oldEnt.getStatus() == ComplaintStatusEnum.REJECTED.getValue()) {
-                log.warn("[repo.getOneLeavingRequest] oldEntity {}: status = [{}]", oldEnt.getLeavingRequestId(), oldEnt.getStatus());
+                log.error("[repo.getOneLeavingRequest] oldEntity {}: status = [{}]", oldEnt.getLeavingRequestId(), oldEnt.getStatus());
                 response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
                 response.setReturnMessage(String.format("Đơn nghỉ phép [%s] đã được xử lý trước đó", oldEnt.getLeavingRequestId()));
                 return response;

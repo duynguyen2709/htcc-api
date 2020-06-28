@@ -1,11 +1,17 @@
 package htcc.employee.service.controller.home;
 
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.dayoff.CompanyDayOffInfo;
+import htcc.common.entity.home.EmployeeHomeResponse;
 import htcc.common.entity.home.ManagerHomeResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.DateTimeUtil;
+import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.repository.EmployeePermissionRepository;
+import htcc.employee.service.service.LogService;
+import htcc.employee.service.service.checkin.CheckInService;
 import htcc.employee.service.service.complaint.ComplaintService;
 import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import htcc.employee.service.service.icon.IconService;
@@ -19,12 +25,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Api(tags = "API của quản lý",
      description = "API ở màn hình chính")
 @RestController
 @Log4j2
 public class ManagerHomeController {
+
+    @Autowired
+    private LogService logService;
 
     @Autowired
     private ComplaintService complaintService;
@@ -34,6 +44,9 @@ public class ManagerHomeController {
 
     @Autowired
     private IconService iconService;
+
+    @Autowired
+    private CheckInService checkInService;
 
     @Autowired
     private EmployeePermissionRepository permissionRepo;
@@ -51,6 +64,8 @@ public class ManagerHomeController {
             ManagerHomeResponse data = new ManagerHomeResponse();
             countPendingComplaint(data, companyId);
             countPendingLeavingRequest(data, companyId);
+            countPendingCheckIn(data, companyId);
+            countUnreadNotifications(data, companyId, username);
             setCanManageOffices(data, companyId, username);
             setCanManageEmployees(data, companyId, username);
             setIsSuperAdmin(data, companyId, username);
@@ -119,5 +134,42 @@ public class ManagerHomeController {
             log.error("[countPendingLeavingRequest] {} ex", companyId, e);
         }
         data.setPendingLeavingRequest(count);
+    }
+
+    private void countPendingCheckIn(ManagerHomeResponse data, String companyId) {
+        int count = 0;
+        try {
+            BaseResponse response = checkInService.countPendingCheckIn(companyId);
+            if (response != null && response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+                count = (int) response.getData();
+            }
+        } catch (Exception e) {
+            log.error("[countPendingCheckIn] {} ex", companyId, e);
+        }
+        data.setPendingCheckIn(count);
+    }
+
+    private void countUnreadNotifications(ManagerHomeResponse data, String companyId, String username){
+        int count = 0;
+        try {
+            BaseResponse response = logService.countUnreadNotification(ClientSystemEnum.MANAGER_WEB.getValue(), companyId, username);
+            if (response != null && response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+                count = (int) response.getData();
+            }
+        } catch (Exception e) {
+            log.error("[countUnreadNotifications] [{} - {}] ex", companyId, username, e);
+        }
+        data.setUnreadNotifications(count);
+    }
+
+    private void setLeavingRequestCategories(ManagerHomeResponse data, String companyId) {
+        List<String> categoryList = DbStaticConfigMap.COMPANY_DAY_OFF_INFO_MAP
+                .get(companyId)
+                .getCategoryList()
+                .stream()
+                .map(CompanyDayOffInfo.CategoryEntity::getCategory)
+                .collect(Collectors.toList());
+
+        data.setLeavingRequestCategories(categoryList);
     }
 }

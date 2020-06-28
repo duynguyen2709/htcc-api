@@ -59,6 +59,10 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
     @Override
     public void process(NotificationModel model) {
         try {
+            if (model.getIconUrl().isEmpty()) {
+                iconService.setIconInfo(model);
+            }
+
             if (model.getTargetClientId() != ClientSystemEnum.MOBILE.getValue()){
                 model.setStatus(NotificationStatusEnum.SUCCESS.getValue());
                 model.setHasRead(false);
@@ -74,10 +78,6 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
                 model.setStatus(NotificationStatusEnum.FAILED.getValue());
                 repository.saveNotification(model);
                 return;
-            }
-
-            if (model.getIconUrl().isEmpty()) {
-                iconService.setIconInfo(model);
             }
 
             NotificationBuz.Key key = new NotificationBuz.Key(model.getTargetClientId(), model.getCompanyId(), model.getUsername());
@@ -118,7 +118,7 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
         }
     }
 
-    private void handleSendNotiFailed(NotificationModel model) {
+    private void handleSendNotiFailed(NotificationModel model) throws Exception {
 
         if (notificationConfig.isAllowRetryOnFail()) {
             model.setNumRetries(model.getNumRetries() + 1);

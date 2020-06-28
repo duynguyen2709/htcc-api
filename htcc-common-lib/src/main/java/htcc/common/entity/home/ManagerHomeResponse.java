@@ -24,6 +24,17 @@ public class ManagerHomeResponse implements Serializable {
 
     private static final long serialVersionUID = 5912346685015150708L;
 
+    @ApiModelProperty(notes = "Số lượng notification chưa đọc",
+                      example = "10")
+    public int unreadNotifications = 0;
+
+    @ApiModelProperty(notes = "Số lượng đơn điểm danh chưa xử lý (để hiển thị ở sidebar)",
+                      example = "10")
+    public int pendingCheckIn = 0;
+
+    @ApiModelProperty(notes = "Danh sách loại nghỉ phép được chọn", example = "[\"Nghỉ phép năm\",\"Nghỉ bệnh\",\"Nghỉ thai sản\"]")
+    public List<String> leavingRequestCategories = new ArrayList<>();
+
     @ApiModelProperty(notes = "Số lượng khiếu nại chưa xử lý (để hiển thị ở sidebar)",
                       example = "10")
     public int pendingComplaint = 0;

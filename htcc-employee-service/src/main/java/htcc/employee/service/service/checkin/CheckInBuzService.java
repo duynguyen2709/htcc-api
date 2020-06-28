@@ -57,6 +57,7 @@ public class CheckInBuzService {
 
     public BaseResponse doCheckInBuz(CheckinModel model) throws Exception {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        response.setReturnMessage("Điểm danh thành công");
 
         String error = model.isValid();
         if (!error.isEmpty()) {
@@ -122,9 +123,7 @@ public class CheckInBuzService {
      */
     private void setValidTimeAndLocation(CheckinModel model) throws Exception {
         Office office = DbStaticConfigMap.OFFICE_MAP.get(model.getCompanyId() + "_" + model.getOfficeId());
-        if (office == null) {
-            throw new Exception("Office is null, model = " + StringUtil.toJsonString(model));
-        }
+
         model.setOfficeId(String.format("%s - %s", office.getOfficeId(), office.getOfficeName()));
         model.setValidLatitude(office.getLatitude());
         model.setValidLongitude(office.getLongitude());
@@ -136,6 +135,12 @@ public class CheckInBuzService {
         } else if (model.getType() == CheckinTypeEnum.CHECKOUT.getValue()) {
             model.setValidTime(model.getShiftTime().getEndTime());
             model.setOnTime(DateTimeUtil.isAfter(model.getClientTime() + (model.getShiftTime().getAllowLateMinutes() + 2) * 60 * 1000, model.getValidTime()));
+        }
+
+        if (model.getSubType() == CheckinSubTypeEnum.FORM.getValue() ||
+            model.getSubType() == CheckinSubTypeEnum.MANAGER.getValue()) {
+            model.setLatitude(office.getLatitude());
+            model.setLongitude(office.getLongitude());
         }
     }
 
@@ -161,8 +166,6 @@ public class CheckInBuzService {
                     return "Khoảng cách điểm danh quá xa. Vui lòng thực hiện lại";
                 }
                 break;
-            case IMAGE:
-                break;
             case QR_CODE:
                 String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
                 if (!request.getDate().equals(today)) {
@@ -178,15 +181,16 @@ public class CheckInBuzService {
                     log.error("\n### QrCodeId [{}] had been used", request.getQrCodeId());
                     return "Mã QR đã được sử dụng. Vui lòng thực hiện lại";
                 }
-
                 break;
+            case IMAGE:
             case FORM:
+            case MANAGER:
                 break;
             default:
                 break;
         }
 
-        if (subType != CheckinSubTypeEnum.FORM) {
+        if (subType != CheckinSubTypeEnum.FORM && subType != CheckinSubTypeEnum.MANAGER) {
             if (isOffThisSession(request)) {
                 return String.format("Hôm nay là ngày nghỉ của chi nhánh %s. Vui lòng thử lại sau.", request.getOfficeId());
             }
@@ -209,7 +213,7 @@ public class CheckInBuzService {
                     .collect(Collectors.toList());
 
             if (shiftArrangementList.isEmpty()) {
-                return "Chưa có ca làm việc hôm nay. Vui lòng liên hệ quản lý để xếp ca";
+                return "Chưa có ca làm việc ở chi nhánh " + model.getOfficeId() +" hôm nay. Vui lòng liên hệ quản lý để xếp ca";
             }
 
             List<ShiftArrangementModel> fixedShiftList = shiftArrangementList.stream()

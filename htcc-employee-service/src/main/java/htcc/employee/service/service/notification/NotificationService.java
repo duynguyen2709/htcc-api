@@ -39,8 +39,8 @@ public class NotificationService {
     /*
        For Employee to get their personal list notification
     */
-    public List<NotificationModel> getListNotification(String companyId, String username, int startIndex, int size) {
-        return parseResponse(logService.getNotificationLog(companyId, username, startIndex, size));
+    public List<NotificationModel> getListNotification(int clientId, String companyId, String username, int startIndex, int size) {
+        return parseResponse(logService.getNotificationLog(clientId, companyId, username, startIndex, size));
     }
 
     /*

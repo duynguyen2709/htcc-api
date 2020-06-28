@@ -8,6 +8,7 @@ import htcc.gateway.service.entity.jpa.admin.AdminUser;
 import htcc.gateway.service.entity.jpa.company.CompanyUser;
 import htcc.gateway.service.entity.request.ChangePasswordRequest;
 import htcc.gateway.service.entity.request.LoginRequest;
+import htcc.gateway.service.entity.request.ResetPasswordRequest;
 import htcc.gateway.service.service.jpa.AdminUserService;
 import htcc.gateway.service.service.jpa.CompanyUserService;
 import lombok.extern.log4j.Log4j2;
@@ -52,9 +53,10 @@ public class AuthenticationService {
                     AdminUser admin = adminUserService.findById(req.username);
                     if (admin != null) {
                         user = new BaseUser();
-                        user.setUsername(admin.username);
-                        user.setPassword(admin.password);
-                        user.setStatus(admin.status);
+                        user.setUsername(admin.getUsername());
+                        user.setPassword(admin.getPassword());
+                        user.setStatus(admin.getStatus());
+                        user.setEmail(admin.getEmail());
                     }
                     break;
 
@@ -64,9 +66,10 @@ public class AuthenticationService {
                     CompanyUser companyUser = companyUserService.findById(key);
                     if (companyUser != null) {
                         user = new BaseUser();
-                        user.setUsername(companyUser.username);
-                        user.setPassword(companyUser.password);
-                        user.setStatus(companyUser.status);
+                        user.setUsername(companyUser.getUsername());
+                        user.setPassword(companyUser.getPassword());
+                        user.setStatus(companyUser.getStatus());
+                        user.setEmail(companyUser.getEmail());
                     }
                     break;
             }
@@ -78,6 +81,11 @@ public class AuthenticationService {
 
     public BaseUser getUser(ChangePasswordRequest req) {
         LoginRequest entity = new LoginRequest(req.clientId, req.companyId, req.username, req.oldPassword, "");
+        return getUser(entity);
+    }
+
+    public BaseUser getUser(ResetPasswordRequest req) {
+        LoginRequest entity = new LoginRequest(req.clientId, req.companyId, req.username, "", "");
         return getUser(entity);
     }
 

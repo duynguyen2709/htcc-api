@@ -5,6 +5,8 @@ import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.CheckinModel;
+import htcc.common.entity.checkin.UpdateCheckInStatusModel;
+import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.LogService;
@@ -76,6 +78,10 @@ public class CheckInService {
         kafka.sendMessage(kafka.getBuzConfig().checkOutLog.topicName, model);
     }
 
+    public List<CheckinModel> getListPendingCheckInLog(String companyId, String yyyyMM) {
+        return parseResponse(logService.getListPendingCheckInLog(companyId, yyyyMM));
+    }
+
     private List<CheckinModel> parseResponse(BaseResponse res) {
         try {
             if (res == null ||
@@ -103,5 +109,13 @@ public class CheckInService {
 
     public CheckinModel getLastCheckInTime(String companyId, String username, String date) {
         return redisService.getLastCheckInTime(companyId, username, date);
+    }
+
+    public BaseResponse updateCheckInStatus(UpdateCheckInStatusModel model) {
+        return logService.updateCheckInStatus(model);
+    }
+
+    public BaseResponse countPendingCheckIn(String companyId) {
+        return logService.countPendingCheckInLogByCompany(companyId);
     }
 }

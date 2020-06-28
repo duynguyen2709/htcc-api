@@ -145,3 +145,6 @@ kafka:
     eventChangeLogInStatus:
       topicName: EVENT-CHANGE-LOGIN-STATUS
       groupId: EVENT-CHANGE-LOGIN-STATUS
+    eventResetPassword:
+      topicName: EVENT-RESET-PASSWORD
+      groupId: EVENT-RESET-PASSWORD

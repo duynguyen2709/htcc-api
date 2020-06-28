@@ -14,6 +14,7 @@ public class BaseUser implements Serializable {
 
     private static final long serialVersionUID = 1327777583005150807L;
 
+    public int    clientId = 1;
     public String username = "";
     public String password = "";
     public int    status   = 1;

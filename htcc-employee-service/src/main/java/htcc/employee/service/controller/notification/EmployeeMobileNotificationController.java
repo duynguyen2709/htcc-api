@@ -51,7 +51,7 @@ public class EmployeeMobileNotificationController {
             int startIndex = size * index;
 
             List<NotificationModel> models = notiService
-                    .getListNotification(companyId, username, startIndex, size);
+                    .getListNotification(ClientSystemEnum.MOBILE.getValue(), companyId, username, startIndex, size);
             if (models == null) {
                 throw new Exception("notiService.getListNotification return null");
             }
@@ -77,7 +77,52 @@ public class EmployeeMobileNotificationController {
         return response;
     }
 
+    @ApiOperation(value = "Lấy danh sách notification (CHO QUẢN LÝ)", response = NotificationResponse.class)
+    @GetMapping("/notifications/manager/{companyId}/{username}")
+    public BaseResponse getListNotificationForManager(@ApiParam(name = "companyId", value = "[Path] Mã công ty", defaultValue = "VNG", required = true)
+                                            @PathVariable String companyId,
+                                            @ApiParam(name = "username", value = "[Path] Tên đăng nhập", defaultValue = "admin", required = true)
+                                            @PathVariable String username,
+                                            @ApiParam(name = "index", value = "[QueryString] Phân trang (0,1,2...)", defaultValue = "0", required = false)
+                                            @RequestParam(required = true, defaultValue = "0") Integer index,
+                                            @ApiParam(name = "size", value = "[QueryString] Số record mỗi trang, nếu không gửi sẽ lấy default 20," +
+                                                    " nếu khác 0 cần gửi thêm index để lấy trang tiếp theo",
+                                                      defaultValue = "0", required = false)
+                                            @RequestParam(required = false, defaultValue = "0") Integer size) {
+        BaseResponse<List<NotificationResponse>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        try {
+            if (size == null || size == 0){
+                size = 20;
+            }
 
+            int startIndex = size * index;
+
+            List<NotificationModel> models = notiService
+                    .getListNotification(ClientSystemEnum.MANAGER_WEB.getValue(), companyId, username, startIndex, size);
+            if (models == null) {
+                throw new Exception("notiService.getListNotification return null");
+            }
+
+            models.sort(new Comparator<NotificationModel>() {
+                @Override
+                public int compare(NotificationModel o1, NotificationModel o2) {
+                    return Long.compare(o2.getSendTime(), o1.getSendTime());
+                }
+            });
+
+            List<NotificationResponse> notificationList = models
+                    .stream()
+                    .map(NotificationResponse::new)
+                    .collect(Collectors.toList());
+
+            response.setData(notificationList);
+        } catch (Exception e){
+            log.error(String.format("[getListNotification] [%s-%s-%s-%s]",
+                    companyId, username, index, size), e);
+            response = new BaseResponse<>(e);
+        }
+        return response;
+    }
 
 
     @ApiOperation(value = "Cập nhật trạng thái đã đọc của noti", response = BaseResponse.class)

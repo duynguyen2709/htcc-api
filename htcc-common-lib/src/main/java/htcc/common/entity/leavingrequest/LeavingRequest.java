@@ -23,6 +23,8 @@ public class LeavingRequest extends BaseJPAEntity {
 
     private static final long serialVersionUID = 5926270983005150708L;
 
+    @ApiModelProperty(notes = "Mã hệ thống",
+                      example = "2")
     public int clientId = ClientSystemEnum.MOBILE.getValue();
 
     @ApiModelProperty(notes = "Mã công ty",
@@ -30,17 +32,17 @@ public class LeavingRequest extends BaseJPAEntity {
     @NotEmpty
     public String companyId;
 
-    @ApiModelProperty(notes = "Tên đăng nhập",
+    @ApiModelProperty(notes = "Tên nhân viên được đăng ký nghỉ",
                       example = "admin")
     @NotEmpty
     public String username;
 
-    @ApiModelProperty(notes = "Thời gian client gửi request: System.currentTimeMillis()",
+    @ApiModelProperty(notes = "Thời gian client gửi request (new Date().getTime())",
                       example = "123")
     @Min(0)
     public long clientTime;
 
-    @ApiModelProperty(notes = "Loại nghỉ phép (chọn từ list trả về)",
+    @ApiModelProperty(notes = "Loại nghỉ phép (chọn từ list trả về ở api /home)",
                       example = "Nghỉ phép năm")
     @NotEmpty
     public String category;
