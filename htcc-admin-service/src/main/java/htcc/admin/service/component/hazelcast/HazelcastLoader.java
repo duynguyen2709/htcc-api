@@ -1,26 +1,25 @@
 package htcc.admin.service.component.hazelcast;
 
+import htcc.admin.service.jpa.FeatureComboRepository;
 import htcc.admin.service.jpa.FeaturePriceRepository;
 import htcc.admin.service.jpa.NotificationIconConfigRepository;
 import htcc.common.component.HazelcastService;
 import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.CacheKeyEnum;
 import htcc.common.constant.ScreenEnum;
+import htcc.common.entity.feature.FeatureCombo;
 import htcc.common.entity.feature.FeaturePrice;
 import htcc.common.entity.icon.NotificationIconConfig;
 import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +43,9 @@ public class HazelcastLoader {
     @Autowired
     private FeaturePriceRepository featurePriceRepository;
 
+    @Autowired
+    private FeatureComboRepository featureComboRepository;
+
     // [important] must init after kafka initialization, otherwise kafka is null
     @Bean
     @DependsOn({"kafkaProducerService"})
@@ -51,6 +53,8 @@ public class HazelcastLoader {
         log.info("####### Started Loading Static Config Map ########\n");
 
         loadFeaturePriceMap();
+
+        loadFeatureComboMap();
 
         loadNotiIconConfigMap();
 
@@ -73,7 +77,16 @@ public class HazelcastLoader {
         SUPPORTED_FEATURE_MAP = hazelcastService.reload(map, CacheKeyEnum.SUPPORTED_FEATURE);
         log.info("[loadFeaturePriceMap] SUPPORTED_FEATURE_MAP loaded succeed \n{}",
                 StringUtil.toJsonString(SUPPORTED_FEATURE_MAP));
+    }
 
+    public void loadFeatureComboMap() {
+        Map<String, FeatureCombo> map = new HashMap<>();
+
+        featureComboRepository.findAll().forEach(c -> map.put(c.getComboId(), c));
+
+        FEATURE_COMBO_MAP = hazelcastService.reload(map, CacheKeyEnum.FEATURE_COMBO);
+        log.info("[loadFeatureComboMap] FEATURE_COMBO_MAP loaded succeed \n{}",
+                StringUtil.toJsonString(FEATURE_COMBO_MAP));
     }
 
     public void loadNotiIconConfigMap() {

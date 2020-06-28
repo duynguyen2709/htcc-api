@@ -283,3 +283,7 @@
 26-06-2020:
  + Version 2.2.0:
     - API Notifications, CheckIn for Manager
+
+28-06-2020:
+ + Version 2.3.0:
+    - API GetPriceList for landing page & CRUD for Admin

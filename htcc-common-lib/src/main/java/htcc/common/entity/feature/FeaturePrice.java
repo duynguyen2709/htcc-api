@@ -23,12 +23,11 @@ import javax.validation.constraints.NotEmpty;
 @ApiModel(description = "Thông tin đơn giá tính năng")
 public class FeaturePrice extends BaseJPAEntity {
 
-    private static final long serialVersionUID = 130807L;
+    private static final long serialVersionUID = 130806L;
 
     @Id
     @NotEmpty
-    @ApiModelProperty(notes = "Mã tính năng",
-                      example = "checkin")
+    @ApiModelProperty(notes = "Mã tính năng", example = "checkin")
     public String featureId = "";
 
     @Column
@@ -56,11 +55,11 @@ public class FeaturePrice extends BaseJPAEntity {
     @Override
     public String isValid() {
         if (StringUtil.isEmpty(featureId)) {
-            return "Mã icon không được rỗng";
+            return "Mã tính năng không được rỗng";
         }
 
         if (StringUtil.isEmpty(featureName)) {
-            return "URL icon không được rỗng";
+            return "Tên tính năng không được rỗng";
         }
 
         if (ScreenEnum.fromInt(linkedScreen) == null) {
@@ -68,7 +67,7 @@ public class FeaturePrice extends BaseJPAEntity {
         }
 
         if (unitPrice < 0) {
-            return "Đơn giá phải là số dương";
+            return "Đơn giá phải lớn hơn 0";
         }
 
         if (calcByEachEmployee != 0 && calcByEachEmployee != 1) {

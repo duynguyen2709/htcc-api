@@ -40,9 +40,8 @@ public class ResetPasswordController {
                 response.setReturnMessage("Không tìm thấy người dùng " + request.getUsername());
                 return response;
             }
-
         } catch (Exception e) {
-            log.error("[sendRequestResetPassword] {} ex", StringUtil.toJsonString(request));
+            log.error("[sendRequestResetPassword] {} ex", StringUtil.toJsonString(request), e);
             response = new BaseResponse<>(e);
         } finally {
             if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {

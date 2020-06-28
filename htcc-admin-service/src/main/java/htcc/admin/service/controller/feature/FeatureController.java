@@ -35,13 +35,13 @@ public class FeatureController {
         }
     }
 
-
     @ApiOperation(value = "Cập nhật tính năng", response = FeaturePrice.class)
     @PutMapping("/features/{featureId}")
     public BaseResponse updateFeature(@PathVariable String featureId, @RequestBody FeaturePrice request) {
         BaseResponse<FeaturePrice> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Cập nhật thành công");
         try {
+            request.setFeatureId(featureId);
             String error = request.isValid();
             if (!error.isEmpty()) {
                 response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
@@ -56,13 +56,12 @@ public class FeatureController {
                 return response;
             }
 
-            request.setFeatureId(featureId);
             request.setLinkedScreen(entity.getLinkedScreen());
             request.setDisplayScreen(entity.getDisplayScreen());
 
             response.setData(featurePriceService.update(request));
         } catch (Exception e){
-            log.error("[updateFeature] id = [{}] ex", featureId, e);
+            log.error("[updateFeature] id = {} ex", featureId, e);
             response = new BaseResponse<>(e);
         }
 

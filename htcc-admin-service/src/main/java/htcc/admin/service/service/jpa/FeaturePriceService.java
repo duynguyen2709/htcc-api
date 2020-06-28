@@ -33,15 +33,15 @@ public class FeaturePriceService extends BaseJPAService<FeaturePrice, String> {
     }
 
     @Override
-    public FeaturePrice create(FeaturePrice icon) {
-        FeaturePrice newCompany = repo.save(icon);
+    public FeaturePrice create(FeaturePrice entity) {
+        FeaturePrice newEnt = repo.save(entity);
         hazelcastLoader.loadFeaturePriceMap();
-        return icon;
+        return newEnt;
     }
 
     @Override
-    public FeaturePrice update(FeaturePrice icon) {
-        return create(icon);
+    public FeaturePrice update(FeaturePrice entity) {
+        return create(entity);
     }
 
     @Override

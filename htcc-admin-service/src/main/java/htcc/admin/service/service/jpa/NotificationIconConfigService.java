@@ -34,9 +34,9 @@ public class NotificationIconConfigService extends BaseJPAService<NotificationIc
 
     @Override
     public NotificationIconConfig create(NotificationIconConfig icon) {
-        NotificationIconConfig newCompany = repo.save(icon);
+        NotificationIconConfig newEnt = repo.save(icon);
         hazelcastLoader.loadNotiIconConfigMap();
-        return icon;
+        return newEnt;
     }
 
     @Override
