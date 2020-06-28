@@ -50,7 +50,7 @@ public class ManagerCheckInController {
     @Autowired
     private EmployeeInfoService employeeInfoService;
 
-    @ApiOperation(value = "Danh sách điểm danh đã phê duyệt", response = BaseResponse.class)
+    @ApiOperation(value = "Danh sách điểm danh đã phê duyệt", response = ManagerCheckInTimeResponse.class)
     @GetMapping("/checkin/manager/{companyId}/{yyyyMM}")
     public BaseResponse getCheckInTimeForManager(@PathVariable String companyId,
                                                  @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String username,
