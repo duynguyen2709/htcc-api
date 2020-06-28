@@ -15,6 +15,7 @@ public enum CacheKeyEnum {
 
     // Admin
     NOTI_ICON,
+    SUPPORTED_FEATURE,
     ;
 //    ALL;
 
