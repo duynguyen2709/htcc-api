@@ -1,5 +1,6 @@
 import htcc.common.constant.WeekDayEnum;
 import htcc.common.util.DateTimeUtil;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.text.ParseException;
@@ -34,5 +35,14 @@ public class TestUtil {
             System.out.println(startDate.format(formatter) + " - " + endDate.format(formatter));
 
         }
+    }
+
+    @Test
+    public void testString() {
+        String TABLE_PREFIX = "LeavingRequestLog";
+        String tableName = "LeavingRequestLog202007";
+        String yyyyMM = tableName.substring(TABLE_PREFIX.length());
+        int year = Integer.parseInt(yyyyMM.substring(0, 4));
+        Assert.assertEquals(2020, year);
     }
 }

@@ -17,13 +17,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Repository
 @Log4j2
@@ -38,7 +36,26 @@ public class LeavingRequestLogRepositoryImpl implements LeavingRequestLogReposit
     @Autowired
     private LogCounterService logCounterService;
 
+    private static final Map<String, String> MAP_TABLE_LOG = new HashMap<>();
+
     private static final String TABLE_PREFIX = "LeavingRequestLog";
+
+    @PostConstruct
+    private void initListTableLog() {
+        try (Connection conn = dataSource.getConnection()) {
+            DatabaseMetaData md = conn.getMetaData();
+            ResultSet rs = md.getTables(null, null,
+                    TABLE_PREFIX + "%", null);
+
+            while (rs.next()) {
+                String tableName = rs.getString("TABLE_NAME");
+                String yyyyMM = tableName.substring(TABLE_PREFIX.length());
+                MAP_TABLE_LOG.put(tableName, yyyyMM.substring(0, 4));
+            }
+        } catch (Exception e) {
+            log.error("[initListTableLog]", e);
+        }
+    }
 
     @Override
     public List<LeavingRequestLogEntity> getLeavingRequestLog(String companyId, String username, String year) {
@@ -190,16 +207,10 @@ public class LeavingRequestLogRepositoryImpl implements LeavingRequestLogReposit
 
     private List<String> getListTableLeavingRequestLog(String year) {
         List<String> result = new ArrayList<>();
-        try (Connection conn = dataSource.getConnection()) {
-            DatabaseMetaData md = conn.getMetaData();
-            ResultSet rs = md.getTables(null, null,
-                    "LeavingRequestLog" + year + "%", null);
-
-            while (rs.next()) {
-                result.add(rs.getString("TABLE_NAME"));
+        for (Map.Entry<String, String> entry : MAP_TABLE_LOG.entrySet()) {
+            if (entry.getValue().equals(year)) {
+                result.add(entry.getKey());
             }
-        } catch (Exception e) {
-            log.error("[getListTableLeavingRequestLog] [{}]", year, e);
         }
         return result;
     }
