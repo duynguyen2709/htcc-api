@@ -1,14 +1,9 @@
 package htcc.gateway.service.controller;
 
-import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.base.BaseUser;
-import htcc.common.entity.feature.GetFeaturePriceResponse;
 import htcc.common.util.StringUtil;
-import htcc.gateway.service.entity.request.ResetPasswordRequest;
-import htcc.gateway.service.service.authentication.AuthenticationService;
 import io.swagger.annotations.Api;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

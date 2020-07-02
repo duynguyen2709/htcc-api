@@ -25,7 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Api(tags = "API thống kê", description = "API thống kê nhân viên")
 @RestController
@@ -56,10 +55,18 @@ public class EmployeeStatisticController {
             LocalDate startDate = LocalDate.parse(dateFrom, formatter);
             LocalDate endDate = LocalDate.parse(dateTo, formatter);
 
+            String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+            LocalDate todayDate = LocalDate.parse(today, formatter);
+
             for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-                String yyyyMMdd = date.format(formatter);
-                handleBuz(dataResponse, companyId, username, yyyyMMdd);
+                if (!date.isAfter(todayDate)) {
+                    String yyyyMMdd = date.format(formatter);
+                    handleBuz(dataResponse, companyId, username, yyyyMMdd);
+                }
             }
+
+            dataResponse.setTotalDays(dataResponse.getTotalWorkingDaysSet().size());
+            dataResponse.setWorkingDays(dataResponse.getActualWorkingDaysSet().size());
 
             float nonPermissionOffDays = dataResponse.getTotalDays() - dataResponse.getWorkingDays() - dataResponse.getValidOffDays();
             if (nonPermissionOffDays < 0) {
@@ -101,7 +108,7 @@ public class EmployeeStatisticController {
             detail.getListCheckInTime().add(new DetailCheckInTime(checkinModel));
 
             if (checkinModel.getType() == CheckinTypeEnum.CHECKOUT.getValue() && checkinModel.hasOppositeAction) {
-                dataResponse.setWorkingDays(dataResponse.getWorkingDays() + checkinModel.getShiftTime().getDayCount());
+                dataResponse.getActualWorkingDaysSet().add(yyyyMMdd);
             }
 
             if (isOvertime(checkinModel)) {
@@ -123,8 +130,9 @@ public class EmployeeStatisticController {
             dataResponse.setValidOffDays(dataResponse.getValidOffDays() + dayCount);
         }
 
-        float totalDayCount = calcTotalWorkingDays(shiftArrangementList.get());
-        dataResponse.setTotalDays(dataResponse.getTotalDays() + totalDayCount);
+        if (!shiftArrangementList.get().isEmpty()) {
+            dataResponse.getTotalWorkingDaysSet().add(yyyyMMdd);
+        }
 
         if (dataResponse.getCheckinTimes() != 0) {
             float percentage = dataResponse.getOnTimeCount() * 1.0f / dataResponse.getCheckinTimes();
@@ -138,23 +146,6 @@ public class EmployeeStatisticController {
         return !checkinModel.isFixedShift &&
                 checkinModel.hasOppositeAction &&
                 checkinModel.type == CheckinTypeEnum.CHECKIN.getValue();
-    }
-
-    private float calcTotalWorkingDays(List<ShiftArrangementModel> shiftArrangementModels) {
-        List<ShiftArrangementModel> fixedShiftList = shiftArrangementModels.stream().filter(ShiftArrangementModel::isFixed).collect(Collectors.toList());
-        List<ShiftArrangementModel> shiftByDateList = shiftArrangementModels.stream().filter(c -> !c.isFixed()).collect(Collectors.toList());
-
-        float total = 0.0f;
-        if (shiftByDateList.isEmpty()) {
-            for (ShiftArrangementModel model : fixedShiftList) {
-                total += model.getShiftTime().getDayCount();
-            }
-        } else {
-            for (ShiftArrangementModel model : shiftByDateList) {
-                total += model.getShiftTime().getDayCount();
-            }
-        }
-        return total;
     }
 
     private BaseResponse validateDate(String dateFrom, String dateTo) {
@@ -178,16 +169,16 @@ public class EmployeeStatisticController {
             return response;
         }
 
-        String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
-        if (Long.parseLong(today) - Long.parseLong(dateTo) < statisticConfig.getDistanceFromToday()) {
-            response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
-            if (statisticConfig.getDistanceFromToday() == 0) {
-                response.setReturnMessage("Ngày kết thúc không được sau ngày hôm nay");
-            } else {
-                response.setReturnMessage(String.format("Ngày kết thúc phải cách %s ngày trước ngày hôm nay", statisticConfig.getDistanceFromToday()));
-            }
-            return response;
-        }
+//        String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+//        if (Long.parseLong(today) - Long.parseLong(dateTo) < statisticConfig.getDistanceFromToday()) {
+//            response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
+//            if (statisticConfig.getDistanceFromToday() == 0) {
+//                response.setReturnMessage("Ngày kết thúc không được sau ngày hôm nay");
+//            } else {
+//                response.setReturnMessage(String.format("Ngày kết thúc phải cách %s ngày trước ngày hôm nay", statisticConfig.getDistanceFromToday()));
+//            }
+//            return response;
+//        }
 
         if (DateTimeUtil.calcDayDiff(dateFrom, dateTo, "yyyyMMdd") > statisticConfig.getMaxDayDiff()) {
             response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);

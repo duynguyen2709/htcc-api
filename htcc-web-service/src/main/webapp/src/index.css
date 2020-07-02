@@ -126,3 +126,32 @@ code {
     font-size: 26px;
   }
 }
+
+.form-password-reset {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 0 auto;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 60%;
+  flex: 1 1 auto;
+}
+
+.form--wrapper {
+  margin: 32px 0;
+}
+
+.form--error {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}

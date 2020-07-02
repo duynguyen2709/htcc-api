@@ -45,3 +45,7 @@ kafka:
     eventLoadIcon:
       topicName: EVENT-LOAD-ICON
       groupId: EVENT-LOAD-ICON-LOG-LOCAL
+
+web-service:
+  baseUrl: http://localhost:3004/#/resetpassword
+  params: ?clientId=%s&companyId=%s&username=%s&token=%s

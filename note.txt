@@ -291,3 +291,7 @@
 29-06-2020:
  + Version 2.3.1:
     - Fix bugs
+
+02-07-2020:
+ + Version 2.4.0:
+    - API Reset Password

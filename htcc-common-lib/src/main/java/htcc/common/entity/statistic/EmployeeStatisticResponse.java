@@ -7,9 +7,12 @@ import htcc.common.util.DateTimeUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -33,6 +36,12 @@ public class EmployeeStatisticResponse implements Serializable {
     public float overtimeHours = 0.0f;
     // danh sách chi tiết theo ngày
     public List<DetailStatisticsByDate> detailList = new ArrayList<>();
+
+    @Transient
+    public Set<String> totalWorkingDaysSet = new HashSet<>();
+
+    @Transient
+    public Set<String> actualWorkingDaysSet = new HashSet<>();
 
     @Data
     @NoArgsConstructor

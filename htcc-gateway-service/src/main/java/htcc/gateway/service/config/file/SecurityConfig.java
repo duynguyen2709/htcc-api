@@ -12,6 +12,7 @@ public class SecurityConfig {
     public JWTConfig jwt;
     public InMemoryUser user;
     public boolean bypassJWT = false;
+    public String hashKey = "";
 
     @Data
     public static class JWTConfig {
