@@ -6,6 +6,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import htcc.web.service.config.QrCodeConfig;
 import htcc.web.service.entity.BaseResponse;
+import htcc.web.service.utils.HashUtil;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -29,7 +30,7 @@ public class QrCodeService {
     private QrCodeConfig qrCodeConfig;
 
     public BaseResponse getQrEntity(String companyId, String officeId) throws Exception {
-        final String sig = hashSHA256(String.format("%s|%s|%s",
+        final String sig = HashUtil.hashSHA256(String.format("%s|%s|%s",
                 companyId, officeId, qrCodeConfig.getHashKey()));
 
         final String url = String.format("%s%s?companyId=%s&officeId=%s&sig=%s",
@@ -50,21 +51,5 @@ public class QrCodeService {
         QRCodeWriter barcodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix = barcodeWriter.encode(data, BarcodeFormat.QR_CODE, 256, 256);
         return MatrixToImageWriter.toBufferedImage(bitMatrix);
-    }
-
-    private String hashSHA256(String input) throws NoSuchAlgorithmException {
-        MessageDigest mDigest = MessageDigest.getInstance("SHA-256");
-        byte[] shaByteArr = mDigest.digest(input.getBytes(Charset.forName("UTF-8")));
-        StringBuilder hexString = new StringBuilder();
-
-        for (byte b : shaByteArr) {
-            String hex = Integer.toHexString(255 & b);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-
-        return hexString.toString();
     }
 }

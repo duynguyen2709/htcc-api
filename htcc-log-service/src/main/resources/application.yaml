@@ -118,7 +118,8 @@ kafka:
 mail:
   buz:
     subject:
-      createNewUserMail: "Thông tin tài khoản mới trên hệ thống HTCC"
+      createNewUserMail: "[HTCC] New Account Info"
+      resetPasswordMail: "[HTCC] Reset Password"
 
 firebase:
   databaseURL: "https://checkinapp-9eac2.firebaseio.com"

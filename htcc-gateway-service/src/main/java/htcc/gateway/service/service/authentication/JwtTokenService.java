@@ -10,7 +10,7 @@ import htcc.common.util.DateTimeUtil;
 import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.config.file.SecurityConfig;
-import htcc.gateway.service.entity.request.LoginRequest;
+import htcc.common.entity.request.LoginRequest;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

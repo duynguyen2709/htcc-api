@@ -384,8 +384,9 @@ public class ShiftArrangementController {
     }
 
     private boolean isConflictFixedShift(ShiftArrangementRequest request) throws Exception {
-        List<FixedShiftArrangement> fixedShiftList = fixedShiftArrangementService.findByCompanyIdAndUsername(request.getCompanyId(), request.getUsername());
-        if (fixedShiftList == null || fixedShiftList.isEmpty()) {
+        List<FixedShiftArrangement> fixedShiftList = fixedShiftArrangementService.findByCompanyIdAndUsername(request.getCompanyId(), request.getUsername()).stream()
+                                    .filter(c -> c.getWeekDay() == request.getWeekDay()).collect(Collectors.toList());
+        if (fixedShiftList.isEmpty()) {
             return false;
         }
 

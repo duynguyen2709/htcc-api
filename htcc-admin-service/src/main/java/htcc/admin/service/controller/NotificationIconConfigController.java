@@ -2,15 +2,11 @@ package htcc.admin.service.controller;
 
 import htcc.admin.service.service.GoogleDriveService;
 import htcc.admin.service.service.jpa.NotificationIconConfigService;
-import htcc.admin.service.service.rest.EmployeeCompanyService;
-import htcc.admin.service.service.rest.GatewayCompanyUserService;
-import htcc.common.constant.AccountStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.constant.ScreenEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.icon.IconResponse;
 import htcc.common.entity.icon.NotificationIconConfig;
-import htcc.common.entity.jpa.Company;
 import htcc.common.util.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -63,7 +59,7 @@ public class NotificationIconConfigController {
     @ApiOperation(value = "Xóa icon", response = BaseResponse.class)
     @DeleteMapping("/icons/{iconId}")
     public BaseResponse deleteIcon(@PathVariable String iconId) {
-        BaseResponse<BaseResponse> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             NotificationIconConfig entity = notiIconService.findById(iconId);
             if (entity == null) {

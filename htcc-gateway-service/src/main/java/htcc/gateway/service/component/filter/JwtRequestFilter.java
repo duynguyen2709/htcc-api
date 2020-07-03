@@ -4,7 +4,7 @@ import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.util.StringUtil;
 import htcc.gateway.service.config.file.SecurityConfig;
-import htcc.gateway.service.entity.request.LoginRequest;
+import htcc.common.entity.request.LoginRequest;
 import htcc.gateway.service.service.authentication.JwtTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.log4j.Log4j2;

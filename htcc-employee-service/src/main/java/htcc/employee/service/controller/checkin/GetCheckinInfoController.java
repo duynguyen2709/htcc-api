@@ -211,8 +211,9 @@ public class GetCheckinInfoController {
             detail.setValidLongitude(office.getLongitude());
             detail.setCanCheckin(getCanCheckinByShift(office.getOfficeId(), fixedShiftList));
             detail.setCanCheckin(getCanCheckinByOffice(companyId, office.getOfficeId(), yyyyMMdd));
-            detail.setCanCheckin(getCanCheckinByShift(office.getOfficeId(), shiftByDateList));
-
+            if (!shiftByDateList.isEmpty()) {
+                detail.setCanCheckin(getCanCheckinByShift(office.getOfficeId(), shiftByDateList));
+            }
             data.getOfficeList().add(detail);
         }
     }

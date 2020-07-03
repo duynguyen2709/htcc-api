@@ -6,7 +6,7 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.notification.NotificationBuz;
 import htcc.common.util.StringUtil;
-import htcc.gateway.service.entity.request.LoginRequest;
+import htcc.common.entity.request.LoginRequest;
 import htcc.gateway.service.entity.response.LoginResponse;
 import htcc.gateway.service.service.authentication.JwtTokenService;
 import io.swagger.annotations.Api;

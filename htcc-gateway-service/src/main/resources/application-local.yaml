@@ -1,8 +1,9 @@
 security:
-  bypassJWT: false
+  bypassJWT: true
   user:
     name: admin
     password: admin
+  hashKey: admin
 
 server:
   port: 8761
@@ -34,6 +35,6 @@ redis:
   nodeAddresses: 127.0.0.1:6379
 
 kafka:
-  enableProducer: false
+  enableProducer: true
   enableConsumer: false
   bootstrapAddress: 127.0.0.1:9092

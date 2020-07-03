@@ -12,6 +12,7 @@ public class RedisBuzConfig {
 
     public String employeeInfoFormat = "EMPLOYEE-INFO-%s-%s"; // clientId-companyId-username
 
+    public String resetPasswordFormat = "RESET-PASSWORD-%s"; //token
     public String tokenFormat = "TOKEN-%s-%s-%s"; // clientId-companyId-username
     public String blacklistTokenFormat = "BLACKLIST-TOKEN-%s-%s-%s"; // clientId-companyId-username
     public String checkinFormat = "CHECKIN-%s-%s-%s"; // companyId-username-date

@@ -6,9 +6,10 @@ import htcc.common.util.StringUtil;
 import htcc.gateway.service.config.file.SecurityConfig;
 import htcc.gateway.service.entity.jpa.admin.AdminUser;
 import htcc.gateway.service.entity.jpa.company.CompanyUser;
-import htcc.gateway.service.entity.request.ChangePasswordRequest;
-import htcc.gateway.service.entity.request.LoginRequest;
-import htcc.gateway.service.entity.request.ResetPasswordRequest;
+import htcc.common.entity.request.ChangePasswordRequest;
+import htcc.common.entity.request.LoginRequest;
+import htcc.common.entity.request.ResetPasswordRequest;
+import htcc.common.entity.request.ResetPasswordUpdateRequest;
 import htcc.gateway.service.service.jpa.AdminUserService;
 import htcc.gateway.service.service.jpa.CompanyUserService;
 import lombok.extern.log4j.Log4j2;
@@ -119,6 +120,12 @@ public class AuthenticationService {
             log.error("updatePassword ex", e);
         }
         return false;
+    }
+
+    public boolean updatePassword(ResetPasswordUpdateRequest req) {
+        ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest(
+                req.getClientId(), req.getCompanyId(), req.getUsername(), null, req.getPassword());
+        return updatePassword(changePasswordRequest);
     }
 
     public Authentication getAuthentication() {
