@@ -49,4 +49,4 @@ kafka:
 
 web-service:
   baseUrl: https://web.1612145.online/#/resetpassword
-  params: ?clientId=%s&username=%s&companyId=%s&token=%s
+  params: ?clientId=%s&companyId=%s&username=%s&token=%s

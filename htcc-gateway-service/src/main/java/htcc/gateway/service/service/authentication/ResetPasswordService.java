@@ -29,7 +29,6 @@ public class ResetPasswordService {
 
         redis.set(StringUtil.toJsonString(request), 30 * 60,
                 redis.buzConfig.getResetPasswordFormat(), token);
-        log.info(StringUtil.toJsonString(request));
         sendMail(request);
     }
 
@@ -46,6 +45,8 @@ public class ResetPasswordService {
         ResetPasswordRequest forgotPasswordRequest = getForgotPasswordInfo(token);
         if (forgotPasswordRequest != null) {
             redis.delete(redis.buzConfig.getResetPasswordFormat(), token);
+            redis.delete(redis.buzConfig.getTokenFormat(), forgotPasswordRequest.getClientId(),
+                    forgotPasswordRequest.getCompanyId(), forgotPasswordRequest.getUsername());
         }
     }
 

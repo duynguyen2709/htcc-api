@@ -59,7 +59,6 @@ public class ResetPasswordController {
 
     @PostMapping("/resetpassword/update")
     public BaseResponse resetPassword(@RequestBody ResetPasswordUpdateRequest request, @RequestParam String sig) {
-        log.info(StringUtil.toJsonString(request));
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Đổi mật khẩu thành công");
         try {
