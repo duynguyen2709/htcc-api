@@ -56,6 +56,7 @@ public class CompanyUserController {
     @PostMapping("/companyusers")
     public BaseResponse createCompanyUser(@ApiParam(value = "[Body] Thông tin admin mới", required = true)
                                    @RequestBody CompanyUserModel user) {
+        log.info(StringUtil.toJsonString(user));
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Tạo người dùng thành công");
         String rawPassword = user.getPassword();

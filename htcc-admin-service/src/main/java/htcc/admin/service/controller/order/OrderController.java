@@ -19,10 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -100,6 +97,42 @@ public class OrderController {
             orderService.sendMailCreateOrder(request);
         } catch (Exception e) {
             log.error("[requestFeature] {} ex", StringUtil.toJsonString(request), e);
+            response = new BaseResponse(e);
+        }
+
+        return response;
+    }
+
+    @PostMapping("/public/nextpay/{companyId}")
+    public BaseResponse nextPay(@PathVariable String companyId) {
+        BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        response.setReturnMessage("Một email đã được gửi đến hộp thư của công ty. " +
+                "Vui lòng xác nhận để thanh toán");
+        try {
+            List<Company> companyList = companyService.getListCompanyModel();
+            if (companyList == null) {
+                throw new Exception("getListCompanyModel return null");
+            }
+
+            Company company = companyList.stream()
+                    .filter(c -> c.getCompanyId().equals(companyId))
+                    .findAny()
+                    .orElse(null);
+
+            if (company == null) {
+                response = new BaseResponse(ReturnCodeEnum.DATA_NOT_FOUND);
+                response.setReturnMessage(String.format("Không tim thấy công ty %s", companyId));
+                return response;
+            }
+
+            CreateOrderRequest request = new CreateOrderRequest();
+            request.setCompanyId(companyId);
+            request.setEmail(company.getEmail());
+            request.setFirstPay(false);
+
+            orderService.sendMailCreateOrder(request);
+        } catch (Exception e) {
+            log.error("[requestFeature] [{}] ex", companyId, e);
             response = new BaseResponse(e);
         }
 

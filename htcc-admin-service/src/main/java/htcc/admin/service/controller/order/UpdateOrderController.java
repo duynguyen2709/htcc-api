@@ -5,7 +5,6 @@ import htcc.admin.service.service.rest.LogService;
 import htcc.common.constant.OrderStatusEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
-import htcc.common.entity.order.DetailOrderModel;
 import htcc.common.entity.order.OrderPaymentResponse;
 import htcc.common.entity.order.UpdateOrderStatusModel;
 import htcc.common.util.DateTimeUtil;
@@ -65,13 +64,11 @@ public class UpdateOrderController {
 
             response = logService.updateOrderStatus(request);
         } catch (Exception e) {
-            log.error(String.format("updateOrderStatus [%s] ex", StringUtil.toJsonString(request)), e);
+            log.error(String.format("[updateOrderStatus] [%s] ex", StringUtil.toJsonString(request)), e);
             response = new BaseResponse<>(e);
         } finally {
             if (response != null && response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
-                if (request.getStatus() == OrderStatusEnum.SUCCESS.getValue()) {
-                    orderService.doDelivery(request.getOrderId());
-                }
+                orderService.updateOrderStatus(request.getOrderId(), request.getStatus());
             }
         }
         return response;

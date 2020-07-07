@@ -30,26 +30,21 @@ public class Company extends BaseJPAEntity {
     public String companyId = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "Tên công ty",
                       example = "Công ty cổ phần VNG")
     public String companyName = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "Email",
                       example = "naduy.hcmus@gmail.com")
     public String email = "";
 
     @Column
-    @NotEmpty
-    @Size(min = 10, max = 20, message = "Số điện thoại, ít nhất 10 chữ số")
     @ApiModelProperty(notes = "Sđt, ít nhất 10 chữ số",
                       example = "0948202709")
     public String phoneNumber = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "Địa chỉ công ty",
                       example = "Quận 7, TPHCM")
     public String address = "";

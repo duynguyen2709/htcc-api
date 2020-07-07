@@ -64,4 +64,14 @@ public class CustomerOrder extends BaseJPAEntity {
         }
         return StringUtil.EMPTY;
     }
+
+    public CustomerOrder(DetailOrderModel model) {
+        this.companyId = model.getCompanyId();
+        this.email = model.getEmail();
+        this.lastPaymentDate = model.getLastPaymentDate();
+        this.nextPaymentDate = model.getNextPaymentDate();
+        this.totalPrice = model.getTotalPrice();
+        this.comboDetail = StringUtil.toJsonString(model.getComboDetail());
+        this.supportedFeatures = StringUtil.toJsonString(model.getSupportedFeatures());
+    }
 }

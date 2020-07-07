@@ -65,9 +65,7 @@ public class DetailOrderModel implements Serializable {
             this.comboDetail = StringUtil.fromJsonString(order.getComboDetail(), FeatureCombo.class);
             this.discountPercentage = this.comboDetail.getDiscountPercentage();
         }
-        if (!StringUtil.isEmpty(order.getLastPaymentDate())) {
-            this.firstPay = false;
-        }
+        this.firstPay = false;
     }
 
     public DetailOrderModel(OrderLogEntity model) {

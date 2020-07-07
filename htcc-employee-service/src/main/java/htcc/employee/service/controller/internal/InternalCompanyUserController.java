@@ -36,10 +36,14 @@ public class InternalCompanyUserController {
         BaseResponse<EmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             List<EmployeeInfo> listEmployeeByCompany = service.findByCompanyId(model.getCompanyId());
-            listEmployeeByCompany.sort(new EmployeeIdComparator());
-            String lastId = listEmployeeByCompany.get(listEmployeeByCompany.size() - 1).getEmployeeId();
+            int newId = 1;
+            if (!listEmployeeByCompany.isEmpty()) {
+                listEmployeeByCompany.sort(new EmployeeIdComparator());
+                String lastId = listEmployeeByCompany.get(listEmployeeByCompany.size() - 1).getEmployeeId();
 
-            int newId = Integer.parseInt(lastId.substring(lastId.length() - 5)) + 1;
+                newId = Integer.parseInt(lastId.substring(lastId.length() - 5)) + 1;
+            }
+
             String employeeId = StringUtil.genEmployeeId(model.getCompanyId(), newId);
 
             EmployeeInfo employee = new EmployeeInfo();

@@ -56,10 +56,10 @@ public class CompanyUserModel {
             return "Mật khẩu không được rỗng";
         }
 
-        if (StringUtil.valueOf(phoneNumber).length() < 10 ||
-                NumberUtil.getLongValue(phoneNumber) == 0L) {
-            return String.format("Số điện thoại %s không phù hợp định dạng", phoneNumber);
-        }
+//        if (StringUtil.valueOf(phoneNumber).length() < 10 ||
+//                NumberUtil.getLongValue(phoneNumber) == 0L) {
+//            return String.format("Số điện thoại %s không phù hợp định dạng", phoneNumber);
+//        }
 
         if (!StringUtil.isEmail(email)) {
             return String.format("Email %s không phù hợp định dạng email", email);

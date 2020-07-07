@@ -1,15 +1,23 @@
 package htcc.admin.service.service.order;
 
+import htcc.admin.service.controller.CompanyUserController;
 import htcc.admin.service.service.jpa.CustomerOrderService;
 import htcc.admin.service.service.jpa.FeatureComboService;
 import htcc.admin.service.service.jpa.FeaturePriceService;
+import htcc.admin.service.service.rest.EmployeeCompanyService;
+import htcc.admin.service.service.rest.EmployeeInfoService;
+import htcc.admin.service.service.rest.GatewayCompanyUserService;
 import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.component.redis.RedisService;
 import htcc.common.constant.FeatureEnum;
 import htcc.common.constant.OrderStatusEnum;
 import htcc.common.constant.PaymentCycleTypeEnum;
+import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.companyuser.CompanyUserModel;
 import htcc.common.entity.feature.FeatureCombo;
 import htcc.common.entity.feature.FeaturePrice;
+import htcc.common.entity.jpa.Company;
 import htcc.common.entity.order.*;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
@@ -37,6 +45,12 @@ public class OrderService {
 
     @Autowired
     private FeaturePriceService featurePriceService;
+
+    @Autowired
+    private EmployeeCompanyService companyService;
+
+    @Autowired
+    private CompanyUserController companyUserController;
 
     @Autowired
     private RedisService redis;
@@ -199,6 +213,57 @@ public class OrderService {
         saveOrder(order);
     }
 
-    public void doDelivery(String orderId) {
+    public void updateOrderStatus(String orderId, int orderStatus) {
+        DetailOrderModel model = null;
+        try {
+            model = getOrder(orderId);
+            model.setOrderStatus(orderStatus);
+
+            if (model.getOrderStatus() == OrderStatusEnum.SUCCESS.getValue()) {
+                delivery(model);
+            }
+        } catch (Exception e) {
+            log.error("[updateOrderStatus] {} ex", StringUtil.toJsonString(model), e);
+        }
+    }
+
+    private void delivery(DetailOrderModel model) {
+        try {
+            if (model.isFirstPay()) {
+                CustomerOrder customerOrder = new CustomerOrder(model);
+                customerOrderService.create(customerOrder);
+
+                // create company
+                Company company = new Company();
+                company.setCompanyId(model.getCompanyId());
+                company.setEmail(model.getEmail());
+                company.setStatus(1);
+                company.setPhoneNumber(StringUtil.EMPTY);
+                company.setCompanyName(StringUtil.EMPTY);
+                company.setAddress(StringUtil.EMPTY);
+                BaseResponse companyResponse = companyService.createCompany(company);
+                log.info(StringUtil.toJsonString(companyResponse));
+                if (companyResponse != null && companyResponse.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
+                    CompanyUserModel user = new CompanyUserModel();
+                    user.setCompanyId(model.getCompanyId());
+                    user.setEmail(model.getEmail());
+                    user.setUsername("admin");
+                    user.setPassword("123456");
+                    user.setPhoneNumber(StringUtil.EMPTY);
+                    user.setStatus(1);
+
+                    BaseResponse userResponse = companyUserController.createCompanyUser(user);
+                    log.info(StringUtil.toJsonString(userResponse));
+                }
+            }
+            else {
+                CustomerOrder customerOrder = customerOrderService.findById(model.getCompanyId());
+                customerOrder.setLastPaymentDate(model.getLastPaymentDate());
+                customerOrder.setNextPaymentDate(model.getNextPaymentDate());
+                customerOrderService.update(customerOrder);
+            }
+        } catch (Exception e) {
+            log.error("[delivery] {} ex", StringUtil.toJsonString(model), e);
+        }
     }
 }
