@@ -142,6 +142,7 @@ public class FeatureComboController {
             if (numEmployees <= 0) {
                 return "Số nhân viên trong gói phải lớn hơn 0";
             }
+            comboDetail.replace(FeatureEnum.EMPLOYEE_MANAGE.getValue(), numEmployees);
         } catch (Exception e) {
             log.error("[validateComboDetail] {} ex", StringUtil.toJsonString(comboDetail), e);
             return "Thông tin trong gói không hợp lệ";

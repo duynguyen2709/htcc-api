@@ -55,6 +55,7 @@ public class OrderController {
                 return response;
             }
 
+            request.setFirstPay(true);
             if (!request.getRequestedFeatures().isEmpty()) {
                 for (FeatureEnum featureEnum : FeatureEnum.values()) {
                     if (!request.getRequestedFeatures().containsKey(featureEnum.getValue())) {
