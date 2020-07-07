@@ -22,7 +22,6 @@ public class ResetPasswordService {
     private ResetPasswordConfig resetPasswordConfig;
 
     public BaseResponse resetPassword(ResetPasswordRequest request) throws Exception {
-        log.info(request);
         String sig = HashUtil.hashSHA256(String.format("%s|%s|%s|%s",
                 request.getClientId(), request.getCompanyId(), request.getUsername(), resetPasswordConfig.getHashKey()));
 

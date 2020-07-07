@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedisBuzConfig {
 
+    public String orderIdFormat = "ORDER-ID";
+    public String orderFormat = "ORDER-%s"; // orderId
+
     public String employeeInfoFormat = "EMPLOYEE-INFO-%s-%s"; // clientId-companyId-username
 
     public String resetPasswordFormat = "RESET-PASSWORD-%s"; //token

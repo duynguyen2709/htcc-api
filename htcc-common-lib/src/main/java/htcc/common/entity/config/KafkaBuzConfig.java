@@ -20,6 +20,8 @@ public class KafkaBuzConfig {
     public KafkaTopicConfig eventAdminSendNotification;
     public KafkaTopicConfig eventLoadIcon;
     public KafkaTopicConfig eventRequireIcon;
+    public KafkaTopicConfig eventCreateOrder;
+    public KafkaTopicConfig eventSubmitTrans;
 
     @Data
     public static class KafkaTopicConfig {

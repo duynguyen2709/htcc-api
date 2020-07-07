@@ -9,3 +9,11 @@ resetpassword:
   hashKey: admin
   baseUrl: http://localhost:8761/api/gateway
   methodName: /public/resetpassword/update
+createorder:
+  hashKey: admin
+  baseUrl: http://localhost:8761/api/admin
+  methodName: /public/createorder
+submittrans:
+  hashKey: admin
+  baseUrl: http://localhost:8761/api/admin
+  methodName: /public/submittrans

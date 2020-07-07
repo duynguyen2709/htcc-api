@@ -114,12 +114,20 @@ kafka:
     eventResetPassword:
       topicName: EVENT-RESET-PASSWORD
       groupId: EVENT-RESET-PASSWORD
+    eventCreateOrder:
+      topicName: EVENT-CREATE-ORDER
+      groupId: EVENT-CREATE-ORDER
+    eventSubmitTrans:
+      topicName: EVENT-SUBMIT-TRANS
+      groupId: EVENT-SUBMIT-TRANS
+
 ################## Mail Buz Config ##################
 mail:
   buz:
     subject:
       createNewUserMail: "[HTCC] New Account Info"
       resetPasswordMail: "[HTCC] Reset Password"
+      createOrderMail: "[HTCC] Order Purchase Detail"
 
 firebase:
   databaseURL: "https://checkinapp-9eac2.firebaseio.com"

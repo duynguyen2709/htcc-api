@@ -17,6 +17,7 @@ public enum CacheKeyEnum {
     NOTI_ICON,
     SUPPORTED_FEATURE,
     FEATURE_COMBO,
+    CUSTOMER_ORDER,
     ;
 //    ALL;
 

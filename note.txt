@@ -295,3 +295,7 @@
 02-07-2020:
  + Version 2.4.0:
     - API Reset Password
+
+07-07-2020:
+ + Version 2.5.0:
+    - API Payment

@@ -1,6 +1,7 @@
 package htcc.admin.service.controller;
 
 import htcc.admin.service.service.ComplaintService;
+import htcc.admin.service.service.rest.LogService;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.home.AdminHomeResponse;
@@ -20,6 +21,9 @@ public class HomeController {
     @Autowired
     private ComplaintService complaintService;
 
+    @Autowired
+    private LogService logService;
+
     @ApiOperation(value = "API ở màn hình Home", response = AdminHomeResponse.class)
     @GetMapping("/home")
     public BaseResponse home() {
@@ -29,6 +33,7 @@ public class HomeController {
 
             AdminHomeResponse data = new AdminHomeResponse();
             countPendingComplaint(data);
+            countPendingOrder(data);
             response.setData(data);
 
         } catch (Exception e) {
@@ -49,5 +54,18 @@ public class HomeController {
             log.error("[countPendingComplaint] ex", e);
         }
         data.setPendingComplaint(count);
+    }
+
+    private void countPendingOrder(AdminHomeResponse data){
+        int count = 0;
+        try {
+            BaseResponse response = logService.countPendingOrderLog();
+            if (response != null && response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+                count = (int) response.getData();
+            }
+        } catch (Exception e) {
+            log.error("[countPendingOrder] ex", e);
+        }
+        data.setPendingOrder(count);
     }
 }

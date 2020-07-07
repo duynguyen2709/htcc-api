@@ -134,7 +134,8 @@ public class EmployeeMobileNotificationController {
             if (!request.isValid().isEmpty()){
                 throw new Exception("Data invalid");
             }
-            request.setClientId(ClientSystemEnum.MOBILE.getValue());
+            // ???
+            //request.setClientId(ClientSystemEnum.MOBILE.getValue());
 
             notiService.updateNotificationHasReadStatus(request);
         } catch (Exception e){

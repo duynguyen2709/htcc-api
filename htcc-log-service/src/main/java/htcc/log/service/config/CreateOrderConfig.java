@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "web-service")
-public class WebServiceConfig {
+@ConfigurationProperties(prefix = "create-order")
+public class CreateOrderConfig {
     private String baseUrl;
     private String params;
 }

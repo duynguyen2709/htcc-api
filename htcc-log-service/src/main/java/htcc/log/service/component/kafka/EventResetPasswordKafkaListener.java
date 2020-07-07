@@ -4,7 +4,7 @@ import htcc.common.entity.request.ResetPasswordRequest;
 import htcc.common.service.kafka.BaseKafkaConsumer;
 import htcc.common.util.StringUtil;
 import htcc.log.service.config.MailBuzConfig;
-import htcc.log.service.config.WebServiceConfig;
+import htcc.log.service.config.ResetPasswordConfig;
 import htcc.log.service.service.mail.MailService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class EventResetPasswordKafkaListener extends BaseKafkaConsumer<ResetPass
     private MailService mailService;
 
     @Autowired
-    private WebServiceConfig webServiceConfig;
+    private ResetPasswordConfig resetPasswordConfig;
 
     @Override
     public void process(ResetPasswordRequest request) {
@@ -34,9 +34,9 @@ public class EventResetPasswordKafkaListener extends BaseKafkaConsumer<ResetPass
             final String template = mailBuzConfig.mailResetPasswordTemplate;
             final String username = "##username##";
             final String resetPasswordLink = "##reset-password-link##";
-            final String params = String.format(webServiceConfig.getParams(), request.getClientId(),
+            final String params = String.format(resetPasswordConfig.getParams(), request.getClientId(),
                     StringUtil.valueOf(request.getCompanyId()), request.getUsername(), request.getToken());
-            final String url = webServiceConfig.getBaseUrl() + params;
+            final String url = resetPasswordConfig.getBaseUrl() + params;
 
             String content = template.replaceAll(username, request.getUsername())
                     .replace(resetPasswordLink, url);

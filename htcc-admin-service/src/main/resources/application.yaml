@@ -112,3 +112,9 @@ kafka:
     eventRequireIcon:
       topicName: EVENT-REQUIRE-ICON
       groupId: EVENT-REQUIRE-ICON
+    eventCreateOrder:
+      topicName: EVENT-CREATE-ORDER
+      groupId: EVENT-CREATE-ORDER
+    eventSubmitTrans:
+      topicName: EVENT-SUBMIT-TRANS
+      groupId: EVENT-SUBMIT-TRANS

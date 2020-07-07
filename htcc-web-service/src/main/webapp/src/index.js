@@ -5,12 +5,14 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import {HashRouter, Route} from 'react-router-dom';
 import FormPasswordReset from "./resetpassword/FormPasswordReset";
+import Invoice from "./Invoice/Invoice";
 
 ReactDOM.render((
     <HashRouter>
         <div>
             <Route exact path="/genqrcode" component={App}/>
             <Route exact path="/resetpassword" component={FormPasswordReset}/>
+            <Route exact path="/createorder" component={Invoice}/>
         </div>
     </HashRouter>
 ), document.getElementById('root'));

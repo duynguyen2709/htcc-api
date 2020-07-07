@@ -9,3 +9,11 @@ resetpassword:
   hashKey: 6h5K8dapxfFdVKAS
   baseUrl: https://1612145.online/api/gateway
   methodName: /public/resetpassword/update
+createorder:
+  hashKey: 6h5K8dapxfFdVKAS
+  baseUrl: https://1612145.online/api/admin
+  methodName: /public/createorder
+submittrans:
+  hashKey: 6h5K8dapxfFdVKAS
+  baseUrl: https://1612145.online/api/admin
+  methodName: /public/submittrans

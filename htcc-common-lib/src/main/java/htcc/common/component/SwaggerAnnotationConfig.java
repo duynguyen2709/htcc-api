@@ -15,7 +15,6 @@ public class SwaggerAnnotationConfig implements ImportSelector {
         System.setProperty("basePackage", attributes.getString("basePackage"));
         System.setProperty("baseUrl", attributes.getString("baseUrl"));
         return new String[]{SwaggerDocsConfig.class.getName()};
-
     }
 }
 
