@@ -46,6 +46,9 @@ public class ManagerHomeResponse implements Serializable {
     @ApiModelProperty(notes = "Danh sách các chi nhánh được phép quản lý")
     public List<String> canManageOffices = new ArrayList<>();
 
+    @ApiModelProperty(notes = "Danh sách các phòng ban được phép quản lý")
+    public List<String> canManageDepartments = new ArrayList<>();
+
     @ApiModelProperty(notes = "Danh sách các nhân viên được phép quản lý")
     public List<EmployeeInfo> canManageEmployees = new ArrayList<>();
 

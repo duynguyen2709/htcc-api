@@ -1,8 +1,10 @@
 package htcc.employee.service.repository.impl;
 
+import htcc.common.entity.jpa.Department;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.Office;
 import htcc.employee.service.repository.EmployeePermissionRepository;
+import htcc.employee.service.service.jpa.DepartmentService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.OfficeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ public class EmployeePermissionRepositoryImpl implements EmployeePermissionRepos
 
     @Autowired
     private OfficeService officeService;
+
+    @Autowired
+    private DepartmentService departmentService;
 
     @Autowired
     private EmployeeInfoService employeeInfoService;
@@ -43,6 +48,14 @@ public class EmployeePermissionRepositoryImpl implements EmployeePermissionRepos
         return officeService.findByCompanyId(companyId)
                 .stream()
                 .map(Office::getOfficeId)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getCanManageDepartments(String companyId, String username) {
+        return departmentService.findByCompanyId(companyId)
+                .stream()
+                .map(Department::getDepartment)
                 .collect(Collectors.toList());
     }
 
