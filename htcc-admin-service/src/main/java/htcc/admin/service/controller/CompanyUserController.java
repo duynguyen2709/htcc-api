@@ -19,6 +19,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Api(tags = "API quản lý Admin của Công Ty",
@@ -46,7 +47,29 @@ public class CompanyUserController {
     @GetMapping("/companyusers/{companyId}")
     public BaseResponse getListCompanyUser(@ApiParam(value = "[Path] Mã công ty", required = true, defaultValue = "VNG")
                                                @PathVariable String companyId){
-        return service.getListCompanyUser(companyId);
+        BaseResponse<List<CompanyUserModel>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        try {
+            BaseResponse subResponse = service.getListCompanyUser(companyId);
+            if (subResponse == null || subResponse.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
+                return subResponse;
+            }
+
+            String rawValue = StringUtil.toJsonString(subResponse.getData());
+            List<CompanyUserModel> companyUserModelList = StringUtil.json2Collection(rawValue,
+                    new TypeToken<List<CompanyUserModel>>() {}.getType());
+
+            List<CompanyUserModel> dataResponse = new ArrayList<>();
+            for (CompanyUserModel model : companyUserModelList) {
+                if (service.isSuperAdmin(model)) {
+                    dataResponse.add(model);
+                }
+            }
+            response.setData(dataResponse);
+        } catch (Exception e) {
+            log.error("[getListCompanyUser] [{}] ex", companyId, e);
+            return new BaseResponse(e);
+        }
+        return response;
     }
 
 

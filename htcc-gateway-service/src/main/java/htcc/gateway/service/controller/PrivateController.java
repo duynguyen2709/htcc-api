@@ -117,12 +117,12 @@ public class PrivateController {
                                            @PathVariable("clientId") int clientId,
                                        @ApiParam(value = "[Body] Mật khẩu mới cần update", required = true)
                                        @RequestBody ChangePasswordRequest req,
-                                       @RequestHeader("Authorization") String authorization) {
+                                       @ApiParam(hidden = true) @RequestHeader("Authorization") String authorization) {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         String token = authorization.substring(Constant.BEARER.length());
         try {
             if (!validPermission(token, clientId, req.companyId, req.username)) {
-                log.warn(String.format("changePassword failed for client %s | company %s | username %s | token %s",
+                log.error(String.format("changePassword failed for client %s | company %s | username %s | token %s",
                         clientId, req.companyId, req.username, token));
                 return new BaseResponse(ReturnCodeEnum.PERMISSION_DENIED);
             }

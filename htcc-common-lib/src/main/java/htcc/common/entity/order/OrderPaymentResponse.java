@@ -18,22 +18,29 @@ public class OrderPaymentResponse implements Serializable {
 
     private static final long serialVersionUID = 130814L;
 
+    // Mã đơn hàng
     private String orderId = "";
+    // Ngày thanh toán
     private String date = "";
-
+    // Mã công ty
     private String companyId = "";
-    private String email     = "";
-
-    private String  paymentName = "";
+    // email công ty
+    private String email = "";
+    // tên người thanh toán
+    private String paymentName = "";
+    // mã thanh toán
     private String  paymentId = "";
-    private int     paymentCycleType = PaymentCycleTypeEnum.MONTHLY.getValue();
-
+    // loại thanh toán (1 = theo tháng / 2 = theo năm)
+    private int paymentCycleType = PaymentCycleTypeEnum.MONTHLY.getValue();
+    // tên gói combo (nếu có đăng ký combo) hoặc empty
     private String comboName = "";
+    // list danh sách tên các tính năng đã đăng ký
     private List<String> featureList = new ArrayList<>();
-
+    // tổng tiền
     private long totalPrice = 0L;
+    // số tiền đã thanh toán
     private long paidPrice = 0L;
-
+    // trạng thái đơn hàng (0 = Hủy/ 1 = Thành công/ 2 = chờ duyệt)
     private int orderStatus = OrderStatusEnum.CREATED.getValue();
 
     public OrderPaymentResponse(DetailOrderModel model) {

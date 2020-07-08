@@ -57,6 +57,7 @@ public class CompanyUser extends BaseJPAEntity {
         model.phoneNumber = this.phoneNumber;
         model.status = this.status;
         model.password = null;
+        model.role = this.role;
         return model;
     }
 

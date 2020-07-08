@@ -127,6 +127,9 @@ kafka:
     eventRequireIcon:
       topicName: EVENT-REQUIRE-ICON
       groupId: EVENT-REQUIRE-ICON
+    eventCreateUser:
+      topicName: EVENT-CREATE-USER
+      groupId: EVENT-CREATE-USER
 
 statistic:
   maxDayDiff: 31

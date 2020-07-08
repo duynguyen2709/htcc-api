@@ -41,6 +41,7 @@ public class CompanyUserModel {
                       example = "1")
     public int status = 1;
 
+    public int role = 0;
 
     @Transient
     public String isValid(){

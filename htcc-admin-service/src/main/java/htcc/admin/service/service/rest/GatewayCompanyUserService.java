@@ -18,6 +18,11 @@ public class GatewayCompanyUserService {
 
     private static final String baseURL = String.format("http://%s/internal", Constant.HTCC_GATEWAY_SERVICE);
 
+    public boolean isSuperAdmin(CompanyUserModel user) {
+        // TODO : implement this method
+        return user.getRole() == 0;
+    }
+
     public BaseResponse getListCompanyUser(String companyId) {
         return callGet("/companyusers/" + companyId);
     }
