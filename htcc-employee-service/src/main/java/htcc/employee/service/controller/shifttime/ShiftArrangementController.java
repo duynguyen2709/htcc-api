@@ -1,5 +1,6 @@
 package htcc.employee.service.controller.shifttime;
 
+import htcc.common.comparator.OfficeShiftInfoComparator;
 import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.constant.ShiftArrangementTypeEnum;
@@ -70,6 +71,8 @@ public class ShiftArrangementController {
             setFixedShiftList(dataResponse, fixedShiftArrangementList);
             setShiftByDateList(dataResponse, logEntities);
 
+            dataResponse.getFixedShiftList().sort(new OfficeShiftInfoComparator());
+            dataResponse.getShiftByDateList().sort(new OfficeShiftInfoComparator());
             response.setData(dataResponse);
         } catch (Exception e) {
             log.error("[getShiftTimeInfo] [{} - {}] ex", companyId, week, e);
@@ -96,6 +99,7 @@ public class ShiftArrangementController {
                 // add office
                 ShiftArrangementResponse.OfficeShiftInfo officeShiftInfo = new ShiftArrangementResponse.OfficeShiftInfo();
                 officeShiftInfo.setOfficeId(office.getOfficeId());
+                officeShiftInfo.setOffice(office);
                 officeShiftInfo.setShiftDetailList(new ArrayList<>());
 
                 // add list shift time of office

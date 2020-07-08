@@ -2,6 +2,7 @@ package htcc.common.entity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.jpa.Office;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -52,6 +53,8 @@ public class ShiftArrangementResponse implements Serializable {
     public static class OfficeShiftInfo implements Serializable {
         private static final long serialVersionUID = 19263258350807L;
         public String officeId = "";
+        @JsonIgnore
+        public transient Office office;
         public List<ShiftDetail> shiftDetailList = new ArrayList<>();
 
         public ShiftDetail findShiftDetail(String _shiftId) {
@@ -66,6 +69,7 @@ public class ShiftArrangementResponse implements Serializable {
         public OfficeShiftInfo copy(){
             OfficeShiftInfo entity = new OfficeShiftInfo();
             entity.officeId = this.officeId;
+            entity.office = this.office;
             entity.shiftDetailList = new ArrayList<>();
 
             for (ShiftDetail shiftDetail : this.shiftDetailList) {
