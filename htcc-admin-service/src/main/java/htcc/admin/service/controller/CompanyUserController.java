@@ -40,9 +40,6 @@ public class CompanyUserController {
     @Autowired
     private KafkaProducerService kafka;
 
-
-
-
     @ApiOperation(value = "Lấy danh sách admin của công ty", response = CompanyUserModel.class)
     @GetMapping("/companyusers/{companyId}")
     public BaseResponse getListCompanyUser(@ApiParam(value = "[Path] Mã công ty", required = true, defaultValue = "VNG")
@@ -99,23 +96,23 @@ public class CompanyUserController {
             }
 
             response = service.createCompanyUser(user);
+            if (response == null || response.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
+                throw new Exception("GatewayCompanyUserService.createCompanyUser response = " + StringUtil.toJsonString(response));
+            }
 
-            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
-                BaseResponse response1 = employeeInfoService.createDefaultEmployeeInfo(user);
-                // if create default employee failed, then rollback
-                if (response1.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
-                    log.error("Rollback on creating new employee {}, response {}",
-                            StringUtil.toJsonString(user), StringUtil.toJsonString(response1));
-                    service.deleteCompanyUser(user);
-                    response = response1;
-                    return response;
-                }
+            BaseResponse response1 = employeeInfoService.createDefaultEmployeeInfo(user);
+            // if create default employee failed, then rollback
+            if (response1 == null || response1.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
+                log.error("Rollback on creating new employee {}, response {}",
+                        StringUtil.toJsonString(user), StringUtil.toJsonString(response1));
+                service.deleteCompanyUser(user);
+                throw new Exception("employeeInfoService.createDefaultEmployeeInfo response = " + StringUtil.toJsonString(response1));
             }
         } catch (Exception e) {
             log.error("[createCompanyUser] {} ex", StringUtil.toJsonString(user), e);
             response = new BaseResponse(e);
         } finally {
-            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
+            if (response != null && response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()){
                 BaseUser model = new BaseUser(user);
                 model.setPassword(rawPassword);
 
@@ -124,7 +121,6 @@ public class CompanyUserController {
         }
         return response;
     }
-
 
     private Company findCompany(String companyId) {
         try {
@@ -145,8 +141,6 @@ public class CompanyUserController {
         }
         return null;
     }
-
-
 
     @ApiOperation(value = "Cập nhật thông tin của admin", response = CompanyUserModel.class)
     @PutMapping("/companyusers/{companyId}/{username}")
@@ -174,9 +168,6 @@ public class CompanyUserController {
             return new BaseResponse(e);
         }
     }
-
-
-
 
     @ApiOperation(value = "Khóa/Mở khóa admin", response = CompanyUserModel.class)
     @PutMapping("/companyusers/{companyId}/{username}/status/{newStatus}")
