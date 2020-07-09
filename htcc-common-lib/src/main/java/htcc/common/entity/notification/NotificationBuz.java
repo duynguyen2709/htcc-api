@@ -30,7 +30,6 @@ public class NotificationBuz extends BaseJPAEntity {
     public int clientId = 1;
 
     @Id
-    @NotEmpty
     public String companyId = "";
 
     @Id

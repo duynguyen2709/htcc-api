@@ -57,6 +57,7 @@ public class CompanyUser extends BaseJPAEntity {
         model.phoneNumber = this.phoneNumber;
         model.status = this.status;
         model.password = null;
+        model.role = this.role;
         return model;
     }
 
@@ -70,17 +71,13 @@ public class CompanyUser extends BaseJPAEntity {
 
     @Column
     @NotEmpty
-    @Size(min = 6, message = "Mật khẩu ít nhất 6 kí tự")
     public String password = "";
 
     @Column
     @NotEmpty
-    @Email(message = "Không đúng định dạng email")
     public String email = "";
 
     @Column
-    @NotEmpty
-    @Size(min = 10, max = 20, message = "Số điện thoại, ít nhất 10 chữ số")
     public String phoneNumber = "";
 
     @Column

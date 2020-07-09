@@ -1,12 +1,14 @@
 package htcc.employee.service.controller.home;
 
+import com.google.gson.reflect.TypeToken;
 import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
-import htcc.common.constant.ScreenEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.home.EmployeeHomeResponse;
+import htcc.common.entity.jpa.Company;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.LogService;
+import htcc.employee.service.service.jpa.CompanyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Api(tags = "API ở màn hình chính của nhân viên")
 @RestController
@@ -27,8 +31,8 @@ public class EmployeeHomeController {
     @Autowired
     private LogService logService;
 
-    // TODO : GET SCREENS FROM CONFIG
-
+    @Autowired
+    private CompanyService companyService;
 
     @ApiOperation(value = "API Home", response = EmployeeHomeResponse.class)
     @GetMapping("/home/employee/{companyId}/{username}")
@@ -50,22 +54,15 @@ public class EmployeeHomeController {
         return response;
     }
 
-    private void selectDisplayScreens(EmployeeHomeResponse data, String companyId, String username, String screens) {
-        Set<Integer> displayScreens = new HashSet<>();
-        displayScreens.add(1);
-        try {
-            if (!StringUtil.isEmpty(screens)) {
-                String[] list = screens.split(",");
-                for (String str : list) {
-                    int screenValue = Integer.parseInt(str);
-                    if (ScreenEnum.fromInt(screenValue) != null) {
-                        displayScreens.add(Integer.parseInt(str));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("[selectDisplayScreens] [{} - {}] ex", companyId, username, e);
+    private void selectDisplayScreens(EmployeeHomeResponse data, String companyId, String username, String screens) throws Exception {
+        Company company = companyService.findById(companyId);
+        if (company == null) {
+            throw new Exception("companyService.findById return null");
         }
+
+        Set<Integer> displayScreens = new HashSet<>(StringUtil.json2Collection(company.getSupportedScreens(),
+                new TypeToken<Set<Integer>>() {}.getType()));
+        displayScreens.add(1);
         data.setDisplayScreens(new ArrayList<>(displayScreens));
     }
 

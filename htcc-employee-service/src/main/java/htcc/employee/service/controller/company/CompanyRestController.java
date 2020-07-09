@@ -63,6 +63,7 @@ public class CompanyRestController {
             }
 
             company.setCompanyId(companyId);
+            company.setSupportedScreens(oldCompany.getSupportedScreens());
             company = companyService.update(company);
             response.setData(company);
         } catch (Exception e) {

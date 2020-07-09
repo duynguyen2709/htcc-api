@@ -25,49 +25,43 @@ import java.util.Objects;
 @IdClass(EmployeeInfo.Key.class)
 @RequiredArgsConstructor
 @AllArgsConstructor
-@ApiModel(description = "Thông tin nhân viên (các field * không cần gửi lại khi update)\n" +
-          "(các field còn lại phải gửi lại kể cả khi không update)")
+@ApiModel(description = "Thông tin nhân viên")
 public class EmployeeInfo extends BaseJPAEntity {
 
     private static final long serialVersionUID = 5922818583125150708L;
 
     @Id
-    @ApiModelProperty(notes = "(*) Mã công ty",
+    @ApiModelProperty(notes = "Mã công ty",
                       example = "VNG")
     public String companyId = "";
 
     @Id
-    @ApiModelProperty(notes = "(*) Tên đăng nhập",
+    @ApiModelProperty(notes = "Tên đăng nhập",
                       example = "admin")
     public String username = "";
 
     @Column
-    @ApiModelProperty(notes = "(*) Mã nhân viên",
+    @ApiModelProperty(notes = "Mã nhân viên",
                       example = "VNG-00001")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String employeeId = "";
 
     @Column
-    @ApiModelProperty(notes = "(*) Mã chi nhánh",
+    @ApiModelProperty(notes = "Mã chi nhánh",
                       example = "CAMPUS")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String officeId = "";
 
     @Column
-    @ApiModelProperty(notes = "(*) Phòng ban/ bộ phận làm việc",
+    @ApiModelProperty(notes = "Phòng ban/ bộ phận làm việc",
                       example = "PMA")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String department = "";
 
     @Column
-    @ApiModelProperty(notes = "(*) Chức danh nhân viên",
+    @ApiModelProperty(notes = "Chức danh nhân viên",
                       example = "Junior Developer")
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String title = "";
 
     @Column
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @ApiModelProperty(notes = "(*) Cấp độ nhân viên",
+    @ApiModelProperty(notes = "Cấp độ nhân viên",
                       example = "2.1")
     public float level = 0.0f;
 
@@ -77,7 +71,7 @@ public class EmployeeInfo extends BaseJPAEntity {
     public String fullName = "";
 
     @Column
-    @ApiModelProperty(notes = "Giới tính",
+    @ApiModelProperty(notes = "Giới tính : 0 (Nữ) hoặc 1 (Nam)",
                       example = "1")
     public int gender;
 
@@ -107,7 +101,7 @@ public class EmployeeInfo extends BaseJPAEntity {
     public String address = "";
 
     @Column
-    @ApiModelProperty(notes = "(*) URL Ảnh đại diện (Default - không cần set)")
+    @ApiModelProperty(notes = "(Bỏ qua) URL Ảnh đại diện (Default - không cần set)")
     public String avatar = "";
 
     @Override

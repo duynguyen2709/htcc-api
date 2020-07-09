@@ -1,13 +1,11 @@
 package htcc.common.entity.statistic;
 
-import htcc.common.entity.checkin.CheckinModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import htcc.common.entity.leavingrequest.LeavingRequest;
 import htcc.common.entity.leavingrequest.LeavingRequestModel;
-import htcc.common.util.DateTimeUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,11 +35,11 @@ public class EmployeeStatisticResponse implements Serializable {
     // danh sách chi tiết theo ngày
     public List<DetailStatisticsByDate> detailList = new ArrayList<>();
 
-    @Transient
-    public Set<String> totalWorkingDaysSet = new HashSet<>();
+    @JsonIgnore
+    public transient Set<String> totalWorkingDaysSet = new HashSet<>();
 
-    @Transient
-    public Set<String> actualWorkingDaysSet = new HashSet<>();
+    @JsonIgnore
+    public transient Set<String> actualWorkingDaysSet = new HashSet<>();
 
     @Data
     @NoArgsConstructor

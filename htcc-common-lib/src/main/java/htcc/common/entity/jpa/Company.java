@@ -1,5 +1,6 @@
 package htcc.common.entity.jpa;
 
+import com.google.gson.reflect.TypeToken;
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
@@ -12,8 +13,7 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Data
@@ -30,26 +30,21 @@ public class Company extends BaseJPAEntity {
     public String companyId = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "Tên công ty",
                       example = "Công ty cổ phần VNG")
     public String companyName = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "Email",
                       example = "naduy.hcmus@gmail.com")
     public String email = "";
 
     @Column
-    @NotEmpty
-    @Size(min = 10, max = 20, message = "Số điện thoại, ít nhất 10 chữ số")
     @ApiModelProperty(notes = "Sđt, ít nhất 10 chữ số",
                       example = "0948202709")
     public String phoneNumber = "";
 
     @Column
-    @NotEmpty
     @ApiModelProperty(notes = "Địa chỉ công ty",
                       example = "Quận 7, TPHCM")
     public String address = "";
@@ -58,6 +53,17 @@ public class Company extends BaseJPAEntity {
     @ApiModelProperty(notes = "Trạng thái công ty (1: Active / 0: Blocked)",
                       example = "1")
     public int status = 1;
+
+    public String supportedScreens = "";
+//
+//    public List<Integer> getSupportedScreens() {
+//        return StringUtil.json2Collection(this.supportedScreens,
+//                new TypeToken<List<Integer>>() {}.getType());
+//    }
+//
+//    public void setSupportedScreens(List<Integer> list) {
+//        this.supportedScreens = StringUtil.toJsonString(list);
+//    }
 
     @Override
     public String isValid() {

@@ -3,6 +3,7 @@ package htcc.admin.service.service.rest;
 import htcc.common.constant.Constant;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
+import htcc.common.entity.order.UpdateOrderStatusModel;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -36,6 +37,25 @@ public class LogService {
     public BaseResponse updateComplaintStatus(UpdateComplaintStatusModel model) {
         HttpEntity<UpdateComplaintStatusModel> request = new HttpEntity<>(model);
         String method = "/complaint/status";
+        return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
+    }
+
+    /*
+    =========================== Order Section ===========================
+     */
+    public BaseResponse getListOrderLogByMonth(String yyyyMM) {
+        String method = String.format("/orders/%s", yyyyMM);
+        return callGet(method);
+    }
+
+    public BaseResponse countPendingOrderLog() {
+        String method = "/orders/count";
+        return callGet(method);
+    }
+
+    public BaseResponse updateOrderStatus(UpdateOrderStatusModel model) {
+        HttpEntity<UpdateOrderStatusModel> request = new HttpEntity<>(model);
+        String method = "/orders/status";
         return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
     }
 

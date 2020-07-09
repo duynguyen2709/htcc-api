@@ -295,3 +295,15 @@
 02-07-2020:
  + Version 2.4.0:
     - API Reset Password
+
+07-07-2020:
+ + Version 2.5.0:
+    - API Payment
+
+08-07-2020:
+ + Version 2.6.0:
+    - API manage Employee for Manager
+
+09-07-2020:
+ + Version 2.6.1:
+    - Fix bug wrong sig createorder & add SupportedScreens for Company

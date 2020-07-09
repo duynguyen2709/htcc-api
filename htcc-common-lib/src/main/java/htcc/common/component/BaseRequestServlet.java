@@ -57,6 +57,7 @@ public abstract class BaseRequestServlet extends DispatcherServlet {
             updateResponse(response);
         }
         response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json; charset=UTF-8");
     }
 
     private String getResponsePayload(HttpServletResponse response) {

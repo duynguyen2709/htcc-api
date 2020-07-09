@@ -4,7 +4,6 @@ import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
-import htcc.common.entity.home.EmployeeHomeResponse;
 import htcc.common.entity.home.ManagerHomeResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.DateTimeUtil;
@@ -13,8 +12,8 @@ import htcc.employee.service.repository.EmployeePermissionRepository;
 import htcc.employee.service.service.LogService;
 import htcc.employee.service.service.checkin.CheckInService;
 import htcc.employee.service.service.complaint.ComplaintService;
-import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import htcc.employee.service.service.icon.IconService;
+import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -67,6 +66,7 @@ public class ManagerHomeController {
             countPendingCheckIn(data, companyId);
             countUnreadNotifications(data, companyId, username);
             setCanManageOffices(data, companyId, username);
+            setCanManageDepartments(data, companyId, username);
             setCanManageEmployees(data, companyId, username);
             setIsSuperAdmin(data, companyId, username);
             setIconList(data);
@@ -98,6 +98,15 @@ public class ManagerHomeController {
             data.setCanManageOffices(officeList);
         } catch (Exception e){
             log.error("[setCanManageOffices] [{} - {}]", companyId, username, e);
+        }
+    }
+
+    private void setCanManageDepartments(ManagerHomeResponse data, String companyId, String username) {
+        try {
+            List<String> departmentList = permissionRepo.getCanManageDepartments(companyId, username);
+            data.setCanManageDepartments(departmentList);
+        } catch (Exception e){
+            log.error("[setCanManageDepartments] [{} - {}]", companyId, username, e);
         }
     }
 

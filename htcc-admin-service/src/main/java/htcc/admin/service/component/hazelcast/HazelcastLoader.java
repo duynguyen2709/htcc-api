@@ -1,5 +1,6 @@
 package htcc.admin.service.component.hazelcast;
 
+import htcc.admin.service.jpa.CustomerOrderRepository;
 import htcc.admin.service.jpa.FeatureComboRepository;
 import htcc.admin.service.jpa.FeaturePriceRepository;
 import htcc.admin.service.jpa.NotificationIconConfigRepository;
@@ -10,6 +11,7 @@ import htcc.common.constant.ScreenEnum;
 import htcc.common.entity.feature.FeatureCombo;
 import htcc.common.entity.feature.FeaturePrice;
 import htcc.common.entity.icon.NotificationIconConfig;
+import htcc.common.entity.order.CustomerOrder;
 import htcc.common.util.StringUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,9 @@ public class HazelcastLoader {
     @Autowired
     private FeatureComboRepository featureComboRepository;
 
+    @Autowired
+    private CustomerOrderRepository customerOrderRepository;
+
     // [important] must init after kafka initialization, otherwise kafka is null
     @Bean
     @DependsOn({"kafkaProducerService"})
@@ -55,6 +60,8 @@ public class HazelcastLoader {
         loadFeaturePriceMap();
 
         loadFeatureComboMap();
+
+        loadCustomerOrderMap();
 
         loadNotiIconConfigMap();
 
@@ -87,6 +94,16 @@ public class HazelcastLoader {
         FEATURE_COMBO_MAP = hazelcastService.reload(map, CacheKeyEnum.FEATURE_COMBO);
         log.info("[loadFeatureComboMap] FEATURE_COMBO_MAP loaded succeed \n{}",
                 StringUtil.toJsonString(FEATURE_COMBO_MAP));
+    }
+
+    public void loadCustomerOrderMap() {
+        Map<String, CustomerOrder> map = new HashMap<>();
+
+        customerOrderRepository.findAll().forEach(c -> map.put(c.getCompanyId(), c));
+
+        CUSTOMER_ORDER_MAP = hazelcastService.reload(map, CacheKeyEnum.CUSTOMER_ORDER);
+        log.info("[loadCustomerOrderMap] CUSTOMER_ORDER_MAP loaded succeed \n{}",
+                StringUtil.toJsonString(CUSTOMER_ORDER_MAP));
     }
 
     public void loadNotiIconConfigMap() {

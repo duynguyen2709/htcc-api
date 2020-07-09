@@ -45,7 +45,7 @@ export default class FormPasswordReset extends React.Component {
                     setTimeout(() => {
                         window.open("", "_self");
                         window.close();
-                    }, 3000);
+                    }, 1000);
                 }
                 else {
                     alert(response.data.returnMessage);

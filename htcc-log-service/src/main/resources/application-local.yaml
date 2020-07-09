@@ -5,6 +5,7 @@ security:
   user:
     name: admin
     password: admin
+  hashKey: admin
 
 eureka:
   client:
@@ -46,6 +47,10 @@ kafka:
       topicName: EVENT-LOAD-ICON
       groupId: EVENT-LOAD-ICON-LOG-LOCAL
 
-web-service:
+reset-password:
   baseUrl: http://localhost:3004/#/resetpassword
   params: ?clientId=%s&companyId=%s&username=%s&token=%s
+
+create-order:
+  baseUrl: http://localhost:8206/#/createorder
+  params: ?params=%s

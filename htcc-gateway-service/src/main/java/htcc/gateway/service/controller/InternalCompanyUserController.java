@@ -18,9 +18,12 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @RestController
 @Log4j2
@@ -43,7 +46,7 @@ public class InternalCompanyUserController {
     //</editor-fold>
 
 
-    @PostMapping("/companyusers")
+    @PostMapping(value = "/companyusers", produces = {APPLICATION_JSON})
     public BaseResponse createUser(@RequestBody @Valid CompanyUserModel model) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -76,7 +79,7 @@ public class InternalCompanyUserController {
      * @param model
      * @return
      */
-    @PostMapping("/companyusers/delete")
+    @PostMapping(value = "/companyusers/delete", produces = {APPLICATION_JSON})
     public BaseResponse deleteUser(@RequestBody CompanyUserModel model) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -92,12 +95,11 @@ public class InternalCompanyUserController {
 
 
 
-    @GetMapping("/companyusers/{companyId}")
+    @GetMapping(value = "/companyusers/{companyId}", produces = {APPLICATION_JSON})
     public BaseResponse getCompanyUsers(@PathVariable String companyId) {
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+        BaseResponse<List<CompanyUserModel>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             List<CompanyUserModel> list = service.findByCompanyId(companyId).stream()
-                              .filter(c -> c.getRole() == 0)
                               .map(CompanyUser::fromEntity)
                               .collect(Collectors.toList());
 
@@ -105,7 +107,7 @@ public class InternalCompanyUserController {
 
         } catch (Exception e) {
             log.error("[getCompanyUsers] [{}] ex", companyId, e);
-            response = new BaseResponse(e);
+            response = new BaseResponse<>(e);
         }
 
         return response;
@@ -114,7 +116,7 @@ public class InternalCompanyUserController {
 
 
 
-    @PostMapping("/companyusers/update")
+    @PostMapping(value = "/companyusers/update", produces = {APPLICATION_JSON})
     public BaseResponse updateCompanyUserInfo(@RequestBody @Valid CompanyUserModel user) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         boolean needUpdate = false;
@@ -155,20 +157,21 @@ public class InternalCompanyUserController {
 
 
 
-    @PostMapping("/companyusers/status")
+    @PostMapping(value = "/companyusers/status", produces = {APPLICATION_JSON})
     public BaseResponse updateCompanyUserStatus(@RequestBody CompanyUserModel user) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
-            CompanyUser oldUser = service.findById(new CompanyUser.Key(user.companyId, user.username));
+            CompanyUser oldUser = service.findById(
+                    new CompanyUser.Key(user.getCompanyId(), user.getUsername()));
             if (oldUser == null) {
-                response = new BaseResponse<>(ReturnCodeEnum.DATA_NOT_FOUND,
-                        String.format("Không tìm thấy user %s", user.username));
+                response = new BaseResponse<>(ReturnCodeEnum.DATA_NOT_FOUND);
+                response.setReturnMessage(String.format("Không tìm thấy user %s", user.username));
                 return response;
             }
 
             if (oldUser.getStatus() == user.getStatus()) {
-                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID,
-                        String.format("Trạng thái mới [%s] không được giống trạng thái cũ", user.getStatus()));
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage(String.format("Trạng thái mới [%s] không được giống trạng thái cũ", user.getStatus()));
                 return response;
             }
 
@@ -181,15 +184,42 @@ public class InternalCompanyUserController {
         } catch (Exception e) {
             log.error("[updateCompanyUserStatus] [{}] ex", StringUtil.toJsonString(user), e);
             response = new BaseResponse<>(e);
+        } finally {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
+                if (user.getStatus() == AccountStatusEnum.BLOCK.getValue()) {
+                    blockRedisToken(user);
+                }
+            }
         }
 
         return response;
     }
 
+    private void blockRedisToken(CompanyUserModel user) {
+        String tokenMobile = StringUtil.valueOf(redis.get(redis.buzConfig.tokenFormat,
+                ClientSystemEnum.MOBILE.getValue(), user.getCompanyId(), user.getUsername()));
 
+        String tokenWeb = StringUtil.valueOf(redis.get(redis.buzConfig.tokenFormat,
+                ClientSystemEnum.MANAGER_WEB.getValue(), user.getCompanyId(), user.getUsername()));
 
+        if (!tokenMobile.isEmpty()) {
+            redis.set(tokenMobile, 0, redis.buzConfig.blacklistTokenFormat,
+                    ClientSystemEnum.MOBILE.getValue(), user.getCompanyId(), user.getUsername());
 
-    @PostMapping("/companyusers/status/{companyId}/{newStatus}")
+            redis.delete(redis.buzConfig.tokenFormat,
+                    ClientSystemEnum.MOBILE.getValue(), user.getCompanyId(), user.getUsername());
+        }
+
+        if (!tokenWeb.isEmpty()) {
+            redis.set(tokenWeb, 0, redis.buzConfig.blacklistTokenFormat,
+                    ClientSystemEnum.MANAGER_WEB.getValue(), user.getCompanyId(), user.getUsername());
+
+            redis.delete(redis.buzConfig.tokenFormat,
+                    ClientSystemEnum.MANAGER_WEB.getValue(), user.getCompanyId(), user.getUsername());
+        }
+    }
+
+    @PostMapping(value = "/companyusers/status/{companyId}/{newStatus}", produces = {APPLICATION_JSON})
     public BaseResponse updateAllCompanyUserStatus(@PathVariable String companyId, @PathVariable int newStatus) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         List<CompanyUser> listUser = new ArrayList<>();
@@ -237,18 +267,24 @@ public class InternalCompanyUserController {
 
                     String tokenWeb = StringUtil.valueOf(redis.get(redis.buzConfig.tokenFormat, ClientSystemEnum.MANAGER_WEB.getValue(), companyId, user.username));
 
-                    redis.set(tokenMobile, 0, redis.buzConfig.blacklistTokenFormat, ClientSystemEnum.MOBILE.getValue(), companyId, user.username);
-
-                    redis.set(tokenWeb, 0, redis.buzConfig.blacklistTokenFormat, ClientSystemEnum.MANAGER_WEB.getValue(), companyId, user.username);
-
-                    redis.delete(redis.buzConfig.tokenFormat, ClientSystemEnum.MOBILE.getValue(), companyId, user.username);
-
-                    redis.delete(redis.buzConfig.tokenFormat, ClientSystemEnum.MANAGER_WEB.getValue(), companyId, user.username);
+                    if (!tokenMobile.isEmpty()) {
+                        redis.set(tokenMobile, 0, redis.buzConfig.blacklistTokenFormat,
+                                ClientSystemEnum.MOBILE.getValue(), companyId, user.username);
+                        redis.delete(redis.buzConfig.tokenFormat,
+                                ClientSystemEnum.MOBILE.getValue(), companyId, user.username);
+                    }
+                    if (!tokenWeb.isEmpty()) {
+                        redis.set(tokenWeb, 0, redis.buzConfig.blacklistTokenFormat,
+                                ClientSystemEnum.MANAGER_WEB.getValue(), companyId, user.username);
+                        redis.delete(redis.buzConfig.tokenFormat,
+                                ClientSystemEnum.MANAGER_WEB.getValue(), companyId, user.username);
+                    }
                 }
+
                 String redisValue = StringUtil.toJsonString(listBlockedUser);
                 redis.set(redisValue, 0, redis.buzConfig.statusBlockUserFormat, companyId);
 
-                log.info("Set Blocked User List of Company [{}], Value = [{}]", companyId, redisValue);
+                log.info("\nSet Blocked User List of Company [{}], Value = [{}]", companyId, redisValue);
 
             } else if (newStatus == AccountStatusEnum.ACTIVE.getValue()) {
                 // get list user blocked in redis cache

@@ -18,5 +18,9 @@ public class AdminHomeResponse implements Serializable {
     @ApiModelProperty(notes = "Số lượng khiếu nại chưa xử lý (để hiển thị ở sidebar)",
                       example = "10")
     public int pendingComplaint = 0;
+
+    @ApiModelProperty(notes = "Số lượng đơn hàng chưa xử lý (để hiển thị ở sidebar)",
+                      example = "10")
+    public int pendingOrder = 0;
 }
 

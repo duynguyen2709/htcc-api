@@ -16,5 +16,7 @@ public interface EmployeePermissionRepository {
 
     List<String> getCanManageOffices(String companyId, String username);
 
+    List<String> getCanManageDepartments(String companyId, String username);
+
     List<EmployeeInfo> getCanManageEmployees(String companyId, String username);
 }

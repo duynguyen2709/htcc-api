@@ -1,15 +1,20 @@
-import htcc.common.constant.WeekDayEnum;
-import htcc.common.util.DateTimeUtil;
-import org.junit.Assert;
+import htcc.common.entity.order.CreateOrderRequest;
+import htcc.common.util.StringUtil;
 import org.junit.Test;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 public class TestUtil {
 
@@ -39,10 +44,26 @@ public class TestUtil {
 
     @Test
     public void testString() {
-        String TABLE_PREFIX = "LeavingRequestLog";
-        String tableName = "LeavingRequestLog202007";
-        String yyyyMM = tableName.substring(TABLE_PREFIX.length());
-        int year = Integer.parseInt(yyyyMM.substring(0, 4));
-        Assert.assertEquals(2020, year);
+        Map<String, Object> map = new HashMap<>();
+        map.put("abc", 123);
+        String ab = "?params=" + StringUtil.toJsonString(map);
+        System.out.println(ab);
+        char quote = '"';
+        ab = ab.replaceAll("\"", "\\\\\"");
+        System.out.println(ab);
+    }
+
+    @Test
+    public void testAES() throws NoSuchPaddingException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, UnsupportedEncodingException, InvalidKeyException {
+        CreateOrderRequest request = new CreateOrderRequest();
+        request.setComboId("CB1");
+        request.setCompanyId("TEST");
+        request.setEmail("naduy.hcmus@gmail.com");
+        request.setRequestedFeatures(new HashMap<>());
+        request.setFirstPay(true);
+
+        String raw = StringUtil.toJsonString(request);
+        String encode = URLEncoder.encode(raw, StandardCharsets.UTF_8.toString());
+        System.out.println(encode);
     }
 }

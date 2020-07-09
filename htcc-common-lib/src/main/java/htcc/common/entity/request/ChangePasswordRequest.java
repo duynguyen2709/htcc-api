@@ -22,7 +22,7 @@ public class ChangePasswordRequest {
     @Min(1)
     public int clientId;
 
-    @ApiModelProperty(notes = "Mã công ty (null đối với web admin)",
+    @ApiModelProperty(notes = "Mã công ty",
                       example = "VNG")
     public String companyId;
 

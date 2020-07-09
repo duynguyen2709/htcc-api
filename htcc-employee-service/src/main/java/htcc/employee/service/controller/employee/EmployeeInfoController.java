@@ -197,20 +197,4 @@ public class EmployeeInfoController {
                     StringUtil.toJsonString(logEnt), (logEnt.responseTime - logEnt.requestTime)));
         }
     }
-
-
-
-    // TODO : DELETE THIS METHOD
-    @ApiOperation(value = "Lấy thông tin của tất cả nhân viên (dành cho quản lý)", response = EmployeeInfo.class)
-    @GetMapping("/users")
-    public BaseResponse getAllUser() {
-        BaseResponse<List<EmployeeInfo>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
-        try {
-            response.data = service.findAll();
-        } catch (Exception e){
-            log.error("getAllUser ex", e);
-            response = new BaseResponse<>(e);
-        }
-        return response;
-    }
 }

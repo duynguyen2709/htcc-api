@@ -86,6 +86,7 @@ public class InternalCompanyController {
             }
 
             company.setStatus(oldCompany.getStatus());
+            company.setSupportedScreens(oldCompany.getSupportedScreens());
             company = companyService.update(company);
 
             response.setData(company);
