@@ -224,7 +224,8 @@ public class OrderController {
             throw new Exception("clientSig is empty");
         }
 
-        String serverSig = StringUtil.hashSHA256(String.format("%s|%s", StringUtil.toJsonString(request), hashKey));
+        String serverSig = StringUtil.hashSHA256(String.format("%s|%s|%s",
+                request.getCompanyId(), request.getEmail(), hashKey));
 
         if (!serverSig.equals(sig)) {
             log.error("\nserverSig [{}] != clientSig [{}]\n", serverSig, sig);

@@ -1,5 +1,6 @@
 package htcc.common.entity.jpa;
 
+import com.google.gson.reflect.TypeToken;
 import htcc.common.constant.AccountStatusEnum;
 import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
@@ -12,8 +13,7 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 @Data
@@ -53,6 +53,17 @@ public class Company extends BaseJPAEntity {
     @ApiModelProperty(notes = "Trạng thái công ty (1: Active / 0: Blocked)",
                       example = "1")
     public int status = 1;
+
+    public String supportedScreens = "";
+//
+//    public List<Integer> getSupportedScreens() {
+//        return StringUtil.json2Collection(this.supportedScreens,
+//                new TypeToken<List<Integer>>() {}.getType());
+//    }
+//
+//    public void setSupportedScreens(List<Integer> list) {
+//        this.supportedScreens = StringUtil.toJsonString(list);
+//    }
 
     @Override
     public String isValid() {

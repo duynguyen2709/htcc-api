@@ -52,5 +52,5 @@ reset-password:
   params: ?clientId=%s&companyId=%s&username=%s&token=%s
 
 create-order:
-  baseUrl: http://localhost:3004/#/createorder
+  baseUrl: http://localhost:8206/#/createorder
   params: ?params=%s

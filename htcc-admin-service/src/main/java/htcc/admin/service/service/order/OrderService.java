@@ -21,6 +21,7 @@ import htcc.common.entity.jpa.Company;
 import htcc.common.entity.order.*;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
+import io.swagger.models.auth.In;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Log4j2
@@ -241,8 +244,15 @@ public class OrderService {
                 company.setPhoneNumber(StringUtil.EMPTY);
                 company.setCompanyName(StringUtil.EMPTY);
                 company.setAddress(StringUtil.EMPTY);
+
+                Set<Integer> screens = new HashSet<>();
+                for (DetailOrderModel.SupportedFeature supportedFeature : model.getSupportedFeatures()) {
+                    FeaturePrice feature = supportedFeature.getFeature();
+                    screens.add(feature.getLinkedScreen());
+                }
+                company.setSupportedScreens(StringUtil.toJsonString(screens));
+
                 BaseResponse companyResponse = companyService.createCompany(company);
-                log.info(StringUtil.toJsonString(companyResponse));
                 if (companyResponse != null && companyResponse.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
                     CompanyUserModel user = new CompanyUserModel();
                     user.setCompanyId(model.getCompanyId());
@@ -253,7 +263,6 @@ public class OrderService {
                     user.setStatus(1);
 
                     BaseResponse userResponse = companyUserController.createCompanyUser(user);
-                    log.info(StringUtil.toJsonString(userResponse));
                 }
             }
             else {

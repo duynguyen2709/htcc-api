@@ -24,7 +24,8 @@ public class CreateOrderService {
     private CreateOrderConfig createOrderConfig;
 
     public BaseResponse createOrder(CreateOrderRequest request) throws Exception {
-        String sig = HashUtil.hashSHA256(String.format("%s|%s", StringUtil.toJsonString(request), createOrderConfig.getHashKey()));
+        String sig = HashUtil.hashSHA256(String.format("%s|%s|%s",
+                request.getCompanyId(), request.getEmail(), createOrderConfig.getHashKey()));
 
         String url = String.format("%s%s?sig=%s", createOrderConfig.getBaseUrl(), createOrderConfig.getMethodName(), sig);
 
