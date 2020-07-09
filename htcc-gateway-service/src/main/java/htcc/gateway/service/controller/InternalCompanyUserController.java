@@ -18,9 +18,12 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @RestController
 @Log4j2
@@ -43,7 +46,7 @@ public class InternalCompanyUserController {
     //</editor-fold>
 
 
-    @PostMapping("/companyusers")
+    @PostMapping(value = "/companyusers", produces = {APPLICATION_JSON})
     public BaseResponse createUser(@RequestBody @Valid CompanyUserModel model) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -76,7 +79,7 @@ public class InternalCompanyUserController {
      * @param model
      * @return
      */
-    @PostMapping("/companyusers/delete")
+    @PostMapping(value = "/companyusers/delete", produces = {APPLICATION_JSON})
     public BaseResponse deleteUser(@RequestBody CompanyUserModel model) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -92,7 +95,7 @@ public class InternalCompanyUserController {
 
 
 
-    @GetMapping("/companyusers/{companyId}")
+    @GetMapping(value = "/companyusers/{companyId}", produces = {APPLICATION_JSON})
     public BaseResponse getCompanyUsers(@PathVariable String companyId) {
         BaseResponse<List<CompanyUserModel>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -113,7 +116,7 @@ public class InternalCompanyUserController {
 
 
 
-    @PostMapping("/companyusers/update")
+    @PostMapping(value = "/companyusers/update", produces = {APPLICATION_JSON})
     public BaseResponse updateCompanyUserInfo(@RequestBody @Valid CompanyUserModel user) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         boolean needUpdate = false;
@@ -154,7 +157,7 @@ public class InternalCompanyUserController {
 
 
 
-    @PostMapping("/companyusers/status")
+    @PostMapping(value = "/companyusers/status", produces = {APPLICATION_JSON})
     public BaseResponse updateCompanyUserStatus(@RequestBody CompanyUserModel user) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -216,7 +219,7 @@ public class InternalCompanyUserController {
         }
     }
 
-    @PostMapping("/companyusers/status/{companyId}/{newStatus}")
+    @PostMapping(value = "/companyusers/status/{companyId}/{newStatus}", produces = {APPLICATION_JSON})
     public BaseResponse updateAllCompanyUserStatus(@PathVariable String companyId, @PathVariable int newStatus) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         List<CompanyUser> listUser = new ArrayList<>();
