@@ -147,6 +147,7 @@ public class ManagerEmployeeInfoController {
             request.setCompanyId(companyId);
             request.setUsername(username);
             request.setAvatar(employeeInfo.getAvatar());
+            request.setManagerRole(employeeInfo.getManagerRole());
 
             if (!request.getEmail().equals(employeeInfo.getEmail()) ||
                     !request.getPhoneNumber().equals(employeeInfo.getPhoneNumber())) {

@@ -1,3 +1,5 @@
+import htcc.common.constant.ManagerActionEnum;
+import htcc.common.constant.ManagerRoleGroupEnum;
 import htcc.common.entity.order.CreateOrderRequest;
 import htcc.common.util.StringUtil;
 import org.junit.Test;
@@ -54,16 +56,16 @@ public class TestUtil {
     }
 
     @Test
-    public void testAES() throws NoSuchPaddingException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, UnsupportedEncodingException, InvalidKeyException {
-        CreateOrderRequest request = new CreateOrderRequest();
-        request.setComboId("CB1");
-        request.setCompanyId("TEST");
-        request.setEmail("naduy.hcmus@gmail.com");
-        request.setRequestedFeatures(new HashMap<>());
-        request.setFirstPay(true);
+    public void testRole() {
+        Map<String, Map<String, Boolean>> map = new HashMap<>();
+        for (ManagerRoleGroupEnum group : ManagerRoleGroupEnum.values()) {
+            map.put(group.getRoleGroup(), new HashMap<>());
+            List<ManagerActionEnum> actions = group.getActions();
+            for (ManagerActionEnum action : actions) {
+                map.get(group.getRoleGroup()).put(action.getValue(), true);
+            }
+        }
 
-        String raw = StringUtil.toJsonString(request);
-        String encode = URLEncoder.encode(raw, StandardCharsets.UTF_8.toString());
-        System.out.println(encode);
+        System.out.println(StringUtil.toJsonString(map));
     }
 }

@@ -1,6 +1,5 @@
 package htcc.common.entity.jpa;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
@@ -14,8 +13,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
@@ -104,6 +101,10 @@ public class EmployeeInfo extends BaseJPAEntity {
     @ApiModelProperty(notes = "(Bỏ qua) URL Ảnh đại diện (Default - không cần set)")
     public String avatar = "";
 
+    //new
+    @Column
+    public String managerRole = "";
+
     @Override
     public String isValid() {
 
@@ -149,6 +150,7 @@ public class EmployeeInfo extends BaseJPAEntity {
         this.title = other.title;
         this.level = other.level;
         this.avatar = other.avatar;
+        this.managerRole = other.managerRole;
     }
 
     public String getBirthDate(){

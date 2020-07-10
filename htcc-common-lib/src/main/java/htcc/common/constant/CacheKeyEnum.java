@@ -12,6 +12,7 @@ public enum CacheKeyEnum {
     SHIFT_TIME,
     FIXED_SHIFT,
     SHIFT_TEMPLATE,
+    MANAGER_ROLE,
 
     // Admin
     NOTI_ICON,

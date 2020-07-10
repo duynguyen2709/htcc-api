@@ -62,6 +62,7 @@ public class InternalCompanyUserController {
             employee.setIdentityCardNo(StringUtil.EMPTY);
             employee.setAddress(StringUtil.EMPTY);
             employee.setAvatar(Constant.USER_DEFAULT_AVATAR);
+            employee.setManagerRole(Constant.ROLE_SUPER_ADMIN);
 
             employee = service.create(employee);
             response.setData(employee);

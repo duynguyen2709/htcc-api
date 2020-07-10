@@ -1,18 +1,23 @@
 package htcc.employee.service.controller.home;
 
+import com.google.gson.reflect.TypeToken;
 import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.home.ManagerHomeResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.role.ManagerRole;
 import htcc.common.util.DateTimeUtil;
+import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.repository.EmployeePermissionRepository;
 import htcc.employee.service.service.LogService;
 import htcc.employee.service.service.checkin.CheckInService;
 import htcc.employee.service.service.complaint.ComplaintService;
 import htcc.employee.service.service.icon.IconService;
+import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.ManagerRoleService;
 import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,7 +28,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Api(tags = "API của quản lý",
@@ -50,6 +57,12 @@ public class ManagerHomeController {
     @Autowired
     private EmployeePermissionRepository permissionRepo;
 
+    @Autowired
+    private EmployeeInfoService employeeInfoService;
+
+    @Autowired
+    private ManagerRoleService managerRoleService;
+
     @ApiOperation(value = "API Home", response = ManagerHomeResponse.class)
     @GetMapping("/home/manager/{companyId}/{username}")
     public BaseResponse home(@ApiParam(value = "[Path] Mã công ty", required = true)
@@ -70,6 +83,7 @@ public class ManagerHomeController {
             setCanManageEmployees(data, companyId, username);
             setIsSuperAdmin(data, companyId, username);
             setIconList(data);
+            setRoleDetail(data, companyId, username);
             response.setData(data);
 
         } catch (Exception e) {
@@ -77,6 +91,27 @@ public class ManagerHomeController {
             response = new BaseResponse<>(e);
         }
         return response;
+    }
+
+    private void setRoleDetail(ManagerHomeResponse data, String companyId, String username) {
+        try {
+            EmployeeInfo employee = employeeInfoService.findById(
+                    new EmployeeInfo.Key(companyId, username));
+            if (employee == null) {
+                throw new Exception("employeeInfoService.findById return null");
+            }
+
+            String managerRole = employee.getManagerRole();
+            if (StringUtil.isEmpty(managerRole)) {
+                data.setRoleDetail(new HashMap<>());
+                return;
+            }
+            ManagerRole role = managerRoleService.findById(new ManagerRole.Key(companyId, managerRole));
+            data.setRoleDetail(role.getRoleDetail());
+        } catch (Exception e) {
+            log.error("[setRoleDetail] [{} - {}]", companyId, username, e);
+            data.setRoleDetail(new HashMap<>());
+        }
     }
 
     private void setIconList(ManagerHomeResponse data) {

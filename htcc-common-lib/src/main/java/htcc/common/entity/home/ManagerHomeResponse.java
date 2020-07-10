@@ -14,9 +14,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Data
 @ApiModel(description = "Response API Home")
@@ -57,5 +55,7 @@ public class ManagerHomeResponse implements Serializable {
 
     @ApiModelProperty(notes = "Danh sách icon (cho notification)")
     public List<NotificationIconConfig> iconList = new ArrayList<>();
+
+    public Map<String, Map<String, Boolean>> roleDetail = new HashMap<>();
 }
 

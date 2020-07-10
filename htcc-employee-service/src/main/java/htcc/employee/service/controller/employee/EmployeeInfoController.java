@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Api(tags = "API thông tin cá nhân",
      description = "API get/update thông tin cá nhân của nhân viên")
@@ -103,7 +102,7 @@ public class EmployeeInfoController {
         }
         try {
             model = new EmployeeInfo(companyId, username, employeeId, officeId, department, title, 0.0f, fullName, gender,
-                    null, email, identityCardNo, phoneNumber, address, StringUtil.EMPTY);
+                    null, email, identityCardNo, phoneNumber, address, StringUtil.EMPTY, StringUtil.EMPTY);
             model.setBirthDate(birthDate);
 
             // validate model

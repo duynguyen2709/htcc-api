@@ -5,6 +5,7 @@ import htcc.common.entity.jpa.BuzConfig;
 import htcc.common.entity.jpa.Company;
 import htcc.common.entity.jpa.Department;
 import htcc.common.entity.jpa.Office;
+import htcc.common.entity.role.ManagerRole;
 import htcc.common.entity.shift.FixedShiftArrangement;
 import htcc.common.entity.shift.ShiftArrangementTemplate;
 import htcc.common.entity.shift.ShiftTime;
@@ -29,6 +30,8 @@ public class DbStaticConfigMap {
     public static Map<String, List<WorkingDay>> WORKING_DAY_MAP = new HashMap<>();
 
     public static Map<String, List<ShiftTime>> SHIFT_TIME_MAP = new HashMap<>();
+
+    public static Map<String, ManagerRole> MANAGER_ROLE_MAP = new HashMap<>();
 
     // key = companyId
     // List Shift for 1 company
