@@ -1,6 +1,7 @@
 package htcc.employee.service.controller.role;
 
 import com.google.gson.reflect.TypeToken;
+import htcc.common.constant.Constant;
 import htcc.common.constant.ManagerActionEnum;
 import htcc.common.constant.ManagerRoleGroupEnum;
 import htcc.common.constant.ReturnCodeEnum;
@@ -55,8 +56,22 @@ public class ManagerRoleController {
                     }
                 }
             }
+
+            List<ManagerRole> roleList = managerRoleService.findByCompanyId(companyId);
+            if (!roleList.isEmpty()) {
+                // sort ROLE_SUPER_ADMIN to first position
+                for (int i = 1; i < roleList.size(); i++) {
+                    if (roleList.get(i).getRoleId().equals(Constant.ROLE_SUPER_ADMIN)) {
+                        ManagerRole temp = roleList.get(0);
+                        roleList.set(0, roleList.get(i));
+                        roleList.set(i, temp);
+                        break;
+                    }
+                }
+            }
+
             ManagerRoleResponse dataResponse = new ManagerRoleResponse();
-            dataResponse.setRoleList(managerRoleService.findByCompanyId(companyId));
+            dataResponse.setRoleList(roleList);
             dataResponse.setDefaultRoleDetail(defaultRoleDetail);
 
             response.setData(dataResponse);
@@ -168,6 +183,7 @@ public class ManagerRoleController {
 
             request.setCompanyId(companyId);
             request.setRoleId(roleId);
+            request.setRoleName(oldEntity.getRoleName());
 
             ManagerRole entity = managerRoleService.update(request);
             response.setData(entity);

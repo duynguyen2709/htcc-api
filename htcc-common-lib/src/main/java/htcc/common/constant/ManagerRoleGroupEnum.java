@@ -20,16 +20,19 @@ public enum ManagerRoleGroupEnum {
 
     COMPLAINT(7, "COMPLAINT", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.UPDATE)),
 
-    LEAVING_REQUEST(2, "LEAVING_REQUEST", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.UPDATE)),
+    LEAVING_REQUEST(2, "LEAVING_REQUEST", Arrays.asList(ManagerActionEnum.READ,
+            ManagerActionEnum.UPDATE, ManagerActionEnum.CREATE)),
 
-    CHECKIN(1, "CHECKIN", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.UPDATE)),
+    CHECKIN(1, "CHECKIN", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.UPDATE
+            , ManagerActionEnum.CREATE)),
 
     EMPLOYEE_MANAGE(1, "EMPLOYEE_MANAGE", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.CREATE,
             ManagerActionEnum.DELETE, ManagerActionEnum.UPDATE)),
 
     DAY_OFF(2, "DAY_OFF", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.UPDATE)),
 
-    WORKING_DAY(12, "WORKING_DAY", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.UPDATE)),
+    WORKING_DAY(12, "WORKING_DAY", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.UPDATE,
+            ManagerActionEnum.CREATE, ManagerActionEnum.DELETE)),
 
     SHIFT(12, "SHIFT", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.CREATE,
             ManagerActionEnum.DELETE, ManagerActionEnum.UPDATE)),

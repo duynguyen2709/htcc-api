@@ -35,7 +35,7 @@ public class ManagerRole extends BaseJPAEntity {
     @NotEmpty
     private String roleId = "";
     @Column
-    @NotEmpty
+//    @NotEmpty
     private String roleName = "";
     @Column
     @NotEmpty
@@ -58,9 +58,9 @@ public class ManagerRole extends BaseJPAEntity {
         if (StringUtil.isEmpty(roleId)) {
             return "Mã nhóm quyền không hợp lệ";
         }
-        if (StringUtil.isEmpty(roleName)) {
-            return "Tên nhóm quyền không hợp lệ";
-        }
+//        if (StringUtil.isEmpty(roleName)) {
+//            return "Tên nhóm quyền không hợp lệ";
+//        }
         try {
             Map<String, Map<String, Boolean>> map = StringUtil.json2Collection(roleDetail,
                     new TypeToken<Map<String, Map<String, Boolean>>>() {}.getType());

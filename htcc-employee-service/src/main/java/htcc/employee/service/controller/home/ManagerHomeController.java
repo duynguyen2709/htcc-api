@@ -1,6 +1,5 @@
 package htcc.employee.service.controller.home;
 
-import com.google.gson.reflect.TypeToken;
 import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Api(tags = "API của quản lý",
@@ -84,6 +82,7 @@ public class ManagerHomeController {
             setIsSuperAdmin(data, companyId, username);
             setIconList(data);
             setRoleDetail(data, companyId, username);
+            setLeavingRequestCategories(data, companyId);
             response.setData(data);
 
         } catch (Exception e) {
