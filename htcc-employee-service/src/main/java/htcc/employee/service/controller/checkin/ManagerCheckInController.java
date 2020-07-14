@@ -9,7 +9,7 @@ import htcc.common.entity.checkin.*;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.repository.EmployeePermissionRepository;
+import htcc.employee.service.repository.PermissionRepository;
 import htcc.employee.service.service.checkin.CheckInBuzService;
 import htcc.employee.service.service.checkin.CheckInService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
@@ -39,7 +39,7 @@ public class ManagerCheckInController {
     private EmployeeStatisticService statisticService;
 
     @Autowired
-    private EmployeePermissionRepository permissionRepository;
+    private PermissionRepository permissionRepository;
 
     @Autowired
     private CheckInService checkInService;

@@ -6,16 +6,17 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.home.ManagerHomeResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.role.EmployeePermission;
 import htcc.common.entity.role.ManagerRole;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
-import htcc.employee.service.repository.EmployeePermissionRepository;
+import htcc.employee.service.repository.PermissionRepository;
 import htcc.employee.service.service.LogService;
 import htcc.employee.service.service.checkin.CheckInService;
 import htcc.employee.service.service.complaint.ComplaintService;
 import htcc.employee.service.service.icon.IconService;
-import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.EmployeePermissionService;
 import htcc.employee.service.service.jpa.ManagerRoleService;
 import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import io.swagger.annotations.Api;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,10 +55,10 @@ public class ManagerHomeController {
     private CheckInService checkInService;
 
     @Autowired
-    private EmployeePermissionRepository permissionRepo;
+    private PermissionRepository permissionRepo;
 
     @Autowired
-    private EmployeeInfoService employeeInfoService;
+    private EmployeePermissionService employeePermissionService;
 
     @Autowired
     private ManagerRoleService managerRoleService;
@@ -82,6 +84,7 @@ public class ManagerHomeController {
             setIsSuperAdmin(data, companyId, username);
             setIconList(data);
             setRoleDetail(data, companyId, username);
+            setCanAssignRoles(data, companyId, username);
             setLeavingRequestCategories(data, companyId);
             response.setData(data);
 
@@ -92,10 +95,36 @@ public class ManagerHomeController {
         return response;
     }
 
+    private void setCanAssignRoles(ManagerHomeResponse data, String companyId, String username) {
+        try {
+            EmployeePermission employee = employeePermissionService.findById(
+                    new EmployeePermission.Key(companyId, username));
+            if (employee == null) {
+                throw new Exception("employeeInfoService.findById return null");
+            }
+
+            String managerRole = employee.getManagerRole();
+            if (StringUtil.isEmpty(managerRole)) {
+                data.setCanAssignRoles(new ArrayList<>());
+                return;
+            }
+            ManagerRole role = managerRoleService.findById(new ManagerRole.Key(companyId, managerRole));
+            int roleLevel = role.getRoleLevel();
+            List<ManagerRole> canAssignRoles = managerRoleService.findByCompanyId(companyId)
+                    .stream()
+                    .filter(c -> c.getRoleLevel() >= roleLevel)
+                    .collect(Collectors.toList());
+            data.setCanAssignRoles(canAssignRoles);
+        } catch (Exception e) {
+            log.error("[setCanAssignRoles] [{} - {}]", companyId, username, e);
+            data.setCanAssignRoles(new ArrayList<>());
+        }
+    }
+
     private void setRoleDetail(ManagerHomeResponse data, String companyId, String username) {
         try {
-            EmployeeInfo employee = employeeInfoService.findById(
-                    new EmployeeInfo.Key(companyId, username));
+            EmployeePermission employee = employeePermissionService.findById(
+                    new EmployeePermission.Key(companyId, username));
             if (employee == null) {
                 throw new Exception("employeeInfoService.findById return null");
             }

@@ -6,10 +6,13 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.constant.ServiceSystemEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.jpa.ExtendedEmployeeInfo;
 import htcc.common.entity.log.RequestLogEntity;
+import htcc.common.entity.role.EmployeePermission;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.googledrive.GoogleDriveService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.EmployeePermissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -32,6 +35,9 @@ public class EmployeeInfoController {
     private EmployeeInfoService service;
 
     @Autowired
+    private EmployeePermissionService employeePermissionService;
+
+    @Autowired
     private GoogleDriveService driveService;
 
     @Autowired
@@ -43,14 +49,20 @@ public class EmployeeInfoController {
     @GetMapping("/users/{companyId}/{username}")
     public BaseResponse getUserInfo(@ApiParam(value = "[Path] Mã công ty", required = true) @PathVariable(required = true) String companyId,
                                        @ApiParam(value = "[Path] Tên đăng nhập", required = true) @PathVariable(required = true) String username) {
-        BaseResponse<EmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
+        BaseResponse<ExtendedEmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             EmployeeInfo user = service.findById(new EmployeeInfo.Key(companyId, username));
             if (user == null) {
                 return new BaseResponse<>(ReturnCodeEnum.USER_NOT_FOUND);
             }
 
-            response.data = user;
+            EmployeePermission permission = employeePermissionService.findById(
+                    new EmployeePermission.Key(companyId, username));
+            ExtendedEmployeeInfo dataResponse = new ExtendedEmployeeInfo(user);
+            if (permission != null) {
+                dataResponse.setManagerRole(permission.getManagerRole());
+            }
+            response.setData(dataResponse);
         } catch (Exception e){
             log.error(String.format("getUserInfo [%s - %s] ex", companyId, username), e);
             response = new BaseResponse<>(e);
@@ -102,7 +114,7 @@ public class EmployeeInfoController {
         }
         try {
             model = new EmployeeInfo(companyId, username, employeeId, officeId, department, title, 0.0f, fullName, gender,
-                    null, email, identityCardNo, phoneNumber, address, StringUtil.EMPTY, StringUtil.EMPTY);
+                    null, email, identityCardNo, phoneNumber, address, StringUtil.EMPTY);
             model.setBirthDate(birthDate);
 
             // validate model

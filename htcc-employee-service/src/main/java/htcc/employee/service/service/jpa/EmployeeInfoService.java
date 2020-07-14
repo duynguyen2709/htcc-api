@@ -150,9 +150,11 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
             for (EmployeeInfo employee : listEmployee) {
                 employee.setOfficeId(StringUtil.EMPTY);
             }
-            repo.saveAll(listEmployee);
-            for (EmployeeInfo employee : listEmployee) {
-                redis.deleteEmployeeInfo(new EmployeeInfo.Key(employee.getCompanyId(), employee.getUsername()));
+            if (!listEmployee.isEmpty()) {
+                repo.saveAll(listEmployee);
+                for (EmployeeInfo employee : listEmployee) {
+                    redis.deleteEmployeeInfo(new EmployeeInfo.Key(employee.getCompanyId(), employee.getUsername()));
+                }
             }
         } catch (Exception e) {
             log.error(String.format("[deleteOffice] [%s-%s] ex", companyId, officeId), e);
@@ -165,9 +167,11 @@ public class EmployeeInfoService extends BaseJPAService<EmployeeInfo, EmployeeIn
             for (EmployeeInfo employee : listEmployee) {
                 employee.setDepartment(StringUtil.EMPTY);
             }
-            repo.saveAll(listEmployee);
-            for (EmployeeInfo employee : listEmployee) {
-                redis.deleteEmployeeInfo(new EmployeeInfo.Key(employee.getCompanyId(), employee.getUsername()));
+            if (!listEmployee.isEmpty()) {
+                repo.saveAll(listEmployee);
+                for (EmployeeInfo employee : listEmployee) {
+                    redis.deleteEmployeeInfo(new EmployeeInfo.Key(employee.getCompanyId(), employee.getUsername()));
+                }
             }
         } catch (Exception e) {
             log.error(String.format("[deleteDepartment] [%s-%s] ex", companyId, department), e);

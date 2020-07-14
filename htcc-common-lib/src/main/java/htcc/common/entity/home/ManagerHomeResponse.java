@@ -3,6 +3,7 @@ package htcc.common.entity.home;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import htcc.common.entity.icon.NotificationIconConfig;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.role.ManagerRole;
 import htcc.common.util.DateTimeUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -57,5 +58,7 @@ public class ManagerHomeResponse implements Serializable {
     public List<NotificationIconConfig> iconList = new ArrayList<>();
 
     public Map<String, Map<String, Boolean>> roleDetail = new HashMap<>();
+
+    public List<ManagerRole> canAssignRoles = new ArrayList<>();
 }
 

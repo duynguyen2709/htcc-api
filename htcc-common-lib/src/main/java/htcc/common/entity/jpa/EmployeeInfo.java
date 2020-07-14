@@ -101,10 +101,6 @@ public class EmployeeInfo extends BaseJPAEntity {
     @ApiModelProperty(notes = "(Bỏ qua) URL Ảnh đại diện (Default - không cần set)")
     public String avatar = "";
 
-    //new
-    @Column
-    public String managerRole = "";
-
     @Override
     public String isValid() {
 
@@ -150,7 +146,6 @@ public class EmployeeInfo extends BaseJPAEntity {
         this.title = other.title;
         this.level = other.level;
         this.avatar = other.avatar;
-        this.managerRole = other.managerRole;
     }
 
     public String getBirthDate(){

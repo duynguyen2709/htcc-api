@@ -8,9 +8,11 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.companyuser.CompanyUserModel;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.ExtendedEmployeeInfo;
+import htcc.common.entity.role.EmployeePermission;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.GatewayService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.EmployeePermissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -31,6 +33,9 @@ public class ManagerEmployeeInfoController {
 
     @Autowired
     private EmployeeInfoService employeeInfoService;
+
+    @Autowired
+    private EmployeePermissionService employeePermissionService;
 
     @Autowired
     private KafkaProducerService kafka;
@@ -110,6 +115,17 @@ public class ManagerEmployeeInfoController {
                 }
                 else {
                     kafka.sendMessage(kafka.getBuzConfig().getEventCreateUser().getTopicName(), companyUserModel);
+
+                    EmployeePermission permission = new EmployeePermission();
+                    permission.setCompanyId(request.getCompanyId());
+                    permission.setUsername(request.getUsername());
+                    permission.setLineManager(StringUtil.EMPTY);
+                    permission.setSubManagers(new ArrayList<>());
+                    permission.setSubordinates(new ArrayList<>());
+                    permission.setCanManageOffices(new ArrayList<>());
+                    permission.setCanManageDepartments(new ArrayList<>());
+                    permission.setManagerRole(StringUtil.EMPTY);
+                    employeePermissionService.create(permission);
                 }
             }
 
@@ -147,7 +163,6 @@ public class ManagerEmployeeInfoController {
             request.setCompanyId(companyId);
             request.setUsername(username);
             request.setAvatar(employeeInfo.getAvatar());
-            request.setManagerRole(employeeInfo.getManagerRole());
 
             if (!request.getEmail().equals(employeeInfo.getEmail()) ||
                     !request.getPhoneNumber().equals(employeeInfo.getPhoneNumber())) {

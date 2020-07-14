@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.Map;
@@ -38,6 +39,8 @@ public class ManagerRole extends BaseJPAEntity {
 //    @NotEmpty
     private String roleName = "";
     @Column
+    private int roleLevel = 0;
+    @Column
     @NotEmpty
     private String roleDetail = "";
 
@@ -58,9 +61,9 @@ public class ManagerRole extends BaseJPAEntity {
         if (StringUtil.isEmpty(roleId)) {
             return "Mã nhóm quyền không hợp lệ";
         }
-//        if (StringUtil.isEmpty(roleName)) {
-//            return "Tên nhóm quyền không hợp lệ";
-//        }
+        if (roleLevel < 0) {
+            return "Cấp bậc không hợp lệ";
+        }
         try {
             Map<String, Map<String, Boolean>> map = StringUtil.json2Collection(roleDetail,
                     new TypeToken<Map<String, Map<String, Boolean>>>() {}.getType());

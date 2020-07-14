@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface EmployeePermissionRepository {
+public interface PermissionRepository {
 
     boolean canManageOffice(String companyId, String actor, String officeId);
 

@@ -8,7 +8,7 @@ import htcc.common.entity.shift.FixedShiftArrangement;
 import htcc.common.entity.shift.ShiftArrangementModel;
 import htcc.common.entity.shift.ShiftTime;
 import htcc.common.util.DateTimeUtil;
-import htcc.employee.service.repository.EmployeePermissionRepository;
+import htcc.employee.service.repository.PermissionRepository;
 import htcc.employee.service.service.jpa.FixedShiftArrangementService;
 import htcc.employee.service.service.jpa.OfficeService;
 import htcc.employee.service.service.jpa.ShiftTimeService;
@@ -43,7 +43,7 @@ public class EmployeeShiftArrangementController {
     private OfficeService officeService;
 
     @Autowired
-    private EmployeePermissionRepository permissionRepo;
+    private PermissionRepository permissionRepo;
 
     @GetMapping("/shifts/personal/{companyId}/{username}/{yyyyMM}")
     public BaseResponse getShiftTimeInfo(@PathVariable String companyId,
