@@ -57,6 +57,7 @@ public class EmployeePermissionController {
             }
 
             EmployeePermissionResponse dataResponse = new EmployeePermissionResponse();
+            EmployeePermissionResponse.DataView dataView = new EmployeePermissionResponse.DataView();
 
             // set LineManager
             if (!permission.getLineManager().isEmpty()) {
@@ -64,7 +65,7 @@ public class EmployeePermissionController {
                 if (lineManager == null) {
                     throw new Exception("employeeInfoService.findById return null : " + permission.getLineManager());
                 }
-                dataResponse.setLineManager(new MiniEmployeeInfo(lineManager));
+                dataView.setLineManager(new MiniEmployeeInfo(lineManager));
             }
 
             // set subManagers
@@ -76,19 +77,19 @@ public class EmployeePermissionController {
                 }
                 subManagers.add(new MiniEmployeeInfo(manager));
             }
-            dataResponse.setSubManagers(subManagers);
+            dataView.setSubManagers(subManagers);
 
             // set subordinates
             List<MiniEmployeeInfo> subordinates = permissionRepository.getCanManageEmployees(companyId, username)
-                                   .stream().map(c -> new MiniEmployeeInfo(c)).collect(Collectors.toList());
-            dataResponse.setSubordinates(subordinates);
+                                   .stream().map(MiniEmployeeInfo::new).collect(Collectors.toList());
+            dataView.setSubordinates(subordinates);
 
             // set ManagerRole
             ManagerRole managerRole = managerRoleService.findById(new ManagerRole.Key(companyId, permission.getManagerRole()));
             if (managerRole == null) {
                 throw new Exception("managerRoleService.findById return null : " + permission.getManagerRole());
             }
-            dataResponse.setManagerRole(managerRole);
+            dataView.setManagerRole(managerRole);
 
             // set offices
             List<Office> officeList = new ArrayList<>();
@@ -99,7 +100,7 @@ public class EmployeePermissionController {
                 }
                 officeList.add(office);
             }
-            dataResponse.setCanManageOffices(officeList);
+            dataView.setCanManageOffices(officeList);
 
             // set departments
             List<Department> departmentList = new ArrayList<>();
@@ -110,8 +111,10 @@ public class EmployeePermissionController {
                 }
                 departmentList.add(department);
             }
-            dataResponse.setCanManageDepartments(departmentList);
+            dataView.setCanManageDepartments(departmentList);
 
+            dataResponse.setDataView(dataView);
+            dataResponse.setDataEdit(permission);
             response.setData(dataResponse);
         } catch (Exception e) {
             log.error("[getEmployeePermission] [{}-{}] ex", companyId, username, e);
