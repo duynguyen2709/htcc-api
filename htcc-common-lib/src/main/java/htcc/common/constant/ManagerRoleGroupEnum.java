@@ -47,7 +47,10 @@ public enum ManagerRoleGroupEnum {
             ManagerActionEnum.DELETE, ManagerActionEnum.UPDATE)),
 
     PERMISSION(1, "PERMISSION", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.CREATE,
-            ManagerActionEnum.DELETE, ManagerActionEnum.UPDATE))
+            ManagerActionEnum.DELETE, ManagerActionEnum.UPDATE)),
+
+    EMPLOYEE_PERMISSION(1, "EMPLOYEE_PERMISSION", Arrays.asList(ManagerActionEnum.READ, ManagerActionEnum.UPDATE)),
+
     ;
 
     private final int screenId;
