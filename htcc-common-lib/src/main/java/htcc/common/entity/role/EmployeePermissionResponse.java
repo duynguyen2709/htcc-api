@@ -28,5 +28,6 @@ public class EmployeePermissionResponse implements Serializable {
         private List<Office>           canManageOffices;
         private List<Department>       canManageDepartments;
         private ManagerRole            managerRole;
+        private MiniEmployeeInfo       self;
     }
 }

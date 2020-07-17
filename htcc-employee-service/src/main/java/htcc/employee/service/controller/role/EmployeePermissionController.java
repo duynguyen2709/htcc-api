@@ -59,6 +59,13 @@ public class EmployeePermissionController {
             EmployeePermissionResponse dataResponse = new EmployeePermissionResponse();
             EmployeePermissionResponse.DataView dataView = new EmployeePermissionResponse.DataView();
 
+            // set Self Info
+            EmployeeInfo self = employeeInfoService.findById(new EmployeeInfo.Key(companyId, username));
+            if (self == null) {
+                throw new Exception("employeeInfoService.findById return null : " + username);
+            }
+            dataView.setLineManager(new MiniEmployeeInfo(self));
+
             // set LineManager
             if (!permission.getLineManager().isEmpty()) {
                 EmployeeInfo lineManager = employeeInfoService.findById(new EmployeeInfo.Key(companyId, permission.getLineManager()));

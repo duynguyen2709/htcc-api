@@ -315,3 +315,7 @@
 14-07-2020:
  + Version 2.7.1:
     - API EmployeePermission
+
+17-07-2020:
+ + Version 2.7.2:
+    - Fixed some bugs

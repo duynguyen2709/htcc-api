@@ -251,7 +251,10 @@ public class LeavingRequestController {
 
             List<LeavingRequest.LeavingDayDetail> dayDetailList = detailMap.get(date);
             for (LeavingRequest.LeavingDayDetail detail : dayDetailList) {
-                if (!isConflictSession(detail, shiftArrangementList) || !isFixedShiftConflictSession(detail, fixedShift)) {
+                if (!shiftArrangementList.isEmpty() && !isConflictSession(detail, shiftArrangementList)) {
+                    toRemove.add(detail);
+                }
+                else if (!fixedShift.isEmpty() && !isFixedShiftConflictSession(detail, fixedShift)) {
                     toRemove.add(detail);
                 }
             }
