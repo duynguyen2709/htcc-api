@@ -64,7 +64,7 @@ public class EmployeePermissionController {
             if (self == null) {
                 throw new Exception("employeeInfoService.findById return null : " + username);
             }
-            dataView.setLineManager(new MiniEmployeeInfo(self));
+            dataView.setSelf(new MiniEmployeeInfo(self));
 
             // set LineManager
             if (!permission.getLineManager().isEmpty()) {
