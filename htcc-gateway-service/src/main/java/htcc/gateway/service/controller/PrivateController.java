@@ -14,6 +14,7 @@ import htcc.common.entity.request.ChangePasswordRequest;
 import htcc.common.entity.request.LoginRequest;
 import htcc.gateway.service.service.authentication.AuthenticationService;
 import htcc.gateway.service.service.authentication.JwtTokenService;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -67,6 +68,7 @@ public class PrivateController {
                     StringUtil.valueOf(loginInfo.companyId),
                     loginInfo.username);
 
+        } catch (ExpiredJwtException ignored) {
         } catch (Exception e) {
             log.error("[logout] ex", e);
             response = new BaseResponse(e);

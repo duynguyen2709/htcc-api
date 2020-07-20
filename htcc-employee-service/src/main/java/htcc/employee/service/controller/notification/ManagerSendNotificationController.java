@@ -9,7 +9,7 @@ import htcc.common.entity.notification.ManagerSendNotificationRequest;
 import htcc.common.entity.notification.NotificationModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.repository.EmployeePermissionRepository;
+import htcc.employee.service.repository.PermissionRepository;
 import htcc.employee.service.service.icon.IconService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.notification.NotificationService;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class ManagerSendNotificationController {
 
     @Autowired
-    private EmployeePermissionRepository permissionRepo;
+    private PermissionRepository permissionRepo;
 
     @Autowired
     private NotificationService notificationService;

@@ -20,6 +20,8 @@ public class ExtendedEmployeeInfo extends EmployeeInfo {
                       example = "1")
     public int status = 1;
 
+    public String managerRole = "";
+
     public ExtendedEmployeeInfo(EmployeeInfo entity) {
         this.companyId = entity.getCompanyId();
         this.username = entity.getUsername();

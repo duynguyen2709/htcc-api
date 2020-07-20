@@ -6,8 +6,10 @@ import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.companyuser.CompanyUserModel;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.role.EmployeePermission;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.EmployeePermissionService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,8 +31,8 @@ public class InternalCompanyUserController {
     @Autowired
     private EmployeeInfoService service;
 
-
-
+    @Autowired
+    private EmployeePermissionService employeePermissionService;
 
     @PostMapping("/employeeinfo")
     public BaseResponse createDefaultEmployee(@RequestBody CompanyUserModel model) {
@@ -62,8 +65,19 @@ public class InternalCompanyUserController {
             employee.setIdentityCardNo(StringUtil.EMPTY);
             employee.setAddress(StringUtil.EMPTY);
             employee.setAvatar(Constant.USER_DEFAULT_AVATAR);
-
             employee = service.create(employee);
+
+            EmployeePermission permission = new EmployeePermission();
+            permission.setCompanyId(model.getCompanyId());
+            permission.setUsername(model.getUsername());
+            permission.setLineManager(StringUtil.EMPTY);
+            permission.setSubManagers(new ArrayList<>());
+            permission.setSubordinates(new ArrayList<>());
+            permission.setCanManageOffices(new ArrayList<>());
+            permission.setCanManageDepartments(new ArrayList<>());
+            permission.setManagerRole(Constant.ROLE_SUPER_ADMIN);
+            employeePermissionService.create(permission);
+
             response.setData(employee);
         } catch (Exception e) {
             log.error("[createDefaultEmployee] {} ex", StringUtil.toJsonString(model), e);

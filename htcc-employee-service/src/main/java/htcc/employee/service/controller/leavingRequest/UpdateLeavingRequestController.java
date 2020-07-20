@@ -8,7 +8,7 @@ import htcc.common.entity.leavingrequest.LeavingRequestResponse;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
-import htcc.employee.service.repository.EmployeePermissionRepository;
+import htcc.employee.service.repository.PermissionRepository;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import io.swagger.annotations.Api;
@@ -36,7 +36,7 @@ public class UpdateLeavingRequestController {
     private EmployeeInfoService employeeInfoService;
 
     @Autowired
-    private EmployeePermissionRepository permissionRepository;
+    private PermissionRepository permissionRepository;
 
     @ApiOperation(value = "Lấy danh sách đơn xin nghỉ phép", response = LeavingRequestResponse.class)
     @GetMapping("/leaving/{companyId}/{month}")

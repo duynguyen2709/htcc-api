@@ -11,6 +11,7 @@ import htcc.common.entity.jpa.BuzConfig;
 import htcc.common.entity.jpa.Company;
 import htcc.common.entity.jpa.Department;
 import htcc.common.entity.jpa.Office;
+import htcc.common.entity.role.ManagerRole;
 import htcc.common.entity.shift.FixedShiftArrangement;
 import htcc.common.entity.shift.ShiftArrangementTemplate;
 import htcc.common.entity.shift.ShiftTime;
@@ -60,6 +61,9 @@ public class HazelcastLoader {
     @Autowired
     private ShiftArrangementTemplateRepository shiftArrangementTemplateRepository;
 
+    @Autowired
+    private ManagerRoleRepository managerRoleRepository;
+
     @PostConstruct
     public void loadAllStaticMap() throws Exception {
         log.info("####### Started Loading Static Config Map ########\n");
@@ -81,7 +85,20 @@ public class HazelcastLoader {
 
         loadShiftArrangementTemplateMap();
 
+        loadManagerRoleMap();
+
         log.info("####### Loaded All Static Config Map Done ########\n");
+    }
+
+    public void loadManagerRoleMap() {
+        Map<String, ManagerRole> map = new HashMap<>();
+
+        managerRoleRepository.findAll()
+                .forEach(c -> map.put(c.getCompanyId() + "_" + c.getRoleId(), c));
+
+        MANAGER_ROLE_MAP = hazelcastService.reload(map, CacheKeyEnum.MANAGER_ROLE);
+        log.info("[loadManagerRoleMap] MANAGER_ROLE_MAP loaded succeed \n{}",
+                StringUtil.toJsonString(MANAGER_ROLE_MAP));
     }
 
     public void loadShiftArrangementTemplateMap() {
@@ -97,7 +114,7 @@ public class HazelcastLoader {
         });
 
         SHIFT_TEMPLATE_MAP = hazelcastService.reload(map, CacheKeyEnum.SHIFT_TEMPLATE);
-        log.info("[loadShiftArrangementTemplateMap] SHIFT_TEMPLATE_MAP loaded succeed [{}]",
+        log.info("[loadShiftArrangementTemplateMap] SHIFT_TEMPLATE_MAP loaded succeed \n{}",
                 StringUtil.toJsonString(SHIFT_TEMPLATE_MAP));
     }
 
@@ -114,7 +131,7 @@ public class HazelcastLoader {
         });
 
         FIXED_SHIFT_MAP = hazelcastService.reload(map, CacheKeyEnum.FIXED_SHIFT);
-        log.info("[loadFixedShiftArrangementMap] FIXED_SHIFT_MAP loaded succeed [{}]",
+        log.info("[loadFixedShiftArrangementMap] FIXED_SHIFT_MAP loaded succeed \n{}",
                 StringUtil.toJsonString(FIXED_SHIFT_MAP));
 
     }
@@ -132,7 +149,7 @@ public class HazelcastLoader {
         });
 
         SHIFT_TIME_MAP = hazelcastService.reload(map, CacheKeyEnum.SHIFT_TIME);
-        log.info("[loadShiftTimeMap] SHIFT_TIME_MAP loaded succeed [{}]", StringUtil.toJsonString(SHIFT_TIME_MAP));
+        log.info("[loadShiftTimeMap] SHIFT_TIME_MAP loaded succeed \n{}", StringUtil.toJsonString(SHIFT_TIME_MAP));
 
     }
 
@@ -176,7 +193,7 @@ public class HazelcastLoader {
         }
 
         WORKING_DAY_MAP = hazelcastService.reload(map, CacheKeyEnum.WORKING_DAY);
-        log.info("[loadWorkingDayMap] WORKING_DAY_MAP loaded succeed [{}]", StringUtil.toJsonString(WORKING_DAY_MAP));
+        log.info("[loadWorkingDayMap] WORKING_DAY_MAP loaded succeed \n{}", StringUtil.toJsonString(WORKING_DAY_MAP));
     }
 
     public void loadCompanyMap() {
@@ -185,7 +202,7 @@ public class HazelcastLoader {
         companyRepository.findAll().forEach(c -> map.put(c.getCompanyId(), c));
 
         COMPANY_MAP = hazelcastService.reload(map, CacheKeyEnum.COMPANY);
-        log.info("[loadCompanyMap] COMPANY_MAP loaded succeed [{}]", StringUtil.toJsonString(COMPANY_MAP));
+        log.info("[loadCompanyMap] COMPANY_MAP loaded succeed \n{}", StringUtil.toJsonString(COMPANY_MAP));
     }
 
     public void loadOfficeMap(){
@@ -194,7 +211,7 @@ public class HazelcastLoader {
         officeRepository.findAll().forEach(c -> map.put(c.getCompanyId() + "_" + c.getOfficeId(), c));
 
         OFFICE_MAP = hazelcastService.reload(map, CacheKeyEnum.OFFICE);
-        log.info("[loadOfficeMap] OFFICE_MAP loaded succeed [{}]", StringUtil.toJsonString(OFFICE_MAP));
+        log.info("[loadOfficeMap] OFFICE_MAP loaded succeed \n{}", StringUtil.toJsonString(OFFICE_MAP));
     }
 
     public void loadDepartmentMap() {
@@ -203,7 +220,7 @@ public class HazelcastLoader {
         departmentRepository.findAll().forEach(c -> map.put(c.getCompanyId() + "_" + c.getDepartment(), c));
 
         DEPARTMENT_MAP = hazelcastService.reload(map, CacheKeyEnum.DEPARTMENT);
-        log.info("[loadDepartmentMap] DEPARTMENT_MAP loaded succeed [{}]", StringUtil.toJsonString(DEPARTMENT_MAP));
+        log.info("[loadDepartmentMap] DEPARTMENT_MAP loaded succeed \n{}", StringUtil.toJsonString(DEPARTMENT_MAP));
     }
 
     public void loadCompanyDayOffInfoMap() throws Exception {
@@ -238,7 +255,7 @@ public class HazelcastLoader {
         }
 
         COMPANY_DAY_OFF_INFO_MAP = hazelcastService.reload(map, CacheKeyEnum.COMPANY_DAY_OFF);
-        log.info("[loadCompanyDayOffInfoMap] COMPANY_DAY_OFF_INFO_MAP loaded succeed [{}]", StringUtil.toJsonString(COMPANY_DAY_OFF_INFO_MAP));
+        log.info("[loadCompanyDayOffInfoMap] COMPANY_DAY_OFF_INFO_MAP loaded succeed \n{}", StringUtil.toJsonString(COMPANY_DAY_OFF_INFO_MAP));
     }
 
     public void loadBuzConfigMap() {

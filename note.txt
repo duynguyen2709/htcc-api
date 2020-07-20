@@ -307,3 +307,15 @@
 09-07-2020:
  + Version 2.6.1:
     - Fix bug wrong sig createorder & add SupportedScreens for Company
+
+10-07-2020:
+ + Version 2.7.0:
+    - API ManagerRole
+
+14-07-2020:
+ + Version 2.7.1:
+    - API EmployeePermission
+
+17-07-2020:
+ + Version 2.7.2:
+    - Fixed some bugs

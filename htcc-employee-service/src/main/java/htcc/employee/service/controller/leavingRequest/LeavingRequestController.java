@@ -6,13 +6,17 @@ import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.dayoff.CompanyDayOffInfo;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.leavingrequest.*;
+import htcc.common.entity.shift.FixedShiftArrangement;
 import htcc.common.entity.shift.ShiftArrangementModel;
+import htcc.common.entity.shift.ShiftTime;
 import htcc.common.entity.workingday.WorkingDay;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
 import htcc.employee.service.config.ServiceConfig;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.FixedShiftArrangementService;
+import htcc.employee.service.service.jpa.ShiftTimeService;
 import htcc.employee.service.service.jpa.WorkingDayService;
 import htcc.employee.service.service.leavingrequest.LeavingRequestService;
 import htcc.employee.service.service.shiftarrangement.ShiftArrangementService;
@@ -51,6 +55,12 @@ public class LeavingRequestController {
 
     @Autowired
     private ShiftArrangementService shiftArrangementService;
+
+    @Autowired
+    private FixedShiftArrangementService fixedShiftArrangementService;
+
+    @Autowired
+    private ShiftTimeService shiftTimeService;
 
     @ApiOperation(value = "Lấy thông tin phép còn lại & đơn đã submit", response = LeavingRequestInfo.class)
     @GetMapping("/leaving/{companyId}/{username}/{yyyy}")
@@ -229,15 +239,22 @@ public class LeavingRequestController {
             if (shiftArrangementList == null) {
                 throw new Exception("[shiftArrangementService.getShiftArrangementListByEmployee] return null");
             }
+            int weekDay = DateTimeUtil.getWeekDayInt(date);
+            List<FixedShiftArrangement> fixedShift = fixedShiftArrangementService.findByCompanyIdAndUsernameAndWeekday(
+                    model.getCompanyId(), model.getUsername(), weekDay
+            );
 
-            if (shiftArrangementList.isEmpty()) {
+            if (shiftArrangementList.isEmpty() && fixedShift.isEmpty()) {
                 toRemove.addAll(detailMap.get(date));
                 continue;
             }
 
             List<LeavingRequest.LeavingDayDetail> dayDetailList = detailMap.get(date);
             for (LeavingRequest.LeavingDayDetail detail : dayDetailList) {
-                if (!isConflictSession(detail, shiftArrangementList)) {
+                if (!shiftArrangementList.isEmpty() && !isConflictSession(detail, shiftArrangementList)) {
+                    toRemove.add(detail);
+                }
+                else if (!fixedShift.isEmpty() && !isFixedShiftConflictSession(detail, fixedShift)) {
                     toRemove.add(detail);
                 }
             }
@@ -253,6 +270,24 @@ public class LeavingRequestController {
             }
 
             if (model.getShiftTime().getSession() == detail.getSession()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isFixedShiftConflictSession(LeavingRequest.LeavingDayDetail detail, List<FixedShiftArrangement> shiftArrangementList) {
+        for (FixedShiftArrangement model : shiftArrangementList) {
+            ShiftTime shiftTime = shiftTimeService.findById(new ShiftTime.Key(model.getCompanyId(), model.getOfficeId(), model.getShiftId()));
+            if (shiftTime == null) {
+                continue;
+            }
+            if (shiftTime.getSession() == SessionEnum.FULL_DAY.getValue()) {
+                return true;
+            }
+
+            if (shiftTime.getSession() == detail.getSession()) {
                 return true;
             }
         }

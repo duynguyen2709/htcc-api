@@ -1,6 +1,5 @@
 package htcc.common.entity.jpa;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
@@ -14,8 +13,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
