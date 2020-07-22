@@ -41,9 +41,7 @@ public class GatewayCompanyUserService {
         try {
             HttpEntity<CompanyUserModel> request = new HttpEntity<>(model);
             String method = "/companyusers";
-            ResponseEntity<BaseResponse> entity =
-                    restTemplate.postForEntity(baseURL + method, model, BaseResponse.class);
-            return entity.getBody();
+            return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
         } catch (Exception e) {
             log.error(e);
             return new BaseResponse(e);
