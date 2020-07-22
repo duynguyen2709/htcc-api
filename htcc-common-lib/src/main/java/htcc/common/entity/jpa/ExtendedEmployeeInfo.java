@@ -29,6 +29,7 @@ public class ExtendedEmployeeInfo extends EmployeeInfo {
         this.officeId = entity.getOfficeId();
         this.department = entity.getDepartment();
         this.title = entity.getTitle();
+        this.level = entity.getLevel();
         this.fullName = entity.getFullName();
         this.gender = entity.getGender();
         this.birthDate = entity.birthDate;
