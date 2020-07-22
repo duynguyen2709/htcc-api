@@ -54,7 +54,7 @@ public class ServletConfig {
 
         // Note: here we are making this converter to process any kind of response,
         // not only application/*json, which is the default behaviour
-        converter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.TEXT_HTML));
+        converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
         messageConverters.add(converter);
         restTemplate.setMessageConverters(messageConverters);
         return restTemplate;
