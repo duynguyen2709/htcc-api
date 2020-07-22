@@ -108,10 +108,16 @@ public class CheckInLogRepositoryImpl implements CheckInLogRepository {
 
             List<CheckinModel> response = new ArrayList<>();
             for (CheckInLogEntity logEnt : listCheckInLog) {
-                response.add(new CheckinModel(logEnt));
+                if (logEnt.getStatus() == ComplaintStatusEnum.PROCESSING.getValue() ||
+                        !logEnt.getApprover().isEmpty()) {
+                    response.add(new CheckinModel(logEnt));
+                }
             }
             for (CheckOutLogEntity logEnt : listCheckOutLog) {
-                response.add(new CheckinModel(logEnt));
+                if (logEnt.getStatus() == ComplaintStatusEnum.PROCESSING.getValue() ||
+                        !logEnt.getApprover().isEmpty()) {
+                    response.add(new CheckinModel(logEnt));
+                }
             }
             return response;
         } catch (IncorrectResultSizeDataAccessException ignored){
