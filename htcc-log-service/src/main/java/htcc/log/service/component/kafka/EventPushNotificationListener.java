@@ -83,7 +83,8 @@ public class EventPushNotificationListener extends BaseKafkaConsumer<Notificatio
             NotificationBuz.Key key = new NotificationBuz.Key(model.getTargetClientId(), model.getCompanyId(), model.getUsername());
             NotificationBuz buzEntity = notificationBuzService.findById(key);
             if (buzEntity == null) {
-                throw new Exception("Can not find NotificationBuz: " + StringUtil.toJsonString(key));
+                log.warn("\nCan not find NotificationBuz: " + StringUtil.toJsonString(key));
+                return;
             }
 
             if (buzEntity.getIsLoggedIn() == 0) {
