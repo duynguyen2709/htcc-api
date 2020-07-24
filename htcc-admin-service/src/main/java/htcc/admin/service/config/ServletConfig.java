@@ -43,20 +43,26 @@ public class ServletConfig {
         resolver.setMaxInMemorySize(Integer.MAX_VALUE);
         return resolver;
     }
+//
+//    @LoadBalanced
+//    @Bean
+//    public RestTemplate restTemplate() {
+//        RestTemplate restTemplate = new RestTemplate();
+//        List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+//        //Add the Jackson Message converter
+//        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+//
+//        // Note: here we are making this converter to process any kind of response,
+//        // not only application/*json, which is the default behaviour
+//        converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
+//        messageConverters.add(converter);
+//        restTemplate.setMessageConverters(messageConverters);
+//        return restTemplate;
+//    }
 
     @LoadBalanced
     @Bean
     public RestTemplate restTemplate() {
-        RestTemplate restTemplate = new RestTemplate();
-        List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
-        //Add the Jackson Message converter
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-
-        // Note: here we are making this converter to process any kind of response,
-        // not only application/*json, which is the default behaviour
-        converter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.TEXT_HTML));
-        messageConverters.add(converter);
-        restTemplate.setMessageConverters(messageConverters);
-        return restTemplate;
+        return new RestTemplate();
     }
 }

@@ -70,25 +70,12 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling();
 
         http.authorizeRequests()
-                .antMatchers(Constant.INTERNAL_API_PATH + "/**")
-                .access(hasIpAddressAllow())
                 .antMatchers(new String[]{eurekaDashboard})
                 .authenticated()
                 .and().formLogin();
 
         // jwt request for api paths
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-    }
-
-    private String hasIpAddressAllow() {
-        String   result      = "";
-        String[] ipAddresses = serviceConfig.getInternalServerIp().split(";");
-        for (String ip : ipAddresses){
-            result += String.format(" or hasIpAddress('%s')", ip);
-        }
-        result = result.substring(4);
-
-        return result;
     }
 
     @Bean

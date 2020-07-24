@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,6 @@ public class GatewayCompanyUserService {
 
     public BaseResponse createCompanyUser(CompanyUserModel model) {
         try {
-            log.info("CompanyUserModel : " + StringUtil.toJsonString(model));
             HttpEntity<CompanyUserModel> request = new HttpEntity<>(model);
             String method = "/companyusers";
             return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);

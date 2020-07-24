@@ -10,6 +10,7 @@ import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.ExtendedEmployeeInfo;
 import htcc.common.entity.role.EmployeePermission;
 import htcc.common.util.StringUtil;
+import htcc.employee.service.repository.PermissionRepository;
 import htcc.employee.service.service.GatewayService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.EmployeePermissionService;
@@ -20,10 +21,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Api(tags = "API quản lý thông tin nhân viên (CHO QUẢN LÝ)",
      description = "API quản lý thông tin cá nhân của nhân viên")
@@ -43,14 +41,17 @@ public class ManagerEmployeeInfoController {
     @Autowired
     private GatewayService gatewayService;
 
+    @Autowired
+    private PermissionRepository permissionRepository;
+
     @ApiOperation(value = "Lấy thông tin của tất cả nhân viên", response = ExtendedEmployeeInfo.class)
     @GetMapping("/users/{companyId}")
-    public BaseResponse getAllUser(@PathVariable String companyId) {
+    public BaseResponse getAllUser(@PathVariable String companyId, @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String username) {
         BaseResponse<List<ExtendedEmployeeInfo>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             List<ExtendedEmployeeInfo> dataResponse = new ArrayList<>();
 
-            List<EmployeeInfo> employeeInfoList = employeeInfoService.findByCompanyId(companyId);
+            List<EmployeeInfo> employeeInfoList = permissionRepository.getCanManageEmployees(companyId, username);
 
             BaseResponse subResponse = gatewayService.getCompanyUsers(companyId);
             if (subResponse != null && subResponse.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
@@ -84,7 +85,7 @@ public class ManagerEmployeeInfoController {
 
     @ApiOperation(value = "Thêm nhân viên mới", response = EmployeeInfo.class)
     @PostMapping("/users")
-    public BaseResponse createEmployee(@RequestBody EmployeeInfo request) {
+    public BaseResponse createEmployee(@RequestBody EmployeeInfo request, @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String actor) {
         BaseResponse<EmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Thêm nhân viên mới thành công");
         try {
@@ -119,13 +120,18 @@ public class ManagerEmployeeInfoController {
                     EmployeePermission permission = new EmployeePermission();
                     permission.setCompanyId(request.getCompanyId());
                     permission.setUsername(request.getUsername());
-                    permission.setLineManager(StringUtil.EMPTY);
+                    permission.setLineManager(actor);
                     permission.setSubManagers(new ArrayList<>());
                     permission.setSubordinates(new ArrayList<>());
                     permission.setCanManageOffices(new ArrayList<>());
                     permission.setCanManageDepartments(new ArrayList<>());
                     permission.setManagerRole(StringUtil.EMPTY);
-                    employeePermissionService.create(permission);
+
+                    EmployeePermission actorPermission = employeePermissionService.findById(
+                            new EmployeePermission.Key(request.getCompanyId(), actor));
+                    List<String> subordinates = actorPermission.getSubordinates();
+                    subordinates.add(request.getUsername());
+                    employeePermissionService.updateAll(Arrays.asList(permission, actorPermission));
                 }
             }
 

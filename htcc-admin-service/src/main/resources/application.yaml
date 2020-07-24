@@ -72,8 +72,8 @@ htcc-gateway-service:
   ribbon:
     eureka:
       enabled: true
-    MaxAutoRetries: 2
-    MaxAutoRetriesNextServer: 2
+    MaxAutoRetries: 5
+    MaxAutoRetriesNextServer: 5
     OkToRetryOnAllOperations: true
     ReadTimeout: 30000
     ConnectTimeout: 30000

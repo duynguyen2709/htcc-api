@@ -76,49 +76,66 @@ public class EmployeePermissionController {
             }
 
             // set subManagers
-            List<MiniEmployeeInfo> subManagers = new ArrayList<>();
+            Map<String, MiniEmployeeInfo> subManagersMap = new HashMap<>();
             for (String subManager : permission.getSubManagers()) {
-                EmployeeInfo manager = employeeInfoService.findById(new EmployeeInfo.Key(companyId, subManager));
-                if (manager == null) {
-                    throw new Exception("employeeInfoService.findById return null : " + subManager);
+                if (!subManagersMap.containsKey(subManager)) {
+                    EmployeeInfo manager = employeeInfoService.findById(new EmployeeInfo.Key(companyId, subManager));
+                    if (manager == null) {
+                        throw new Exception("employeeInfoService.findById return null : " + subManager);
+                    }
+                    subManagersMap.put(subManager, new MiniEmployeeInfo(manager));
                 }
-                subManagers.add(new MiniEmployeeInfo(manager));
             }
-            dataView.setSubManagers(subManagers);
+            dataView.setSubManagers(new ArrayList<>(subManagersMap.values()));
 
             // set subordinates
             List<MiniEmployeeInfo> subordinates = permissionRepository.getCanManageEmployees(companyId, username)
-                                   .stream().map(MiniEmployeeInfo::new).collect(Collectors.toList());
-            dataView.setSubordinates(subordinates);
+                                   .stream().filter(c -> !c.getUsername().equals(username))
+                    .map(MiniEmployeeInfo::new).collect(Collectors.toList());
+            Map<String, MiniEmployeeInfo> subordinatesMap = new HashMap<>();
+            for (MiniEmployeeInfo sub : subordinates) {
+                if (!subordinatesMap.containsKey(sub.getUsername())) {
+                    subordinatesMap.put(sub.getUsername(), sub);
+                }
+            }
+            dataView.setSubordinates(new ArrayList<>(subordinatesMap.values()));
 
             // set ManagerRole
-            ManagerRole managerRole = managerRoleService.findById(new ManagerRole.Key(companyId, permission.getManagerRole()));
-            if (managerRole == null) {
-                throw new Exception("managerRoleService.findById return null : " + permission.getManagerRole());
+            ManagerRole managerRole = null;
+            if (!permission.getManagerRole().isEmpty()) {
+                managerRole = managerRoleService.findById(new ManagerRole.Key(companyId, permission.getManagerRole()));
+                if (managerRole == null) {
+                    throw new Exception("managerRoleService.findById return null : " + permission.getManagerRole());
+                }
             }
             dataView.setManagerRole(managerRole);
 
             // set offices
-            List<Office> officeList = new ArrayList<>();
+            Map<String, Office> officeMap = new HashMap<>();
             for (String officeId : permissionRepository.getCanManageOffices(companyId, username)) {
-                Office office = officeService.findById(new Office.Key(companyId, officeId));
-                if (office == null) {
-                    throw new Exception("officeService.findById return null : " + officeId);
+                if (!officeMap.containsKey(officeId)) {
+                    Office office = officeService.findById(new Office.Key(companyId, officeId));
+                    if (office == null) {
+                        throw new Exception("officeService.findById return null : " + officeId);
+                    }
+                    officeMap.put(officeId, office);
                 }
-                officeList.add(office);
             }
-            dataView.setCanManageOffices(officeList);
+            dataView.setCanManageOffices(new ArrayList<>(officeMap.values()));
 
             // set departments
-            List<Department> departmentList = new ArrayList<>();
+            Map<String, Department> departmentMap = new HashMap<>();
+
             for (String departmentId : permissionRepository.getCanManageDepartments(companyId, username)) {
-                Department department = departmentService.findById(new Department.Key(companyId, departmentId));
-                if (department == null) {
-                    throw new Exception("departmentService.findById return null : " + departmentId);
+                if (!departmentMap.containsKey(departmentId)) {
+                    Department department = departmentService.findById(new Department.Key(companyId, departmentId));
+                    if (department == null) {
+                        throw new Exception("departmentService.findById return null : " + departmentId);
+                    }
+                    departmentMap.put(departmentId, department);
                 }
-                departmentList.add(department);
             }
-            dataView.setCanManageDepartments(departmentList);
+            dataView.setCanManageDepartments(new ArrayList<>(departmentMap.values()));
 
             dataResponse.setDataView(dataView);
             dataResponse.setDataEdit(permission);

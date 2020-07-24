@@ -45,8 +45,7 @@ public class InternalCompanyUserController {
     private RedisService redis;
     //</editor-fold>
 
-
-    @PostMapping(value = "/companyusers", produces = {APPLICATION_JSON})
+    @PostMapping(value = "/companyusers")
     public BaseResponse createUser(@RequestBody @Valid CompanyUserModel model) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -79,7 +78,7 @@ public class InternalCompanyUserController {
      * @param model
      * @return
      */
-    @PostMapping(value = "/companyusers/delete", produces = {APPLICATION_JSON})
+    @PostMapping(value = "/companyusers/delete")
     public BaseResponse deleteUser(@RequestBody CompanyUserModel model) {
         BaseResponse response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -92,10 +91,7 @@ public class InternalCompanyUserController {
         return response;
     }
 
-
-
-
-    @GetMapping(value = "/companyusers/{companyId}", produces = {APPLICATION_JSON})
+    @GetMapping(value = "/companyusers/{companyId}")
     public BaseResponse getCompanyUsers(@PathVariable String companyId) {
         BaseResponse<List<CompanyUserModel>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -113,10 +109,7 @@ public class InternalCompanyUserController {
         return response;
     }
 
-
-
-
-    @PostMapping(value = "/companyusers/update", produces = {APPLICATION_JSON})
+    @PostMapping(value = "/companyusers/update")
     public BaseResponse updateCompanyUserInfo(@RequestBody @Valid CompanyUserModel user) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         boolean needUpdate = false;
@@ -154,10 +147,7 @@ public class InternalCompanyUserController {
         return response;
     }
 
-
-
-
-    @PostMapping(value = "/companyusers/status", produces = {APPLICATION_JSON})
+    @PostMapping(value = "/companyusers/status")
     public BaseResponse updateCompanyUserStatus(@RequestBody CompanyUserModel user) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
@@ -219,7 +209,7 @@ public class InternalCompanyUserController {
         }
     }
 
-    @PostMapping(value = "/companyusers/status/{companyId}/{newStatus}", produces = {APPLICATION_JSON})
+    @PostMapping(value = "/companyusers/status/{companyId}/{newStatus}")
     public BaseResponse updateAllCompanyUserStatus(@PathVariable String companyId, @PathVariable int newStatus) {
         BaseResponse<CompanyUserModel> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         List<CompanyUser> listUser = new ArrayList<>();

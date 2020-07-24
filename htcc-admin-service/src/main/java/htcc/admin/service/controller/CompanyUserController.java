@@ -152,15 +152,15 @@ public class CompanyUserController {
                                           @RequestBody CompanyUserModel user){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         try {
+            user.setCompanyId(companyId);
+            user.setUsername(username);
+
             String error = user.isValid();
             if (!error.isEmpty()) {
                 response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
                 response.setReturnMessage(error);
                 return response;
             }
-
-            user.setCompanyId(companyId);
-            user.setUsername(username);
 
             return service.updateCompanyUserInfo(user);
         } catch (Exception e) {
