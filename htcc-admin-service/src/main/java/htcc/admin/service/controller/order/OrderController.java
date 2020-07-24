@@ -204,7 +204,7 @@ public class OrderController {
             }
         }
 
-        if (!StringUtil.isEmpty(request.getOrderId())) {
+        if (!StringUtil.isEmpty(request.getOrderId()) && !request.getOrderId().equals("string")) {
             String otherFormat = DateTimeUtil.convertToOtherFormat(request.getOrderId().substring(0, 6), "yyMMdd", "yyyyMMdd");
             if (DateTimeUtil.isBeforeToday(otherFormat)) {
                 return "Đơn hàng không hợp lệ hoặc đã quá hạn. Vui lòng tạo lại đơn hàng khác";
