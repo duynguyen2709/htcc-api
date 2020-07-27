@@ -24,11 +24,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Api(tags = "API lấy danh sách điểm danh (CỦA QUẢN LÝ)")
 @RestController
@@ -70,13 +68,15 @@ public class ManagerCheckInController {
             LocalDate startDate = LocalDate.parse(yyyyMM + "01", formatter);
             LocalDate endDate   = startDate.plusDays(startDate.lengthOfMonth());
 
-            List<EmployeeInfo> employeeInfoList = permissionRepository.getCanManageEmployees(companyId, username);
+            Set<String> canManageEmployee = permissionRepository.getCanManageEmployees(companyId, username)
+                    .stream().map(EmployeeInfo::getUsername).collect(Collectors.toSet());
+            canManageEmployee.add(username);
 
-            if (!employeeInfoList.isEmpty()) {
-                for (EmployeeInfo employee : employeeInfoList) {
+            if (!canManageEmployee.isEmpty()) {
+                for (String employee : canManageEmployee) {
                     for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
                         String yyyyMMdd = date.format(formatter);
-                        handleBuz(dataResponse, companyId, employee.getUsername(), yyyyMMdd);
+                        handleBuz(dataResponse, companyId, employee, yyyyMMdd);
                     }
                 }
             }

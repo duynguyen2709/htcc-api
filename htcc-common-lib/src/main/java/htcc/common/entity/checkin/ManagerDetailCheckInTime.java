@@ -36,6 +36,8 @@ public class ManagerDetailCheckInTime implements Serializable {
     @ApiModelProperty(notes = "loại (1 = điểm danh vào/ 2 = tan ca)",
                       example = "1")
     public int type = 1;
+
+    public int subType = 1;
     // giờ điểm danh
     @ApiModelProperty(notes = "giờ điểm danh",
                       example = "07:31")
@@ -71,6 +73,7 @@ public class ManagerDetailCheckInTime implements Serializable {
         this.shiftName = model.getShiftTime().getShiftName();
         this.shiftTime = String.format("%s - %s", model.getShiftTime().getStartTime(), model.getShiftTime().getEndTime());
         this.type = model.getType();
+        this.subType = model.getSubType();
         this.checkInTime = DateTimeUtil.parseTimestampToString(model.getClientTime(), "HH:mm");
         this.checkInDate = DateTimeUtil.parseTimestampToString(model.getClientTime(), "dd/MM/yyyy");
         this.isOnTime = model.isOnTime();

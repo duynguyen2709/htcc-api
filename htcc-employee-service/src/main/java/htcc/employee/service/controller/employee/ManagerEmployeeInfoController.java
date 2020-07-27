@@ -3,17 +3,22 @@ package htcc.employee.service.controller.employee;
 import com.google.gson.reflect.TypeToken;
 import htcc.common.component.kafka.KafkaProducerService;
 import htcc.common.constant.Constant;
+import htcc.common.constant.PaymentCycleTypeEnum;
 import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.constant.SalaryFormulaEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.companyuser.CompanyUserModel;
 import htcc.common.entity.jpa.EmployeeInfo;
 import htcc.common.entity.jpa.ExtendedEmployeeInfo;
+import htcc.common.entity.payslip.SalaryFormula;
 import htcc.common.entity.role.EmployeePermission;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.repository.PermissionRepository;
 import htcc.employee.service.service.GatewayService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.EmployeePermissionService;
+import htcc.employee.service.service.salary.SalaryCalculationService;
+import htcc.employee.service.service.salary.SalaryFormulaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -44,6 +49,9 @@ public class ManagerEmployeeInfoController {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private SalaryCalculationService salaryCalculationService;
+
     @ApiOperation(value = "Lấy thông tin của tất cả nhân viên", response = ExtendedEmployeeInfo.class)
     @GetMapping("/users/{companyId}")
     public BaseResponse getAllUser(@PathVariable String companyId, @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String username) {
@@ -52,6 +60,21 @@ public class ManagerEmployeeInfoController {
             List<ExtendedEmployeeInfo> dataResponse = new ArrayList<>();
 
             List<EmployeeInfo> employeeInfoList = permissionRepository.getCanManageEmployees(companyId, username);
+            boolean hasActor = false;
+            for (EmployeeInfo employeeInfo : employeeInfoList) {
+                if (employeeInfo.getUsername().equals(username)) {
+                    hasActor = true;
+                    break;
+                }
+            }
+
+            if (!hasActor) {
+                EmployeeInfo employeeInfo = employeeInfoService.findById(new EmployeeInfo.Key(companyId, username));
+                if (employeeInfo == null) {
+                    throw new Exception("employeeInfoService.findById return null");
+                }
+                employeeInfoList.add(employeeInfo);
+            }
 
             BaseResponse subResponse = gatewayService.getCompanyUsers(companyId);
             if (subResponse != null && subResponse.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
@@ -88,6 +111,10 @@ public class ManagerEmployeeInfoController {
     public BaseResponse createEmployee(@RequestBody EmployeeInfo request, @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String actor) {
         BaseResponse<EmployeeInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Thêm nhân viên mới thành công");
+        CompanyUserModel companyUserModel = null;
+        EmployeePermission permission = null;
+        EmployeePermission actorPermission = null;
+
         try {
             String error = request.isValid();
             if (!error.isEmpty()) {
@@ -99,7 +126,7 @@ public class ManagerEmployeeInfoController {
 
             EmployeeInfo dataResponse = employeeInfoService.create(request);
             if (dataResponse != null) {
-                CompanyUserModel companyUserModel = new CompanyUserModel();
+                companyUserModel = new CompanyUserModel();
                 companyUserModel.setCompanyId(request.getCompanyId());
                 companyUserModel.setUsername(request.getUsername());
                 companyUserModel.setPhoneNumber(request.getPhoneNumber());
@@ -109,15 +136,13 @@ public class ManagerEmployeeInfoController {
 
                 BaseResponse subResponse = gatewayService.createCompanyUser(companyUserModel);
                 if (subResponse == null || subResponse.getReturnCode() != ReturnCodeEnum.SUCCESS.getValue()) {
-                    log.error(
-                            "\nRollback on creating new Employee, response = " + StringUtil.toJsonString(subResponse));
-                    employeeInfoService.delete(new EmployeeInfo.Key(request.getCompanyId(), request.getUsername()));
+                    log.error("\nRollback on creating new Employee, response = " +
+                            StringUtil.toJsonString(subResponse));
+                    rollbackEmployeeInfo(request.getCompanyId(), request.getUsername());
                     return subResponse;
                 }
                 else {
-                    kafka.sendMessage(kafka.getBuzConfig().getEventCreateUser().getTopicName(), companyUserModel);
-
-                    EmployeePermission permission = new EmployeePermission();
+                    permission = new EmployeePermission();
                     permission.setCompanyId(request.getCompanyId());
                     permission.setUsername(request.getUsername());
                     permission.setLineManager(actor);
@@ -126,12 +151,32 @@ public class ManagerEmployeeInfoController {
                     permission.setCanManageOffices(new ArrayList<>());
                     permission.setCanManageDepartments(new ArrayList<>());
                     permission.setManagerRole(StringUtil.EMPTY);
+                    permission = employeePermissionService.update(permission);
 
-                    EmployeePermission actorPermission = employeePermissionService.findById(
+                    actorPermission = employeePermissionService.findById(
                             new EmployeePermission.Key(request.getCompanyId(), actor));
                     List<String> subordinates = actorPermission.getSubordinates();
                     subordinates.add(request.getUsername());
-                    employeePermissionService.updateAll(Arrays.asList(permission, actorPermission));
+                    actorPermission.setSubordinates(subordinates);
+                    List<EmployeePermission> list = employeePermissionService.updateAll(Arrays.asList(permission, actorPermission));
+
+                    if (list != null) {
+                        SalaryFormula formula = salaryCalculationService.createDefaultSalaryFormula(request.getCompanyId(), request.getUsername());
+                        if (formula == null) {
+                            rollbackEmployeePermission(request.getCompanyId(), request.getUsername(), actor);
+                            rollbackCompanyUser(request.getCompanyId(), request.getUsername());
+                            rollbackEmployeeInfo(request.getCompanyId(), request.getUsername());
+                            throw new Exception("createDefaultSalaryFormula return null");
+                        }
+                        else {
+                            kafka.sendMessage(kafka.getBuzConfig().getEventCreateUser().getTopicName(), companyUserModel);
+                        }
+                    }
+                    else {
+                        rollbackCompanyUser(request.getCompanyId(), request.getUsername());
+                        rollbackEmployeeInfo(request.getCompanyId(), request.getUsername());
+                        throw new Exception("employeePermissionService.create return null");
+                    }
                 }
             }
 
@@ -139,8 +184,27 @@ public class ManagerEmployeeInfoController {
         } catch (Exception e) {
             log.error("[createEmployee] {} ex", StringUtil.toJsonString(request), e);
             response = new BaseResponse<>(e);
+
+            if (companyUserModel != null) {
+                rollbackCompanyUser(request.getCompanyId(), request.getUsername());
+            }
+            if (permission != null || actorPermission != null) {
+                rollbackEmployeePermission(request.getCompanyId(), request.getUsername(), actor);
+            }
         }
         return response;
+    }
+
+    private void rollbackEmployeePermission(String companyId, String username, String actor) {
+        employeePermissionService.delete(new EmployeePermission.Key(companyId, username));
+        employeePermissionService.delete(new EmployeePermission.Key(companyId, actor));
+    }
+
+    private void rollbackCompanyUser(String companyId, String username) {
+    }
+
+    private void rollbackEmployeeInfo(String company, String username) {
+        employeeInfoService.delete(new EmployeeInfo.Key(company, username));
     }
 
     @ApiOperation(value = "Cập nhật thông tin của nhân viên", response = EmployeeInfo.class)

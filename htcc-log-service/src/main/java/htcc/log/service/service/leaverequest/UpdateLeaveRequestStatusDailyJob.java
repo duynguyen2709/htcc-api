@@ -1,13 +1,21 @@
 package htcc.log.service.service.leaverequest;
 
+import htcc.common.component.LoggingConfiguration;
+import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.constant.ClientSystemEnum;
 import htcc.common.constant.ComplaintStatusEnum;
+import htcc.common.constant.NotificationStatusEnum;
+import htcc.common.constant.ScreenEnum;
+import htcc.common.entity.icon.NotificationIconConfig;
 import htcc.common.entity.leavingrequest.LeavingRequest;
 import htcc.common.entity.leavingrequest.LeavingRequestLogEntity;
 import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
+import htcc.common.entity.notification.NotificationModel;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.log.service.repository.LeavingRequestLogRepository;
+import htcc.log.service.service.icon.IconService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,6 +38,12 @@ public class UpdateLeaveRequestStatusDailyJob {
 
     @Autowired
     private LeavingRequestLogRepository repo;
+
+    @Autowired
+    private KafkaProducerService kafka;
+
+    @Autowired
+    private IconService iconService;
 
     @Scheduled(cron = "${service.schedule.leaveRequest}")
     public void autoUpdateStatusJob(){
@@ -64,6 +78,8 @@ public class UpdateLeaveRequestStatusDailyJob {
                     if (response != 1) {
                         throw new Exception("repo.updateLeavingRequestLogStatus return " + response);
                     }
+
+                    sendNoti(model);
                 } catch (Exception e) {
                     log.error("[updateLeavingRequestLogStatus] {} ex", StringUtil.toJsonString(model), e);
                 }
@@ -74,6 +90,35 @@ public class UpdateLeaveRequestStatusDailyJob {
         }
 
         log.info("### End UpdateLeaveRequestStatusDailyJob ###");
+    }
+
+    private void sendNoti(LeavingRequestModel info) {
+        try {
+            NotificationModel model = new NotificationModel();
+            model.setRequestId(LoggingConfiguration.getTraceId());
+            model.setSourceClientId(0);
+            model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
+            model.setReceiverType(2);
+            model.setSender("Hệ thống");
+            model.setCompanyId(info.getCompanyId());
+            model.setUsername(info.getUsername());
+            model.setSendTime(System.currentTimeMillis());
+            int screenId = ScreenEnum.DAY_OFF.getValue();
+            model.setScreenId(screenId);
+            NotificationIconConfig icon = iconService.getIcon(screenId);
+            if (icon != null) {
+                model.setIconId(icon.getIconId());
+                model.setIconUrl(icon.getIconURL());
+            }
+            model.setStatus(NotificationStatusEnum.INIT.getValue());
+            model.setHasRead(false);
+            model.setTitle("Trạng thái đơn nghỉ phép");
+            model.setContent("Đơn nghỉ phép của bạn đã bị hủy do quá hạn phê duyệt");
+
+            kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
+        } catch (Exception e) {
+            log.error(String.format("[sendNoti] [%s] ex", StringUtil.toJsonString(info)), e);
+        }
     }
 
     private static class OverdueLeavingRequestFilter implements Predicate<LeavingRequestModel> {

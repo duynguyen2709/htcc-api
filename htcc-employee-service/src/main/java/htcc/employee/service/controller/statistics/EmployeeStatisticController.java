@@ -169,17 +169,6 @@ public class EmployeeStatisticController {
             return response;
         }
 
-//        String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
-//        if (Long.parseLong(today) - Long.parseLong(dateTo) < statisticConfig.getDistanceFromToday()) {
-//            response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
-//            if (statisticConfig.getDistanceFromToday() == 0) {
-//                response.setReturnMessage("Ngày kết thúc không được sau ngày hôm nay");
-//            } else {
-//                response.setReturnMessage(String.format("Ngày kết thúc phải cách %s ngày trước ngày hôm nay", statisticConfig.getDistanceFromToday()));
-//            }
-//            return response;
-//        }
-
         if (DateTimeUtil.calcDayDiff(dateFrom, dateTo, "yyyyMMdd") > statisticConfig.getMaxDayDiff()) {
             response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
             response.setReturnMessage(String.format("Khoảng cách tối đa là %s ngày. Vui lòng chọn lại", statisticConfig.getMaxDayDiff()));

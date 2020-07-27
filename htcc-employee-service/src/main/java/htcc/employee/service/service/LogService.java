@@ -6,6 +6,8 @@ import htcc.common.entity.checkin.UpdateCheckInStatusModel;
 import htcc.common.entity.complaint.ResubmitComplaintModel;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
+import htcc.common.entity.payslip.ManagerLockSalaryRequest;
+import htcc.common.entity.payslip.SalaryFormula;
 import htcc.common.entity.shift.ShiftArrangementModel;
 import htcc.common.entity.shift.ShiftTime;
 import lombok.extern.log4j.Log4j2;
@@ -191,6 +193,46 @@ public class LogService {
             log.error(e);
             return new BaseResponse(e);
         }
+    }
+
+    /*
+    ##################### Salary Section #####################
+     */
+    public BaseResponse insertSalaryLog(SalaryFormula entity, long totalIncome, long totalDeduction) {
+        try {
+            HttpEntity<SalaryFormula> request = new HttpEntity<>(entity);
+            String method = String.format("/salary?totalIncome=%s&totalDeduction=%s", totalIncome, totalDeduction);
+            return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
+        } catch (Exception e) {
+            log.error(e);
+            return new BaseResponse(e);
+        }
+    }
+
+    public BaseResponse lockSalaryLog(ManagerLockSalaryRequest entity) {
+        try {
+            HttpEntity<ManagerLockSalaryRequest> request = new HttpEntity<>(entity);
+            String method = "/salary/lock";
+            return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
+        } catch (Exception e) {
+            log.error(e);
+            return new BaseResponse(e);
+        }
+    }
+
+    public BaseResponse getPayslipForEmployee(String companyId, String username, String yyyyMM) {
+        String method = String.format("/salary/%s/%s/%s", companyId, username, yyyyMM);
+        return callGet(method);
+    }
+
+    public BaseResponse getSalaryLogForManager(String companyId, String yyyyMM) {
+        String method = String.format("/salary/%s/%s", companyId, yyyyMM);
+        return callGet(method);
+    }
+
+    public BaseResponse deleteSalaryLogForManager(String yyyyMM, String paySlipId) {
+        String method = String.format("/salary/delete/%s/%s", yyyyMM, paySlipId);
+        return callGet(method);
     }
 
     /*

@@ -10,9 +10,11 @@ import java.util.List;
 @NoArgsConstructor
 public class EmployeePayslipResponse {
 
+    private static final long serialVersionUID = 2713L;
+
     // mã phiếu lương
     private String paySlipId = "";
-    // loại trả lương (theo tháng, theo tuần, theo ngày)
+//    // loại trả lương (theo tháng, theo tuần, theo ngày)
     private String paymentType = "";
     // ngày phát lương
     private String payDate = "";

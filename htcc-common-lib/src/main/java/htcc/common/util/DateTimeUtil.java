@@ -117,12 +117,10 @@ public class DateTimeUtil {
     }
 
     public static int calcDayDiff(String from, String to, String format) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-        Period diff = Period.between(
-                LocalDate.parse(from, formatter),
-                LocalDate.parse(to, formatter));
-
-        return Math.abs(diff.getDays());
+        Date dt1 = DateTimeUtil.parseStringToDate(from, format);
+        Date dt2 = DateTimeUtil.parseStringToDate(to, format);
+        long diff = Math.abs(dt2.getTime() - dt1.getTime());
+        return (int)(diff / (24 * 60 * 60 * 1000));
     }
 
     public static Date parseStringToDate(String str){

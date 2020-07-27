@@ -16,6 +16,7 @@ import htcc.employee.service.service.LogService;
 import htcc.employee.service.service.checkin.CheckInService;
 import htcc.employee.service.service.complaint.ComplaintService;
 import htcc.employee.service.service.icon.IconService;
+import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.EmployeePermissionService;
 import htcc.employee.service.service.jpa.ManagerRoleService;
 import htcc.employee.service.service.leavingrequest.LeavingRequestService;
@@ -62,6 +63,9 @@ public class ManagerHomeController {
 
     @Autowired
     private ManagerRoleService managerRoleService;
+
+    @Autowired
+    private EmployeeInfoService employeeInfoService;
 
     @ApiOperation(value = "API Home", response = ManagerHomeResponse.class)
     @GetMapping("/home/manager/{companyId}/{username}")
@@ -176,6 +180,22 @@ public class ManagerHomeController {
     private void setCanManageEmployees(ManagerHomeResponse data, String companyId, String username) {
         try {
             List<EmployeeInfo> employeeInfoList = permissionRepo.getCanManageEmployees(companyId, username);
+            boolean hasActor = false;
+            for (EmployeeInfo employeeInfo : employeeInfoList) {
+                if (employeeInfo.getUsername().equals(username)) {
+                    hasActor = true;
+                    break;
+                }
+            }
+
+            if (!hasActor) {
+                EmployeeInfo employeeInfo = employeeInfoService.findById(new EmployeeInfo.Key(companyId, username));
+                if (employeeInfo == null) {
+                    throw new Exception("employeeInfoService.findById return null");
+                }
+                employeeInfoList.add(employeeInfo);
+            }
+
             data.setCanManageEmployees(employeeInfoList);
         } catch (Exception e){
             log.error("[setCanManageEmployees] [{} - {}]", companyId, username, e);

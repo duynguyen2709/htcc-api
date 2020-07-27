@@ -66,4 +66,13 @@ public class IconService {
 
         this.notiIconMap = map;
     }
+
+    public NotificationIconConfig getIcon(int screenId) {
+        for (NotificationIconConfig icon : notiIconMap.values()) {
+            if (icon.getScreenId() == screenId) {
+                return icon;
+            }
+        }
+        return null;
+    }
 }

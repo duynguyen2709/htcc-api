@@ -47,4 +47,6 @@ public class Constant {
 
     public static final String DEFAULT_ICON_ID  = "noti";
     public static final String DEFAULT_ICON_URL = "https://drive.google.com/uc?export=view&id=1lwV3OFqdTDH3cFHt-cAruMVGN4SV6yTi";
+
+    public static final long PRE_TAX_DEPENDENCY_REDUCTION = 11_000_000L;
 }

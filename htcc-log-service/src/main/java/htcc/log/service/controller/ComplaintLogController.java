@@ -1,16 +1,21 @@
 package htcc.log.service.controller;
 
-import htcc.common.constant.ComplaintStatusEnum;
-import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.component.LoggingConfiguration;
+import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.constant.*;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.complaint.ComplaintLogEntity;
 import htcc.common.entity.complaint.ComplaintModel;
 import htcc.common.entity.complaint.ResubmitComplaintModel;
 import htcc.common.entity.complaint.UpdateComplaintStatusModel;
+import htcc.common.entity.icon.NotificationIconConfig;
+import htcc.common.entity.notification.NotificationModel;
+import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.repository.ComplaintLogRepository;
 import htcc.log.service.repository.LogCounterRepository;
+import htcc.log.service.service.icon.IconService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +33,13 @@ public class ComplaintLogController {
 
     @Autowired
     private LogCounterRepository logCounterRepo;
+
+    @Autowired
+    private IconService iconService;
+
+    @Autowired
+    private KafkaProducerService kafka;
+
 
     @GetMapping("/complaint/{companyId}/{username}/{yyyyMM}")
     public BaseResponse getComplaintLog(@PathVariable String companyId,
@@ -121,12 +133,15 @@ public class ComplaintLogController {
     public BaseResponse updateComplaintStatus(@RequestBody UpdateComplaintStatusModel request){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Xử lý khiếu nại thành công");
-
+        String companyId = "";
+        String username = "";
+        boolean needSendNoti = true;
         try {
             ComplaintLogEntity oldEnt = complaintRepo.getComplaint(request);
             if (oldEnt == null) {
                 log.warn("[complaintRepo.getComplaint] {} return null", StringUtil.toJsonString(request));
-                return new BaseResponse<>(ReturnCodeEnum.LOG_NOT_FOUND);
+                response = new BaseResponse<>(ReturnCodeEnum.LOG_NOT_FOUND);
+                return response;
             }
 
             if (oldEnt.getStatus() == ComplaintStatusEnum.DONE.getValue() ||
@@ -136,6 +151,9 @@ public class ComplaintLogController {
                 response.setReturnMessage("Khiếu nại đã được xử lý trước đó");
                 return response;
             }
+            companyId = oldEnt.getCompanyId();
+            username = oldEnt.getUsername();
+            needSendNoti = oldEnt.getIsAnonymous() == 0;
 
             List<String> oldResponses = StringUtil.json2Collection(oldEnt.response, StringUtil.LIST_STRING_TYPE);
             oldResponses.add(request.getResponse());
@@ -145,7 +163,46 @@ public class ComplaintLogController {
             complaintRepo.updateComplaintLogStatus(request);
         } catch (Exception e){
             log.error(String.format("[updateLeavingRequestStatus] [%s] ex", StringUtil.toJsonString(request)), e);
-            return new BaseResponse(e);
+            response = new BaseResponse(e);
+        } finally {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
+                try {
+                    if (needSendNoti) {
+                        NotificationModel model = new NotificationModel();
+
+                        long now = System.currentTimeMillis();
+                        String date = DateTimeUtil.parseTimestampToString(now, "yyyyMMdd");
+                        model.setNotiId(String.format("%s-%s-%s-%s-%s%s", date, 0,
+                                ClientSystemEnum.MOBILE.getValue(), model.getCompanyId(), model.getUsername(), now));
+
+                        model.setRequestId(LoggingConfiguration.getTraceId());
+                        model.setSourceClientId(0);
+                        model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
+                        model.setReceiverType(2);
+                        model.setSender("Hệ thống");
+                        model.setCompanyId(companyId);
+                        model.setUsername(username);
+                        model.setSendTime(System.currentTimeMillis());
+
+                        int screenId = ScreenEnum.COMPLAINT.getValue();
+                        model.setScreenId(screenId);
+                        NotificationIconConfig icon = iconService.getIcon(screenId);
+                        if (icon != null) {
+                            model.setIconId(icon.getIconId());
+                            model.setIconUrl(icon.getIconURL());
+                        }
+
+                        model.setStatus(NotificationStatusEnum.INIT.getValue());
+                        model.setHasRead(false);
+                        model.setTitle("Trạng thái đơn khiếu nại");
+                        model.setContent("Đơn khiếu nại của bạn đã được xử lý. Vào xem ngay thôi");
+
+                        kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
+                    }
+                } catch (Exception e) {
+                    log.error(String.format("[updateLeavingRequestStatus] [%s] ex", StringUtil.toJsonString(request)), e);
+                }
+            }
         }
 
         return response;

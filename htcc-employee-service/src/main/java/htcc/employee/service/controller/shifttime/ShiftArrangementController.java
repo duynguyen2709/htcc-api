@@ -12,6 +12,7 @@ import htcc.common.entity.shift.*;
 import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.repository.PermissionRepository;
+import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.FixedShiftArrangementService;
 import htcc.employee.service.service.jpa.OfficeService;
 import htcc.employee.service.service.jpa.ShiftTimeService;
@@ -45,6 +46,9 @@ public class ShiftArrangementController {
 
     @Autowired
     private PermissionRepository permissionRepo;
+
+    @Autowired
+    private EmployeeInfoService employeeInfoService;
 
     @GetMapping("/shifts/{companyId}/{year}/{week}")
     public BaseResponse getShiftTimeInfo(@PathVariable String companyId,
@@ -222,8 +226,23 @@ public class ShiftArrangementController {
         }
     }
 
-    private void setCanManageEmployees(ShiftArrangementResponse dataResponse, String companyId, String actor) {
+    private void setCanManageEmployees(ShiftArrangementResponse dataResponse, String companyId, String actor) throws Exception {
         List<EmployeeInfo> employeeInfoList = permissionRepo.getCanManageEmployees(companyId, actor);
+        boolean hasActor = false;
+        for (EmployeeInfo employeeInfo : employeeInfoList) {
+            if (employeeInfo.getUsername().equals(actor)) {
+                hasActor = true;
+                break;
+            }
+        }
+
+        if (!hasActor) {
+            EmployeeInfo employeeInfo = employeeInfoService.findById(new EmployeeInfo.Key(companyId, actor));
+            if (employeeInfo == null) {
+                throw new Exception("employeeInfoService.findById return null");
+            }
+            employeeInfoList.add(employeeInfo);
+        }
 
         Map<String, EmployeeInfo> map = new HashMap<>();
         Map<String, EmployeeShiftDetail> employeeShiftDetailMap = new HashMap<>();
