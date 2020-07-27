@@ -10,6 +10,7 @@ import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.checkin.UpdateCheckInStatusModel;
 import htcc.common.entity.icon.NotificationIconConfig;
 import htcc.common.entity.notification.NotificationModel;
+import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.repository.CheckInLogRepository;
@@ -165,6 +166,12 @@ public class CheckInLogController {
             if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
                 try {
                     NotificationModel model = new NotificationModel();
+
+                    long now = System.currentTimeMillis();
+                    String date = DateTimeUtil.parseTimestampToString(now, "yyyyMMdd");
+                    model.setNotiId(String.format("%s-%s-%s-%s-%s%s", date, 0,
+                            ClientSystemEnum.MOBILE.getValue(), model.getCompanyId(), model.getUsername(), now));
+
                     model.setRequestId(LoggingConfiguration.getTraceId());
                     model.setSourceClientId(0);
                     model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
