@@ -134,6 +134,7 @@ public class ComplaintLogController {
         response.setReturnMessage("Xử lý khiếu nại thành công");
         String companyId = "";
         String username = "";
+        boolean needSendNoti = true;
         try {
             ComplaintLogEntity oldEnt = complaintRepo.getComplaint(request);
             if (oldEnt == null) {
@@ -151,6 +152,7 @@ public class ComplaintLogController {
             }
             companyId = oldEnt.getCompanyId();
             username = oldEnt.getUsername();
+            needSendNoti = oldEnt.getIsAnonymous() == 0;
 
             List<String> oldResponses = StringUtil.json2Collection(oldEnt.response, StringUtil.LIST_STRING_TYPE);
             oldResponses.add(request.getResponse());
@@ -164,30 +166,32 @@ public class ComplaintLogController {
         } finally {
             if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
                 try {
-                    NotificationModel model = new NotificationModel();
-                    model.setRequestId(LoggingConfiguration.getTraceId());
-                    model.setSourceClientId(0);
-                    model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
-                    model.setReceiverType(2);
-                    model.setSender("Hệ thống");
-                    model.setCompanyId(companyId);
-                    model.setUsername(username);
-                    model.setSendTime(System.currentTimeMillis());
+                    if (needSendNoti) {
+                        NotificationModel model = new NotificationModel();
+                        model.setRequestId(LoggingConfiguration.getTraceId());
+                        model.setSourceClientId(0);
+                        model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
+                        model.setReceiverType(2);
+                        model.setSender("Hệ thống");
+                        model.setCompanyId(companyId);
+                        model.setUsername(username);
+                        model.setSendTime(System.currentTimeMillis());
 
-                    int screenId = ScreenEnum.COMPLAINT.getValue();
-                    model.setScreenId(screenId);
-                    NotificationIconConfig icon = iconService.getIcon(screenId);
-                    if (icon != null) {
-                        model.setIconId(icon.getIconId());
-                        model.setIconUrl(icon.getIconURL());
+                        int screenId = ScreenEnum.COMPLAINT.getValue();
+                        model.setScreenId(screenId);
+                        NotificationIconConfig icon = iconService.getIcon(screenId);
+                        if (icon != null) {
+                            model.setIconId(icon.getIconId());
+                            model.setIconUrl(icon.getIconURL());
+                        }
+
+                        model.setStatus(NotificationStatusEnum.INIT.getValue());
+                        model.setHasRead(false);
+                        model.setTitle("Trạng thái đơn khiếu nại");
+                        model.setContent("Đơn khiếu nại của bạn đã được xử lý. Vào xem ngay thôi");
+
+                        kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
                     }
-
-                    model.setStatus(NotificationStatusEnum.INIT.getValue());
-                    model.setHasRead(false);
-                    model.setTitle("Trạng thái đơn khiếu nại " + request.getComplaintId());
-                    model.setContent("Đơn khiếu nại của bạn đã được xử lý. Vào xem ngay thôi");
-
-                    kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
                 } catch (Exception e) {
                     log.error(String.format("[updateLeavingRequestStatus] [%s] ex", StringUtil.toJsonString(request)), e);
                 }

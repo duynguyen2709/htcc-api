@@ -227,7 +227,7 @@ public class LeavingRequestLogController {
                     }
                     model.setStatus(NotificationStatusEnum.INIT.getValue());
                     model.setHasRead(false);
-                    model.setTitle("Trạng thái đơn nghỉ phép " + request.getLeavingRequestId());
+                    model.setTitle("Trạng thái đơn nghỉ phép");
                     model.setContent("Đơn nghỉ phép của bạn đã được xử lý. Vào xem ngay thôi");
 
                     kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);

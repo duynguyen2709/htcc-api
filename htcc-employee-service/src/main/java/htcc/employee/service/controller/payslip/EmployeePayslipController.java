@@ -138,6 +138,7 @@ public class EmployeePayslipController {
                     SalaryFormula.DetailFormula baseOn = formulaMap.get(formula.getIdBasedOn());
                     String desc = (baseOn == null) ? "" : baseOn.getDescription();
                     String extra = String.format("= %s x %s%%", desc, formula.getValue());
+                    detail.setExtraInfo(extra);
                 }
                 result.getIncomeList().add(detail);
             }
@@ -194,6 +195,7 @@ public class EmployeePayslipController {
                     SalaryFormula.DetailFormula baseOn = formulaMap.get(formula.getIdBasedOn());
                     String desc = (baseOn == null) ? "" : baseOn.getDescription();
                     String extra = String.format("= %s x %s%%", desc, formula.getValue());
+                    detail.setExtraInfo(extra);
                 }
                 result.getDeductionList().add(detail);
             }
