@@ -1,6 +1,7 @@
 import htcc.common.constant.ManagerActionEnum;
 import htcc.common.constant.ManagerRoleGroupEnum;
 import htcc.common.entity.order.CreateOrderRequest;
+import htcc.common.util.DateTimeUtil;
 import htcc.common.util.StringUtil;
 import org.junit.Test;
 
@@ -23,36 +24,20 @@ public class TestUtil {
     @Test
     public void testTime() throws ParseException {
 
-        String yyyyMM = "202006";
-        int n = 3;
-        for (int i=0; i< n ;i++) {
-            // do buz
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-            LocalDate         date      = LocalDate.parse(yyyyMM + "01", formatter);
+        String yyyyMMdd1 = "20200726";
+        String yyyyMMdd2 = "20200826";
+        Date dt1 = DateTimeUtil.parseStringToDate(yyyyMMdd1, "yyyyMMdd");
+        Date dt2 = DateTimeUtil.parseStringToDate(yyyyMMdd2, "yyyyMMdd");
+        long diff = Math.abs(dt2.getTime() - dt1.getTime());
+        int diffDays = (int) (diff / (24 * 60 * 60 * 1000));
+        System.out.println(diffDays);
 
-            int totalDaysInMonth = date.lengthOfMonth();
-
-            LocalDate startDate = date.plusDays(i * totalDaysInMonth / n);
-            LocalDate endDate = startDate.plusDays(totalDaysInMonth / n - 1);
-
-            if (i == n - 1) {
-                endDate = date.plusDays(totalDaysInMonth - 1);
-            }
-
-            System.out.println(startDate.format(formatter) + " - " + endDate.format(formatter));
-
-        }
     }
 
     @Test
     public void testString() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("abc", 123);
-        String ab = "?params=" + StringUtil.toJsonString(map);
-        System.out.println(ab);
-        char quote = '"';
-        ab = ab.replaceAll("\"", "\\\\\"");
-        System.out.println(ab);
+        String str = "VNG-200726-0001";
+        System.out.println(str.substring(str.length() - 4));
     }
 
     @Test

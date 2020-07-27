@@ -319,3 +319,7 @@
 17-07-2020:
  + Version 2.7.2:
     - Fixed some bugs
+
+27-07-2020:
+ + Version 2.8.0:
+    - Salary

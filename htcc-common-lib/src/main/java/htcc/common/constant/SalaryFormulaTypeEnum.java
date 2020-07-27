@@ -2,18 +2,19 @@ package htcc.common.constant;
 
 import java.util.HashMap;
 
-public enum PaymentCycleTypeEnum {
+public enum SalaryFormulaTypeEnum {
 
-    MONTHLY(1),
-    YEARLY (2),
-    WEEKLY(3)
+    PERCENTAGE(2),
+    DIRECT(1),
+    TIMES(0),
+
     ;
 
     private final int value;
 
-    private static final HashMap<Integer, PaymentCycleTypeEnum> map = new HashMap<>();
+    private static final HashMap<Integer, SalaryFormulaTypeEnum> map = new HashMap<>();
 
-    PaymentCycleTypeEnum(int value) {
+    SalaryFormulaTypeEnum(int value) {
         this.value = value;
     }
 
@@ -21,7 +22,7 @@ public enum PaymentCycleTypeEnum {
         return this.value;
     }
 
-    public static PaymentCycleTypeEnum fromInt(int iValue) {
+    public static SalaryFormulaTypeEnum fromInt(int iValue) {
         return map.get(iValue);
     }
 
@@ -30,11 +31,10 @@ public enum PaymentCycleTypeEnum {
     }
 
     static {
-        PaymentCycleTypeEnum[] var0 = values();
+        SalaryFormulaTypeEnum[] var0 = values();
 
-        for (PaymentCycleTypeEnum errorCodeEnum : var0) {
+        for (SalaryFormulaTypeEnum errorCodeEnum : var0) {
             map.put(errorCodeEnum.value, errorCodeEnum);
         }
-
     }
 }

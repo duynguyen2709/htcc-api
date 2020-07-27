@@ -2,14 +2,19 @@ package htcc.employee.service.controller.internal;
 
 import htcc.common.comparator.EmployeeIdComparator;
 import htcc.common.constant.Constant;
+import htcc.common.constant.PaymentCycleTypeEnum;
 import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.constant.SalaryFormulaEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.companyuser.CompanyUserModel;
 import htcc.common.entity.jpa.EmployeeInfo;
+import htcc.common.entity.payslip.SalaryFormula;
 import htcc.common.entity.role.EmployeePermission;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
 import htcc.employee.service.service.jpa.EmployeePermissionService;
+import htcc.employee.service.service.salary.SalaryCalculationService;
+import htcc.employee.service.service.salary.SalaryFormulaService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +38,9 @@ public class InternalCompanyUserController {
 
     @Autowired
     private EmployeePermissionService employeePermissionService;
+
+    @Autowired
+    private SalaryCalculationService salaryCalculationService;
 
     @PostMapping("/employeeinfo")
     public BaseResponse createDefaultEmployee(@RequestBody CompanyUserModel model) {
@@ -67,16 +75,31 @@ public class InternalCompanyUserController {
             employee.setAvatar(Constant.USER_DEFAULT_AVATAR);
             employee = service.create(employee);
 
-            EmployeePermission permission = new EmployeePermission();
-            permission.setCompanyId(model.getCompanyId());
-            permission.setUsername(model.getUsername());
-            permission.setLineManager(StringUtil.EMPTY);
-            permission.setSubManagers(new ArrayList<>());
-            permission.setSubordinates(new ArrayList<>());
-            permission.setCanManageOffices(new ArrayList<>());
-            permission.setCanManageDepartments(new ArrayList<>());
-            permission.setManagerRole(Constant.ROLE_SUPER_ADMIN);
-            employeePermissionService.create(permission);
+            if (employee != null) {
+                EmployeePermission permission = new EmployeePermission();
+                permission.setCompanyId(model.getCompanyId());
+                permission.setUsername(model.getUsername());
+                permission.setLineManager(StringUtil.EMPTY);
+                permission.setSubManagers(new ArrayList<>());
+                permission.setSubordinates(new ArrayList<>());
+                permission.setCanManageOffices(new ArrayList<>());
+                permission.setCanManageDepartments(new ArrayList<>());
+                permission.setManagerRole(Constant.ROLE_SUPER_ADMIN);
+                permission = employeePermissionService.create(permission);
+
+                if (permission != null) {
+                    SalaryFormula formula = salaryCalculationService.createDefaultSalaryFormula(model.getCompanyId(), model.getUsername());
+                    if (formula == null) {
+                        rollbackEmployeePermission(model.getCompanyId(), model.getUsername());
+                        rollbackEmployeeInfo(model.getCompanyId(), model.getUsername());
+                        throw new Exception("createDefaultSalaryFormula return null");
+                    }
+                }
+                else {
+                    rollbackEmployeeInfo(model.getCompanyId(), model.getUsername());
+                    throw new Exception("employeePermissionService.create return null");
+                }
+            }
 
             response.setData(employee);
         } catch (Exception e) {
@@ -86,4 +109,14 @@ public class InternalCompanyUserController {
 
         return response;
     }
+
+    private void rollbackEmployeeInfo(String companyId, String username) {
+        service.delete(new EmployeeInfo.Key(companyId, username));
+    }
+
+    private void rollbackEmployeePermission(String companyId, String username) {
+        employeePermissionService.delete(new EmployeePermission.Key(companyId, username));
+    }
+
+
 }

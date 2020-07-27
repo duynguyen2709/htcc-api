@@ -1,11 +1,18 @@
 package htcc.employee.service.controller.payslip;
 
 import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.constant.SalaryFormulaEnum;
+import htcc.common.constant.SalaryFormulaTypeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.payslip.EmployeePayslipResponse;
+import htcc.common.entity.payslip.SalaryFormula;
+import htcc.common.entity.payslip.SalaryModel;
 import htcc.common.util.DateTimeUtil;
+import htcc.common.util.StringUtil;
+import htcc.employee.service.service.salary.SalaryCalculationService;
 import io.swagger.annotations.Api;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,16 +28,14 @@ import java.util.*;
 @RestController
 @Log4j2
 public class EmployeePayslipController {
-    // TODO : implement this class
 
-    private static final List<String> incomeCategories = Arrays.asList("Lương cơ bản", "Phụ cấp ăn trưa", "Thưởng KPI", "Tăng ca", "Thưởng sinh nhật");
-    private static final List<String> deductionCategories = Arrays.asList("Phạt đi trễ", "Phạt quên điểm danh", "Thuế thu nhập cá nhân");
+    @Autowired
+    private SalaryCalculationService salaryCalculationService;
 
     @GetMapping("/payslip")
     public BaseResponse getPayslip(@RequestParam String companyId,
                                       @RequestParam String username,
-                                      @RequestParam String yyyyMM,
-                                   @RequestParam(required = false) Integer count) {
+                                      @RequestParam String yyyyMM) {
         BaseResponse<List<EmployeePayslipResponse>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             if (!DateTimeUtil.isRightFormat(yyyyMM, "yyyyMM")) {
@@ -41,14 +46,10 @@ public class EmployeePayslipController {
 
             List<EmployeePayslipResponse> dataResponse = new ArrayList<>();
 
-            String thisMonth = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMM");
-            if (Integer.parseInt(yyyyMM) <= Integer.parseInt(thisMonth) ||
-                    Integer.parseInt(yyyyMM) > 202002) {
-                int n = count == null ? new Random().nextInt(3) + 1 : count;
-                for (int i = 0; i < n; i++) {
-                    EmployeePayslipResponse entity = fakeResponse(n, i, companyId, username, yyyyMM);
-                    dataResponse.add(entity);
-                }
+            List<SalaryModel> salaryModelList = salaryCalculationService.getPayslip(companyId, username, yyyyMM);
+            for (SalaryModel salaryModel : salaryModelList) {
+                EmployeePayslipResponse entity = calculateSalary(salaryModel, yyyyMM);
+                dataResponse.add(entity);
             }
 
             response.setData(dataResponse);
@@ -59,60 +60,144 @@ public class EmployeePayslipController {
         return response;
     }
 
-    private EmployeePayslipResponse fakeResponse(int n, int i, String companyId, String username, String yyyyMM) {
+    private EmployeePayslipResponse calculateSalary(SalaryModel model, String yyyyMM) {
         EmployeePayslipResponse result = new EmployeePayslipResponse();
-
-        // do buz
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate date = LocalDate.parse(yyyyMM + "01", formatter);
-        int totalDaysInMonth = date.lengthOfMonth();
-        LocalDate startDate = date.plusDays(i * totalDaysInMonth / n);
-        LocalDate endDate = startDate.plusDays(totalDaysInMonth / n);
-        if (i == n - 1) {
-            endDate = date.plusDays(totalDaysInMonth - 1);
-        }
-        LocalDate payDate = endDate.plusDays(1);
-        result.setDateFrom(startDate.format(formatter));
-        result.setDateTo(endDate.format(formatter));
-        result.setPayDate(payDate.format(formatter));
-        result.setPaySlipId(String.format("#Payslip-%s-%s-%s_%s", companyId, username, yyyyMM, i));
+        result.setPaySlipId(model.getPaySlipId());
+        result.setDateFrom(model.getLastPaymentDate());
+        result.setDateTo(model.getNextPaymentDate());
+        result.setPayDate(model.getLockDate());
+        result.setTotalIncome(String.format("%s VND", toVND(model.getTotalIncome())));
+        result.setTotalDeduction(String.format("%s VND", toVND(model.getTotalDeduction())));
+        result.setTotalNetPay(String.format("%s VND", toVND(model.getTotalIncome() - model.getTotalDeduction())));
         result.setIncomeList(new ArrayList<>());
         result.setDeductionList(new ArrayList<>());
 
-        int incomeN = new Random().nextInt(5) + 1;
-        int deductionN = new Random().nextInt(3) + 1;
+        Map<String, SalaryFormula.DetailFormula> formulaMap = new HashMap<>();
+        formulaMap.put(SalaryFormulaEnum.BASE.getId(), model.getBaseSalary());
+        formulaMap.put(SalaryFormulaEnum.EXTRA.getId(), model.getExtraSalary());
+        formulaMap.put(SalaryFormulaEnum.MEAL.getId(), model.getMealMoney());
+        formulaMap.put(SalaryFormulaEnum.OVERTIME.getId(), model.getOvertimeMoney());
+        formulaMap.put(SalaryFormulaEnum.LATE.getId(), model.getLatePenalty());
+        formulaMap.put(SalaryFormulaEnum.NON_PERMISSION_OFF.getId(), model.getNonPermissionOff());
+        formulaMap.put(SalaryFormulaEnum.TAX.getId(), model.getTaxMoney());
+        formulaMap.put(SalaryFormulaEnum.INSURANCE.getId(), model.getInsuranceMoney());
+        formulaMap.put(SalaryFormulaEnum.PRE_TAX_REDUCTION.getId(), model.getPreTaxDependencyReduction());
+        for (SalaryFormula.DetailFormula detail : model.getAdditionalIncome()) {
+            formulaMap.put(detail.getFormulaId(), detail);
+        }
+        for (SalaryFormula.DetailFormula detail : model.getAdditionalPenalty()) {
+            formulaMap.put(detail.getFormulaId(), detail);
+        }
 
-        long totalIncome = 0L;
-        for (int k = 0 ; k < incomeN; k++) {
-            EmployeePayslipResponse.PayslipDetailValue detail = new EmployeePayslipResponse.PayslipDetailValue();
-            detail.setCategory(incomeCategories.get(k));
-            detail.setExtraInfo(new Random().nextInt(2) == 0 ? "" : "Đây là thông tin phụ");
-            if (k == 0) {
-                long amount = new Random().nextInt(10_000_000) + 5_000_000L;
-                totalIncome += amount;
-                detail.setAmount(String.format("%s VND", toVND(amount)));
-            } else {
-                long amount = new Random().nextInt(1_000_000) + 100_000L;
-                totalIncome += amount;
-                detail.setAmount(String.format("%s VND", toVND(amount)));
+        // Base Salary
+        EmployeePayslipResponse.PayslipDetailValue baseSalary = new EmployeePayslipResponse.PayslipDetailValue();
+        baseSalary.setCategory(model.getBaseSalary().getDescription());
+        baseSalary.setExtraInfo(StringUtil.EMPTY);
+        baseSalary.setAmount(String.format("%s VND", toVND(model.getBaseSalary().getTotalAmount())));
+        if (model.getBaseSalary().getType() == 2) {
+            baseSalary.setExtraInfo(String.format("= %s đ/h * số giờ", model.getBaseSalary().getValue()));
+        }
+        result.getIncomeList().add(baseSalary);
+
+
+        // Extra Salary
+        if (model.getExtraSalary().getValue() > 0) {
+            EmployeePayslipResponse.PayslipDetailValue extraSalary = new EmployeePayslipResponse.PayslipDetailValue();
+            extraSalary.setCategory(model.getExtraSalary().getDescription());
+            extraSalary.setExtraInfo(StringUtil.EMPTY);
+            extraSalary.setAmount(String.format("%s VND", toVND(model.getExtraSalary().getTotalAmount())));
+            result.getIncomeList().add(extraSalary);
+        }
+
+
+        // Meal Money
+        if (model.getMealMoney().getValue() > 0) {
+            EmployeePayslipResponse.PayslipDetailValue mealMoney = new EmployeePayslipResponse.PayslipDetailValue();
+            mealMoney.setCategory(model.getMealMoney().getDescription());
+            mealMoney.setExtraInfo(StringUtil.EMPTY);
+            mealMoney.setAmount(String.format("%s VND", toVND(model.getMealMoney().getTotalAmount())));
+            result.getIncomeList().add(mealMoney);
+        }
+
+
+        // Overtime Money
+        if (model.getOvertimeMoney().getValue() > 0) {
+            EmployeePayslipResponse.PayslipDetailValue overtimeMoney = new EmployeePayslipResponse.PayslipDetailValue();
+            overtimeMoney.setCategory(model.getOvertimeMoney().getDescription());
+            overtimeMoney.setExtraInfo(String.format("= %s đ/h * số giờ", model.getOvertimeMoney().getValue()));
+            overtimeMoney.setAmount(String.format("%s VND", toVND(model.getOvertimeMoney().getTotalAmount())));
+            result.getIncomeList().add(overtimeMoney);
+        }
+
+        for (SalaryFormula.DetailFormula formula : model.getAdditionalIncome()) {
+            if (formula.getValue() > 0) {
+                EmployeePayslipResponse.PayslipDetailValue detail = new EmployeePayslipResponse.PayslipDetailValue();
+                detail.setCategory(formula.getDescription());
+                detail.setAmount(String.format("%s VND", toVND(formula.getTotalAmount())));
+                if (formula.getType() == SalaryFormulaTypeEnum.PERCENTAGE.getValue()) {
+                    SalaryFormula.DetailFormula baseOn = formulaMap.get(formula.getIdBasedOn());
+                    String desc = (baseOn == null) ? "" : baseOn.getDescription();
+                    String extra = String.format("= %s x %s%%", desc, formula.getValue());
+                }
+                result.getIncomeList().add(detail);
             }
-            result.getIncomeList().add(detail);
         }
 
-        long totalDeduction = 0L;
-        for (int k = 0 ; k < deductionN; k++) {
-            EmployeePayslipResponse.PayslipDetailValue detail = new EmployeePayslipResponse.PayslipDetailValue();
-            detail.setCategory(deductionCategories.get(k));
-            detail.setExtraInfo(new Random().nextInt(2) == 0 ? "" : "Đây là thông tin phụ");
-            long amount = new Random().nextInt(100_000) + 500_000L;
-            totalDeduction += amount;
-            detail.setAmount(String.format("%s VND", toVND(amount)));
-            result.getDeductionList().add(detail);
+        // Deduction List
+
+        // Late Penalty
+        if (model.getLatePenalty().getValue() > 0) {
+            EmployeePayslipResponse.PayslipDetailValue latePenalty = new EmployeePayslipResponse.PayslipDetailValue();
+            latePenalty.setCategory(model.getLatePenalty().getDescription());
+            latePenalty.setExtraInfo(String.format("= %s đ * số lần", model.getLatePenalty().getValue()));
+            latePenalty.setAmount(String.format("%s VND", toVND(model.getLatePenalty().getTotalAmount())));
+            result.getDeductionList().add(latePenalty);
         }
 
-        result.setTotalIncome(String.format("%s VND", toVND(totalIncome)));
-        result.setTotalDeduction(String.format("%s VND", toVND(totalDeduction)));
-        result.setTotalNetPay(String.format("%s VND", toVND(totalIncome - totalDeduction)));
+        // Non Permission Off
+        if (model.getNonPermissionOff().getValue() > 0) {
+            EmployeePayslipResponse.PayslipDetailValue nonPermissionOff = new EmployeePayslipResponse.PayslipDetailValue();
+            nonPermissionOff.setCategory(model.getLatePenalty().getDescription());
+            nonPermissionOff.setExtraInfo(String.format("= %s đ * số ngày", model.getLatePenalty().getValue()));
+            nonPermissionOff.setAmount(String.format("%s VND", toVND(model.getLatePenalty().getTotalAmount())));
+            result.getDeductionList().add(nonPermissionOff);
+        }
+
+        // Insurance
+        if (model.getInsuranceMoney().getValue() > 0) {
+            EmployeePayslipResponse.PayslipDetailValue insurance = new EmployeePayslipResponse.PayslipDetailValue();
+            insurance.setCategory(model.getInsuranceMoney().getDescription());
+            insurance.setExtraInfo(String.format("= Lương cơ bản x %s%%", model.getInsuranceMoney().getValue()));
+            insurance.setAmount(String.format("%s VND", toVND(model.getInsuranceMoney().getTotalAmount())));
+            result.getDeductionList().add(insurance);
+        }
+
+        // Tax
+        if (model.getTaxMoney().getValue() > 0) {
+            EmployeePayslipResponse.PayslipDetailValue tax = new EmployeePayslipResponse.PayslipDetailValue();
+            tax.setCategory(model.getTaxMoney().getDescription());
+            String preTax = model.getPreTaxDependencyReduction().getValue() > 0 ?
+                    String.format(" - Giảm trừ phụ thuộc %s đ", (long)model.getPreTaxDependencyReduction().getValue()) : "";
+            tax.setExtraInfo(String.format("= (Tổng thu nhập %s- Các khoản không tính thuế) x %s%%",
+                    preTax, model.getTaxMoney().getValue()));
+            tax.setAmount(String.format("%s VND", toVND(model.getTaxMoney().getTotalAmount())));
+            result.getDeductionList().add(tax);
+        }
+
+        // Additional Deduction
+        for (SalaryFormula.DetailFormula formula : model.getAdditionalPenalty()) {
+            if (formula.getValue() > 0) {
+                EmployeePayslipResponse.PayslipDetailValue detail = new EmployeePayslipResponse.PayslipDetailValue();
+                detail.setCategory(formula.getDescription());
+                detail.setAmount(String.format("%s VND", toVND(formula.getTotalAmount())));
+                if (formula.getType() == SalaryFormulaTypeEnum.PERCENTAGE.getValue()) {
+                    SalaryFormula.DetailFormula baseOn = formulaMap.get(formula.getIdBasedOn());
+                    String desc = (baseOn == null) ? "" : baseOn.getDescription();
+                    String extra = String.format("= %s x %s%%", desc, formula.getValue());
+                }
+                result.getDeductionList().add(detail);
+            }
+        }
 
         return result;
     }

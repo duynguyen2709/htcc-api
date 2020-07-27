@@ -1,12 +1,16 @@
 package htcc.employee.service.controller.department;
 
+import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.departmentinfo.DepartmentInfo;
 import htcc.common.entity.jpa.Department;
+import htcc.common.entity.role.EmployeePermission;
 import htcc.common.util.StringUtil;
+import htcc.employee.service.repository.PermissionRepository;
 import htcc.employee.service.service.jpa.DepartmentService;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.EmployeePermissionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,6 +18,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,13 +33,28 @@ public class DepartmentRestController {
     @Autowired
     private EmployeeInfoService employeeService;
 
+    @Autowired
+    private EmployeePermissionService employeePermissionService;
+
+    @Autowired
+    private PermissionRepository permissionRepository;
+
     @ApiOperation(value = "Lấy danh sách phòng ban", response = DepartmentInfo.class)
     @GetMapping("/departments/{companyId}")
     public BaseResponse getListDepartment(@ApiParam(value = "[Path] Mã công ty", required = true, defaultValue = "VNG")
-                                          @PathVariable String companyId){
+                                          @PathVariable String companyId,
+                                          @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String actor){
         BaseResponse<DepartmentInfo> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
-            List<Department> departmentList = departmentService.findByCompanyId(companyId);
+            List<Department> departmentList = new ArrayList<>();
+            List<String> departmentIdList = permissionRepository.getCanManageDepartments(companyId, actor);
+            for (String department : departmentIdList) {
+                Department dep = departmentService.findById(new Department.Key(companyId, department));
+                if (dep != null) {
+                    departmentList.add(dep);
+                }
+            }
+
             List<String> employeeList = employeeService.findByCompanyId(companyId)
                     .stream()
                     .map(e -> String.format("%s - %s", e.getUsername(), e.getFullName()))
@@ -55,7 +75,8 @@ public class DepartmentRestController {
     @ApiOperation(value = "Tạo phòng ban mới", response = Department.class)
     @PostMapping("/departments")
     public BaseResponse createDepartment(@ApiParam(value = "[Body] Thông tin phòng ban mới", required = true)
-                                      @RequestBody Department department) {
+                                      @RequestBody Department department,
+                                         @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String actor) {
         BaseResponse<Department> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Tạo phòng ban mới thành công");
         try {
@@ -74,6 +95,15 @@ public class DepartmentRestController {
             }
 
             department = departmentService.create(department);
+
+            if (department != null) {
+                EmployeePermission permission = employeePermissionService.findById(new EmployeePermission.Key(department.getCompanyId(), actor));
+                List<String> departmentList = permission.getCanManageDepartments();
+                departmentList.add(department.getDepartment());
+                permission.setCanManageDepartments(departmentList);
+                employeePermissionService.update(permission);
+            }
+
             response.setData(department);
         } catch (Exception e) {
             log.error("[createDepartment] {} ex", StringUtil.toJsonString(department), e);

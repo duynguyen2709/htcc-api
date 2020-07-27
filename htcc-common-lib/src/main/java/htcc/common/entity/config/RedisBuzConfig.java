@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedisBuzConfig {
 
+    public String paySlipIdFormat = "PAYSLIP-%s-%s"; // companyId-date
+
     public String orderIdFormat = "ORDER-ID";
     public String orderFormat = "ORDER-%s"; // orderId
 

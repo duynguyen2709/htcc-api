@@ -1,11 +1,15 @@
 package htcc.employee.service.controller.office;
 
+import htcc.common.constant.Constant;
 import htcc.common.constant.ReturnCodeEnum;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.jpa.Office;
+import htcc.common.entity.role.EmployeePermission;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.config.DbStaticConfigMap;
+import htcc.employee.service.repository.PermissionRepository;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
+import htcc.employee.service.service.jpa.EmployeePermissionService;
 import htcc.employee.service.service.jpa.OfficeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +18,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Api(tags = "API quản lý danh sách chi nhánh (CỦA QUẢN LÝ)")
@@ -27,16 +32,32 @@ public class OfficeRestController {
     @Autowired
     private EmployeeInfoService employeeService;
 
+    @Autowired
+    private EmployeePermissionService employeePermissionService;
+
+    @Autowired
+    private PermissionRepository permissionRepository;
+
     @ApiOperation(value = "Lấy danh sách chi nhánh", response = Office.class)
     @GetMapping("/offices/{companyId}")
     public BaseResponse getListOffice(@ApiParam(value = "[Path] Mã công ty", required = true, defaultValue = "VNG")
-                                          @PathVariable String companyId){
-        BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
+                                          @PathVariable String companyId,
+                                      @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String actor){
+        BaseResponse<List<Office>> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
-            response.setData(officeService.findByCompanyId(companyId));
+            List<Office> officeList = new ArrayList<>();
+            List<String> officeIdList = permissionRepository.getCanManageOffices(companyId, actor);
+            for (String officeId : officeIdList) {
+                Office office = officeService.findById(new Office.Key(companyId, officeId));
+                if (office != null) {
+                    officeList.add(office);
+                }
+            }
+
+            response.setData(officeList);
         } catch (Exception e){
             log.error("[getListOffice] [{}] ex", companyId, e);
-            response = new BaseResponse(e);
+            response = new BaseResponse<>(e);
         }
         return response;
     }
@@ -47,7 +68,8 @@ public class OfficeRestController {
     @ApiOperation(value = "Tạo chi nhánh mới", response = Office.class)
     @PostMapping("/offices")
     public BaseResponse createOffice(@ApiParam(value = "[Body] Thông tin chi nhánh mới", required = true)
-                                      @RequestBody Office office) {
+                                      @RequestBody Office office,
+                                     @ApiParam(hidden = true) @RequestHeader(Constant.USERNAME) String actor) {
         BaseResponse<Office> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Tạo chi nhánh mới thành công");
         try {
@@ -73,6 +95,14 @@ public class OfficeRestController {
             }
 
             office = officeService.create(office);
+            if (office != null) {
+                EmployeePermission permission = employeePermissionService.findById(new EmployeePermission.Key(office.getCompanyId(), actor));
+                List<String> officeList = permission.getCanManageOffices();
+                officeList.add(office.getOfficeId());
+                permission.setCanManageOffices(officeList);
+                employeePermissionService.update(permission);
+            }
+
             response.setData(office);
         } catch (Exception e) {
             log.error("[createOffice] {} ex", StringUtil.toJsonString(office), e);

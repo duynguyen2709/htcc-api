@@ -161,6 +161,10 @@ public class LeavingRequestController {
         response.setReturnMessage("Đơn nghỉ phép của bạn đã gửi thành công. Vui lòng chờ quản lý phê duyệt.");
         LeavingRequestModel model = null;
         try {
+            if (request.getClientId() == 0) {
+                request.setClientId(ClientSystemEnum.MOBILE.getValue());
+            }
+
             String error = request.isValid();
             if (!error.isEmpty()){
                 response = new BaseResponse(ReturnCodeEnum.PARAM_DATA_INVALID);
@@ -265,7 +269,8 @@ public class LeavingRequestController {
 
     private boolean isConflictSession(LeavingRequest.LeavingDayDetail detail, List<ShiftArrangementModel> shiftArrangementList) {
         for (ShiftArrangementModel model : shiftArrangementList) {
-            if (model.getShiftTime().getSession() == SessionEnum.FULL_DAY.getValue()) {
+            if (model.getShiftTime().getSession() == SessionEnum.FULL_DAY.getValue() ||
+                    detail.getSession() ==  SessionEnum.FULL_DAY.getValue()) {
                 return true;
             }
 
@@ -283,7 +288,8 @@ public class LeavingRequestController {
             if (shiftTime == null) {
                 continue;
             }
-            if (shiftTime.getSession() == SessionEnum.FULL_DAY.getValue()) {
+            if (shiftTime.getSession() == SessionEnum.FULL_DAY.getValue() ||
+                    detail.getSession() == SessionEnum.FULL_DAY.getValue()) {
                 return true;
             }
 
