@@ -138,31 +138,35 @@ public class SalaryLogController {
             log.error(String.format("[lockSalaryLog] %s ex", StringUtil.toJsonString(request)), e);
             response = new BaseResponse<>(e);
         } if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
-            for (String username : usernameList) {
-                NotificationModel model = new NotificationModel();
-                model.setRequestId(LoggingConfiguration.getTraceId());
-                model.setSourceClientId(0);
-                model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
-                model.setReceiverType(2);
-                model.setSender("Hệ thống");
-                model.setCompanyId(companyId);
-                model.setUsername(username);
-                model.setSendTime(System.currentTimeMillis());
+            try {
+                for (String username : usernameList) {
+                    NotificationModel model = new NotificationModel();
+                    model.setRequestId(LoggingConfiguration.getTraceId());
+                    model.setSourceClientId(0);
+                    model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
+                    model.setReceiverType(2);
+                    model.setSender("Hệ thống");
+                    model.setCompanyId(companyId);
+                    model.setUsername(username);
+                    model.setSendTime(System.currentTimeMillis());
 
-                int screenId = ScreenEnum.PAYCHECK.getValue();
-                model.setScreenId(screenId);
-                NotificationIconConfig icon = iconService.getIcon(screenId);
-                if (icon != null) {
-                    model.setIconId(icon.getIconId());
-                    model.setIconUrl(icon.getIconURL());
+                    int screenId = ScreenEnum.PAYCHECK.getValue();
+                    model.setScreenId(screenId);
+                    NotificationIconConfig icon = iconService.getIcon(screenId);
+                    if (icon != null) {
+                        model.setIconId(icon.getIconId());
+                        model.setIconUrl(icon.getIconURL());
+                    }
+
+                    model.setStatus(NotificationStatusEnum.INIT.getValue());
+                    model.setHasRead(false);
+                    model.setTitle("Thông báo về bảng lương");
+                    model.setContent("Bảng lương tháng mới của bạn đã sẵn sàng. Vào kiểm tra ngay thôi");
+
+                    kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
                 }
-
-                model.setStatus(NotificationStatusEnum.INIT.getValue());
-                model.setHasRead(false);
-                model.setTitle("Thông báo về bảng lương");
-                model.setContent("Bảng lương tháng mới của bạn đã sẵn sàng. Vào kiểm tra ngay thôi");
-
-                kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
+            } catch (Exception e) {
+                log.error(String.format("[lockSalaryLog] %s ex", StringUtil.toJsonString(request)), e);
             }
         }
         return response;
