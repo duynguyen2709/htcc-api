@@ -62,7 +62,7 @@ public class EmployeePayslipController {
 
     private EmployeePayslipResponse calculateSalary(SalaryModel model, String yyyyMM) {
         EmployeePayslipResponse result = new EmployeePayslipResponse();
-        result.setPaySlipId(model.getPaySlipId());
+        result.setPaySlipId("#" + model.getPaySlipId());
         result.setDateFrom(model.getLastPaymentDate());
         result.setDateTo(model.getNextPaymentDate());
         result.setPayDate(model.getLockDate());

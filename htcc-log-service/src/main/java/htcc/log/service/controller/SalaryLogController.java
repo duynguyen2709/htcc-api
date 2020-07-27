@@ -81,13 +81,18 @@ public class SalaryLogController {
     }
 
     @PostMapping("/salary")
-    public BaseResponse insertPayslip(@RequestBody SalaryFormula formula) {
+    public BaseResponse insertPayslip(@RequestBody SalaryFormula formula,
+                                      @RequestParam long totalIncome,
+                                      @RequestParam long totalDeduction) {
         BaseResponse<Long> response = new BaseResponse<>(ReturnCodeEnum.SUCCESS);
         try {
             SalaryLogEntity logEntity = new SalaryLogEntity(formula);
 
             String payslipId = salaryService.genPayslipId(logEntity);
             logEntity.setPaySlipId(payslipId);
+            logEntity.setTotalIncome(totalIncome);
+            logEntity.setTotalDeduction(totalDeduction);
+            logEntity.setTotalNetPay(totalIncome - totalDeduction);
 
             long id = baseLogDAO.insertLog(logEntity);
             response.setData(id);

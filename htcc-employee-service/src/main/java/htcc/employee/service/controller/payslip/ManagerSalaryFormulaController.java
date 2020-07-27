@@ -8,6 +8,7 @@ import htcc.common.entity.payslip.ManagerLockSalaryRequest;
 import htcc.common.entity.payslip.SalaryModel;
 import htcc.common.entity.payslip.SalaryFormula;
 import htcc.common.util.DateTimeUtil;
+import htcc.common.util.NumberUtil;
 import htcc.common.util.StringUtil;
 import htcc.employee.service.repository.PermissionRepository;
 import htcc.employee.service.service.jpa.EmployeeInfoService;
@@ -97,6 +98,16 @@ public class ManagerSalaryFormulaController {
             if (formula == null) {
                 response = new BaseResponse<>(ReturnCodeEnum.DATA_NOT_FOUND);
                 response.setReturnMessage("Không tìm thấy công thức tính lương cho nhân viên " + username);
+                return response;
+            }
+
+            String today = DateTimeUtil.parseTimestampToString(System.currentTimeMillis(), "yyyyMMdd");
+            long nextPaymentDate = NumberUtil.getLongValue(formula.getNextPaymentDate());
+            long todayNum = Long.parseLong(today);
+
+            if (todayNum < nextPaymentDate) {
+                response = new BaseResponse<>(ReturnCodeEnum.PARAM_DATA_INVALID);
+                response.setReturnMessage("Chưa tới ngày kết thúc kì lương. Vui lòng cập nhật lại");
                 return response;
             }
 

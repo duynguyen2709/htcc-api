@@ -198,10 +198,10 @@ public class LogService {
     /*
     ##################### Salary Section #####################
      */
-    public BaseResponse insertSalaryLog(SalaryFormula entity) {
+    public BaseResponse insertSalaryLog(SalaryFormula entity, long totalIncome, long totalDeduction) {
         try {
             HttpEntity<SalaryFormula> request = new HttpEntity<>(entity);
-            String method = "/salary";
+            String method = String.format("/salary?totalIncome=%s&totalDeduction=%s", totalIncome, totalDeduction);
             return restTemplate.postForObject(baseURL + method, request, BaseResponse.class);
         } catch (Exception e) {
             log.error(e);

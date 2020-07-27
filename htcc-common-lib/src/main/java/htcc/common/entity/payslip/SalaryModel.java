@@ -86,7 +86,7 @@ public class SalaryModel implements Serializable {
                 SalaryFormula.DetailFormula.class);
         this.additionalIncome = StringUtil.json2Collection(entity.getAdditionalIncome(),
                 new TypeToken<List<SalaryFormula.DetailFormula>>() {}.getType());
-        this.additionalPenalty = StringUtil.json2Collection(entity.getAdditionalIncome(),
+        this.additionalPenalty = StringUtil.json2Collection(entity.getAdditionalPenalty(),
                 new TypeToken<List<SalaryFormula.DetailFormula>>() {}.getType());
 
     }

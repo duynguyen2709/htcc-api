@@ -184,18 +184,6 @@ public class SalaryFormula extends BaseJPAEntity {
             if (Long.parseLong(lastPaymentDate) >= Long.parseLong(nextPaymentDate)) {
                 return "Ngày trả lương tiếp theo phải sau ngày trả lương trước";
             }
-            int dayDiff = DateTimeUtil.calcDayDiff(lastPaymentDate, nextPaymentDate, "yyyyMMdd");
-
-            if (cycleType == 1) {
-                if (dayDiff < 28) {
-                    return "Khoảng cách ngày trả lương ít nhất là 28 ngày cho loại bảng lương tháng";
-                }
-            }
-            else if (cycleType == 2) {
-                if (dayDiff < 7) {
-                    return "Khoảng cách ngày trả lương ít nhất là 7 ngày cho loại bảng lương tuần";
-                }
-            }
         }
         Set<String> formulaIdSet = new HashSet<>();
         for (SalaryFormulaEnum formulaEnum : SalaryFormulaEnum.values()) {
