@@ -96,6 +96,28 @@ public class SalaryLogRepositoryImpl implements SalaryLogRepository {
     }
 
     @Override
+    public List<SalaryLogEntity> getSalaryLogInList(List<String> paySlipIdList, String yyyyMM) throws Exception {
+        try {
+            final String tableName = TABLE_PREFIX + yyyyMM;
+            if (!MAP_TABLE_LOG.containsKey(tableName)) {
+                throw new Exception("Table " + tableName + " is not exist");
+            }
+
+            String list = "";
+            for (String id : paySlipIdList) {
+                list += ",'" + id + "'";
+            }
+            list = list.substring(1);
+
+            final String query = String.format("SELECT * FROM %s WHERE paySlipId IN (%s) AND status = 0", tableName, list);
+            return jdbcTemplate.query(query, new SalaryLogRowMapper());
+        } catch (Exception e) {
+            log.error("[getSalaryLogInList] ex", e);
+            return null;
+        }
+    }
+
+    @Override
     public int deleteSalaryLog(String yyyyMM, String paySlipId) {
         try {
             final String tableName = TABLE_PREFIX + yyyyMM;

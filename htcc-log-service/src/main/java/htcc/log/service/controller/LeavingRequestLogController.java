@@ -1,16 +1,20 @@
 package htcc.log.service.controller;
 
-import htcc.common.constant.ComplaintStatusEnum;
-import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.component.LoggingConfiguration;
+import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.constant.*;
 import htcc.common.entity.base.BaseResponse;
+import htcc.common.entity.icon.NotificationIconConfig;
 import htcc.common.entity.leavingrequest.LeavingRequest;
 import htcc.common.entity.leavingrequest.LeavingRequestLogEntity;
 import htcc.common.entity.leavingrequest.LeavingRequestModel;
 import htcc.common.entity.leavingrequest.UpdateLeavingRequestStatusModel;
+import htcc.common.entity.notification.NotificationModel;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.repository.LeavingRequestLogRepository;
 import htcc.log.service.repository.LogCounterRepository;
+import htcc.log.service.service.icon.IconService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +33,12 @@ public class LeavingRequestLogController {
 
     @Autowired
     private LogCounterRepository logCounterRepo;
+
+    @Autowired
+    private KafkaProducerService kafka;
+
+    @Autowired
+    private IconService iconService;
 
     @GetMapping("/leaving")
     public BaseResponse getOneLeavingRequestLog(@RequestParam String leavingRequestId,
@@ -169,9 +179,10 @@ public class LeavingRequestLogController {
     @PostMapping("/leaving/status")
     public BaseResponse updateLeavingRequestStatus(@RequestBody UpdateLeavingRequestStatusModel request){
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
-        response.setReturnMessage("Xử lý khiếu nại thành công");
+        response.setReturnMessage("Xử lý đơn nghỉ phép thành công");
         int result = 0;
-
+        String companyId = "";
+        String username = "";
         try {
             LeavingRequestLogEntity oldEnt = repo.getOneLeavingRequest(request);
             if (oldEnt == null) {
@@ -188,10 +199,38 @@ public class LeavingRequestLogController {
                 return response;
             }
 
+            companyId = oldEnt.getCompanyId();
+            username = oldEnt.getUsername();
+
             result = repo.updateLeavingRequestLogStatus(request);
         } catch (Exception e){
             log.error(String.format("[updateLeavingRequestStatus] [%s] ex", StringUtil.toJsonString(request)), e);
             response = new BaseResponse(e);
+        } finally {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
+                NotificationModel model = new NotificationModel();
+                model.setRequestId(LoggingConfiguration.getTraceId());
+                model.setSourceClientId(0);
+                model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
+                model.setReceiverType(2);
+                model.setSender("Hệ thống");
+                model.setCompanyId(companyId);
+                model.setUsername(username);
+                model.setSendTime(System.currentTimeMillis());
+                int screenId = ScreenEnum.DAY_OFF.getValue();
+                model.setScreenId(screenId);
+                NotificationIconConfig icon = iconService.getIcon(screenId);
+                if (icon != null) {
+                    model.setIconId(icon.getIconId());
+                    model.setIconUrl(icon.getIconURL());
+                }
+                model.setStatus(NotificationStatusEnum.INIT.getValue());
+                model.setHasRead(false);
+                model.setTitle("Trạng thái đơn nghỉ phép " + request.getLeavingRequestId());
+                model.setContent("Đơn nghỉ phép của bạn đã được xử lý. Vào xem ngay thôi");
+
+                kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
+            }
         }
 
         return response;

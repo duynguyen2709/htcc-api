@@ -1,16 +1,20 @@
 package htcc.log.service.controller;
 
-import htcc.common.constant.ComplaintStatusEnum;
-import htcc.common.constant.ReturnCodeEnum;
+import htcc.common.component.LoggingConfiguration;
+import htcc.common.component.kafka.KafkaProducerService;
+import htcc.common.constant.*;
 import htcc.common.entity.base.BaseResponse;
 import htcc.common.entity.checkin.CheckInLogEntity;
 import htcc.common.entity.checkin.CheckOutLogEntity;
 import htcc.common.entity.checkin.CheckinModel;
 import htcc.common.entity.checkin.UpdateCheckInStatusModel;
+import htcc.common.entity.icon.NotificationIconConfig;
+import htcc.common.entity.notification.NotificationModel;
 import htcc.common.util.StringUtil;
 import htcc.log.service.entity.jpa.LogCounter;
 import htcc.log.service.repository.CheckInLogRepository;
 import htcc.log.service.repository.LogCounterRepository;
+import htcc.log.service.service.icon.IconService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +32,13 @@ public class CheckInLogController {
 
     @Autowired
     private LogCounterRepository logCounterRepo;
+
+    @Autowired
+    private IconService iconService;
+
+    @Autowired
+    private KafkaProducerService kafka;
+
 
     @GetMapping("/checkin/{companyId}/{username}/{yyyyMMdd}")
     public BaseResponse getCheckInLog(@PathVariable String companyId,
@@ -123,7 +134,8 @@ public class CheckInLogController {
         BaseResponse response = new BaseResponse(ReturnCodeEnum.SUCCESS);
         response.setReturnMessage("Phê duyệt yêu cầu thành công");
         int result = 0;
-
+        String companyId = "";
+        String username = "";
         try {
             CheckinModel oldEnt = repo.getOneCheckInLog(request);
             if (oldEnt == null) {
@@ -139,6 +151,8 @@ public class CheckInLogController {
                 response.setReturnMessage("Yêu cầu phê duyệt đã được xử lý trước đó");
                 return response;
             }
+            companyId = oldEnt.getCompanyId();
+            username = oldEnt.getUsername();
 
             result = repo.updateCheckInStatus(request, oldEnt.getCompanyId());
             if (result != 1) {
@@ -147,6 +161,31 @@ public class CheckInLogController {
         } catch (Exception e){
             log.error(String.format("[updateLeavingRequestStatus] [%s] ex", StringUtil.toJsonString(request)), e);
             response = new BaseResponse<>(e);
+        } finally {
+            if (response.getReturnCode() == ReturnCodeEnum.SUCCESS.getValue()) {
+                NotificationModel model = new NotificationModel();
+                model.setRequestId(LoggingConfiguration.getTraceId());
+                model.setSourceClientId(0);
+                model.setTargetClientId(ClientSystemEnum.MOBILE.getValue());
+                model.setReceiverType(2);
+                model.setSender("Hệ thống");
+                model.setCompanyId(companyId);
+                model.setUsername(username);
+                model.setSendTime(System.currentTimeMillis());
+                int screenId = ScreenEnum.CHECKIN.getValue();
+                model.setScreenId(screenId);
+                NotificationIconConfig icon = iconService.getIcon(screenId);
+                if (icon != null) {
+                    model.setIconId(icon.getIconId());
+                    model.setIconUrl(icon.getIconURL());
+                }
+                model.setStatus(NotificationStatusEnum.INIT.getValue());
+                model.setHasRead(false);
+                model.setTitle("Trạng thái yêu cầu điểm danh");
+                model.setContent("Yêu cầu điểm danh của bạn đã được xử lý. Vào xem ngay thôi");
+
+                kafka.sendMessage(kafka.getBuzConfig().getEventPushNotification().getTopicName(), model);
+            }
         }
 
         return response;
