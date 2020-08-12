@@ -47,7 +47,7 @@ public class UploadImageController {
 
     @PostMapping(value = "/public/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String uploadImage(@RequestParam(name = "image", required = false) MultipartFile image,
-                              HttpServletRequest httpServletRequest) {
+                              HttpServletRequest httpServletRequest) throws Exception {
         long requestTime = System.currentTimeMillis();
         String response = "";
         try {
@@ -57,9 +57,6 @@ public class UploadImageController {
                 throw new Exception("driveService.uploadAvatar return null");
             }
             response = link;
-        } catch (Exception e) {
-            log.error("[uploadImage] ex", e);
-            response = "";
         } finally {
             printRequestLogEntity(httpServletRequest, response, requestTime);
         }
@@ -82,8 +79,8 @@ public class UploadImageController {
         } catch (Exception e) {
             log.warn("printRequestLogEntity ex {}", e.getMessage(), e);
         } finally {
-            log.info(String.format("%s , Total Time : %sms\n",
-                    StringUtil.toJsonString(logEnt), (logEnt.responseTime - logEnt.requestTime)));
+            log.info(String.format("%s , Total Time : %sms, Content-Type : %s\n",
+                    StringUtil.toJsonString(logEnt), (logEnt.responseTime - logEnt.requestTime), request.getContentType()));
         }
     }
 }
